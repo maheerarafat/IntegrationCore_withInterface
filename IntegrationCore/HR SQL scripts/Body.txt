@@ -1,0 +1,454 @@
+CREATE OR REPLACE PACKAGE BODY INTEGRATION IS
+
+    
+  --===============================================================================
+   PROCEDURE UpdateDepartments(SerialNumber varchar2,DepartmentID varchar2,TransactionType varchar2,ChangedColumn varchar2
+                              ,OldValue varchar2,NewValue varchar2,TransactionDate varchar2) IS
+    Counter         number;
+    TarasolClassType number;
+    ParentExisits    number;
+    status           number;
+    DeptUID  char(36);
+  BEGIN
+      select FLDdeptUID into DeptUID from HRdeptSMAP where fldhrdeptid = DepartmentID;
+      if deptuid is not null then
+      Counter         := 0;
+      TarasolClassType := -1;
+      status           := 0;
+
+      select count(*)
+        into Counter
+        from intupdates
+       where FLDServiceName = 'dept'
+         and intupdates.FLDTRANSACTIONID = SerialNumber
+         and intupdates.FLDTRANSACTIONDATE =
+             to_date(replace(TransactionDate, 'T', ' '),
+                     'YYYY-MM-DD HH24:mi:ss')
+         and intupdates.fldstatus = '1';
+
+      if Counter = 0 then
+        select count(*)
+          into Counter
+          from intupdates
+         where fldtransactionid = SerialNumber
+           and FLDTRANSACTIONDATE =
+               to_date(replace(TransactionDate, 'T', ' '),
+                       'YYYY-MM-DD HH24:mi:ss');
+        if Counter = 0 then
+          insert into intupdates
+            (FLDServiceName,
+             FLDObjectID,
+             FLDChangedColumn,
+             FLDTRANSACTIONID,
+             FLDTRANSACTIONDATE,
+             fldtransactiontype,
+             fldOldValue,
+             fldNewValue,
+             fldstatus)
+          VALUES
+            ('dept',
+             DepartmentID,
+             ChangedColumn,
+             SerialNumber,
+             to_date(replace(TransactionDate, 'T', ' '),
+                     'YYYY-MM-DD HH24:mi:ss'),
+             TransactionType,
+             OldValue,
+             NewValue,
+             '0')
+
+          ;
+        end if;
+
+        if ChangedColumn = 'DEPT_NAME_A' then
+
+          update temp_tsdepartment d
+             set fldlname = newvalue
+           where d.flduid = DeptUID;
+          status := 1;
+
+        elsif ChangedColumn = 'DEPT_NAME_E' then
+
+          update temp_tsdepartment d
+             set fldename = newvalue
+          where d.flduid = DeptUID;
+		elsif ChangedColumn = 'DEPT_STATUS' then 
+
+          update temp_tsdepartment d
+             set fldisactive = case when newvalue = 'A' then 1 else 0 end
+          where d.flduid = DeptUID;
+          status := 1;
+		elsif ChangedColumn = 'DEPT_ID' then -- code 
+
+          update temp_tsdepartment d
+             set fldcode = newvalue
+          where d.flduid = DeptUID;
+          status := 1;
+        elsif ChangedColumn = 'DEPT_ID_PARENT' then ----canceled
+
+          select count(flduid)
+            into ParentExisits
+            from temp_tsdepartment
+           where fldcode = newvalue;
+          if ParentExisits > 0 then
+            update temp_tsdepartment d
+               set d.fldparentid = newvalue
+             where d.flduid = DeptUID;
+
+            if TarasolClassType in (1, 2) then
+              update temp_tsdepartment d
+                 set d.fldmainparentid = d.flduid, d.fldismain = 1
+               where d.flduid = DeptUID;
+            elsif TarasolClassType in (3, 4) then
+              update temp_tsdepartment d
+                 set d.fldismain       = 0,
+                     d.fldmainparentid =
+                     (select flduid
+                        from (select flduid, rownum
+                                from temp_tsdepartment
+                               where fldtype in (1, 2)
+                                 and rownum = 1
+                               start with flduid = DeptUID
+                              connect by flduid = prior fldparentid
+                               order by fldtype desc))
+               where d.flduid = deptUID;
+
+            end if;
+            status := 1;
+          end if;
+
+        elsif ChangedColumn = 'DEPT_CLASS_ID' then --canceled
+          TarasolClassType := case
+                                when newvalue in (6, 5) then
+                                 4
+                                when newvalue = 4 then
+                                 3
+                                when newvalue in (2, 3, 9) then
+                                 2
+                                else
+                                 1
+                              end;
+
+          update temp_tsdepartment d
+             set fldtype = TarasolClassType
+           where d.flduid = DeptUID;
+
+          if TarasolClassType in (1, 2) then
+            update temp_tsdepartment d
+               set d.fldmainparentid = d.flduid, d.fldismain = 1
+             where d.flduid = DeptUID;
+          elsif TarasolClassType in (3, 4) then
+            update temp_tsdepartment d
+               set d.fldismain       = 0,
+                   d.fldmainparentid =
+                   (select flduid
+                      from (select flduid, rownum
+                              from temp_tsdepartment
+                             where fldtype in (1, 2)
+                               and rownum = 1
+                             start with flduid = DeptUID
+                            connect by flduid = prior fldparentid
+                             order by fldtype desc))
+             where d.flduid = DeptUID;
+
+          end if;
+          status := 1;
+          --DEPT_STATUS , DEPTSECTOR_ID , WRKPLACE_ID
+        end if;
+
+        update intupdates d
+           set fldstatus = status
+         where d.fldtransactionid = SerialNumber
+           and d.FLDTRANSACTIONDATE =
+               to_date(replace(TransactionDate, 'T', ' '),
+                       'YYYY-MM-DD HH24:mi:ss');
+
+      end if;
+      commit;
+      end if;
+      
+    
+  END;
+  --==================================================================================
+  PROCEDURE UpdateUsers(SerialNumber varchar2,EmployeeID varchar2,TransactionType varchar2,ChangedColumn varchar2
+                              ,OldValue varchar2,NewValue varchar2,TransactionDate varchar2) IS
+    Counter         number;
+    
+    EmpUID char(36);
+    status number;
+  BEGIN
+      select FLDUSERUID into EmpUID from HRUSERSMAP where fldhrempid = EmployeeID; 
+      if EmpUId is not null then 
+        Counter         := 0;
+      
+      status           := 0;
+
+      select count(*)
+        into Counter
+        from intupdates
+       where FLDServiceName = 'users'
+         and intupdates.FLDTRANSACTIONID = SerialNumber
+         and intupdates.FLDTRANSACTIONDATE =
+             to_date(replace(TransactionDate, 'T', ' '),
+                     'YYYY-MM-DD HH24:mi:ss')
+         and intupdates.fldstatus = '1';
+
+      if Counter = 0 then
+        select count(*)
+          into Counter
+          from intupdates
+         where fldtransactionid = SerialNumber
+           and FLDTRANSACTIONDATE =
+               to_date(replace(TransactionDate, 'T', ' '),
+                       'YYYY-MM-DD HH24:mi:ss');
+        if Counter = 0 then
+          insert into intupdates
+            (FLDServiceName,
+             FLDObjectID,
+             FLDChangedColumn,
+             FLDTRANSACTIONID,
+             FLDTRANSACTIONDATE,
+             fldtransactiontype,
+             fldOldValue,
+             fldNewValue,
+             fldstatus)
+          VALUES
+            ('users',
+             EmployeeID,
+             ChangedColumn,
+             SerialNumber,
+             to_date(replace(TransactionDate, 'T', ' '),
+                     'YYYY-MM-DD HH24:mi:ss'),
+             TransactionType,
+             OldValue,
+             NewValue,
+             '0');
+        end if;
+
+        if ChangedColumn = 'EMP_NAME_A' then --canceled
+
+          update tsusers u
+             set fldlocalfirstname = newvalue
+           where u.flduid = EmpUID;
+          status := 1;
+
+        elsif ChangedColumn = 'EMP_NAME_E' then --canceled
+
+          update tsusers u
+             set fldfirstname = newvalue
+           where u.flduid = EmpUID;
+          status := 1;
+        
+        elsif ChangedColumn = 'EMP_STATUS' then
+
+          update tsusers u
+             set u.fldblocked = case when newvalue = 'N' then '1' else '0' end
+           where u.flduid = EmpUID;
+          status := 1;
+        end if;
+
+        update intupdates d
+           set fldstatus = status
+         where d.fldtransactionid = SerialNumber
+           and d.FLDTRANSACTIONDATE =
+               to_date(replace(TransactionDate, 'T', ' '),
+                       'YYYY-MM-DD HH24:mi:ss');
+      end if;
+      end if;    
+      
+
+      commit;
+    
+  END;
+  --==================================================================================
+  Function UpdateUserDepartmentPosition(EmpID varchar2,EmpNumber varchar2,Dept_ID varchar2
+           ,Pos_Name varchar2,SerialNumber varchar2,TransactionDate varchar2,TransactionType varchar2)return varchar2 is
+    DeptUID char(36);
+    PosUID char(36);
+    EmpUID char(36);
+    FResult varchar2(2);
+    Counter number;
+    begin
+      select FLDUSERUID into EmpUID from HRUSERSMAP where fldhrempid = EmpID;
+      if EmpUID is not null then
+       
+        select count(*)
+        into Counter
+        from intupdates
+       where FLDServiceName = 'users'
+         and intupdates.FLDTRANSACTIONID = SerialNumber
+         and intupdates.FLDTRANSACTIONDATE =
+             to_date(replace(TransactionDate, 'T', ' '),
+                     'YYYY-MM-DD HH24:mi:ss')
+         and intupdates.fldstatus = '1';
+
+      if Counter = 0 then
+        select count(*)
+          into Counter
+          from intupdates
+         where fldtransactionid = SerialNumber
+           and FLDTRANSACTIONDATE =
+               to_date(replace(TransactionDate, 'T', ' '),
+                       'YYYY-MM-DD HH24:mi:ss');
+        if Counter = 0 then
+          insert into intupdates
+            (FLDServiceName,
+             FLDObjectID,
+             FLDChangedColumn,
+             FLDTRANSACTIONID,
+             FLDTRANSACTIONDATE,
+             fldtransactiontype,
+             --fldOldValue,
+             fldNewValue,
+             fldstatus)
+          VALUES
+            ('users',
+             EmpID,
+             'Dept,Pos',
+             SerialNumber,
+             to_date(replace(TransactionDate, 'T', ' '),
+                     'YYYY-MM-DD HH24:mi:ss'),
+             TransactionType,
+             --OldValue,
+             EmpID || ',' || Pos_Name,
+             '0');
+        end if;
+      
+        select FLDdeptUID into DeptUID from HRdeptSMAP where fldhrdeptid = Dept_ID;
+       
+       if DeptUID is not null then
+           -- Get position that matchs HR position name and department
+           select dp.flduid into PosUID from tsdepartmentpositions dp where dp.flddepid = DeptUID and dp.fldlpositionname = Pos_name;   -- depends on how we will build position name
+           if PosUID is null then
+              PosUId := generate_uuid(sys_guid()); 
+           end if;
+           -- Add position
+           merge into tsdepartmentpositions  dp
+           using (select DeptUID,Pos_Name,Pos_Name as ename,PosUID,'' from dual) hr
+           on (dp.flduid = hr.PosUID)
+           when not matched then 
+             insert (flddepid,fldlpositionname,fldepositionname,flduid,fldcode) 
+             values (DeptUID,Pos_Name,Pos_Name,PosUID,'');
+           -- Add user to Position
+           merge into tsuserposition up
+           using (select EmpUID,PosUID,generate_uuid(sys_guid()),0 from dual) hr
+           on (up.flduserid = EmpUID and up.fldposid = PosUID)
+           when not matched then
+           insert (flduserid,fldposid,flduid,flddeleted) values (EmpUID,PosUID,generate_uuid(sys_guid()),0);
+           
+           -- Add HR position as default position
+           merge into tsuserdefaultpositions dfp
+           using (select EmpUID,PosUID,generate_uuid(sys_guid()),0 from dual) hr
+           on (dfp.flduuid = EmpUID and dfp.flddefaultposid = PosUID)
+           when not matched then
+           insert (flduuid,flddefaultposid,flduid,fldsecrecylevel) values(EmpUID,PosUID,generate_uuid(sys_guid()),0);-- need to update and discuss later
+           
+           --delete user other default "HR" positions 
+           delete from  tsuserdefaultpositions where flduuid = EmpUID and flddefaultposid <> PosUID;
+           -- block other user positions not from HR
+           update tsuserposition set flddeleted = 1 where flduserid = Empuid and fldposid <> PosUID; -- delete last condition to make all user positions blocked
+
+           FResult := '0';
+       else
+             FResult := '-2';
+       end if;
+       update intupdates d
+           set fldstatus = case when FResult = '0' then 1 else 0 end
+         where d.fldtransactionid = SerialNumber
+           and d.FLDTRANSACTIONDATE =
+               to_date(replace(TransactionDate, 'T', ' '),
+                       'YYYY-MM-DD HH24:mi:ss');
+      end if; 
+      else 
+         FResult := '-1';
+      end if;
+       return FResult;
+    end;
+  --==================================================================================
+  Function UpdateUserRank(EmpID varchar2,EmpNumber varchar2
+           ,Rank varchar2,SerialNumber varchar2,TransactionDate varchar2,TransactionType varchar2)return varchar2 is
+    
+    
+    EmpUID char(36);
+    FResult varchar2(2);
+    Counter number;
+    begin
+      select FLDUSERUID into EmpUID from HRUSERSMAP where fldhrempid = EmpID;
+      if EmpUID is not null then
+       
+        select count(*)
+        into Counter
+        from intupdates
+       where FLDServiceName = 'users'
+         and intupdates.FLDTRANSACTIONID = SerialNumber
+         and intupdates.FLDTRANSACTIONDATE =
+             to_date(replace(TransactionDate, 'T', ' '),
+                     'YYYY-MM-DD HH24:mi:ss')
+         and intupdates.fldstatus = '1';
+
+      if Counter = 0 then
+        select count(*)
+          into Counter
+          from intupdates
+         where fldtransactionid = SerialNumber
+           and FLDTRANSACTIONDATE =
+               to_date(replace(TransactionDate, 'T', ' '),
+                       'YYYY-MM-DD HH24:mi:ss');
+        if Counter = 0 then
+          insert into intupdates
+            (FLDServiceName,
+             FLDObjectID,
+             FLDChangedColumn,
+             FLDTRANSACTIONID,
+             FLDTRANSACTIONDATE,
+             fldtransactiontype,
+             --fldOldValue,
+             fldNewValue,
+             fldstatus)
+          VALUES
+            ('users',
+             EmpID,
+             'Rank',
+             SerialNumber,
+             to_date(replace(TransactionDate, 'T', ' '),
+                     'YYYY-MM-DD HH24:mi:ss'),
+             TransactionType,
+             --OldValue,
+             Rank,
+             '0');
+        end if;
+      
+         update tsusers u
+             set u.fldtitle = Rank ,u.fldlocaltitle =  Rank 
+           where u.flduid = EmpUID;
+          
+       
+       
+       
+       update intupdates d
+           set fldstatus = case when FResult = '0' then 1 else 0 end
+         where d.fldtransactionid = SerialNumber
+           and d.FLDTRANSACTIONDATE =
+               to_date(replace(TransactionDate, 'T', ' '),
+                       'YYYY-MM-DD HH24:mi:ss');
+      end if; 
+      else 
+         FResult := '-1';
+      end if;
+       return FResult;
+    end;
+  --==================================================================================
+  Function GetLastUpdateDate(ServiceName varchar2) return date is
+    lastDate date;
+  begin
+    select max(FLDTRANSACTIONDATE)
+      into lastDate
+      from intupdates
+     where fldservicename = ServiceName
+       and fldstatus = '1';
+    return lastDate;
+  end;
+--==================================================================================
+  
+
+END INTEGRATION;

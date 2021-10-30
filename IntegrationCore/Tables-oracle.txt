@@ -1,0 +1,64 @@
+create table INTDMSSESSIONS
+              (
+                fldsessionid    CHAR(36),
+                flddocuid       CHAR(36),
+                fldpageguid     CHAR(36),
+                flddate         CHAR(14),
+                fldflags        NUMBER,
+                fldinterfaceuid CHAR(36)
+              );
+            alter table INTDMSSESSIONS add constraint PK_INTDMSSESSIONS primary key (FLDINTERFACEUID);
+
+------------------------------------------------------------------------------------------------
+create table INTDEPTLINKS
+(
+  flduid       CHAR(36) not null,
+  fldfromdep   VARCHAR2(50),
+  fldtodep     VARCHAR2(50),
+  flddisablewf NUMBER,
+  fldststus    NUMBER,
+  fldflags     NUMBER
+)
+;
+create unique index INTX_PK on INTDEPTLINKS (FLDUID);
+---------------------------------------------------------------------------
+create table INTFAXRECEIVEHISTORY
+(
+  fldlastid      NUMBER not null,
+  fldreceivedate DATE,
+  fldflags       VARCHAR2(50)
+);
+alter table INTFAXRECEIVEHISTORY  add constraint INTFAXRECEIVEHISTORY_PK primary key (FLDLASTID);
+---------------------------------------------------------------------------
+create table INTHRDEPTSMAP
+(
+  flddeptuid  CHAR(36) not null,
+  fldhrdeptid NUMBER,
+  fldflags    VARCHAR2(256)
+);
+alter table INTHRDEPTSMAP  add constraint INTHRDEPTSMAP_PK primary key (FLDDEPTUID);
+---------------------------------------------------------------------------  
+create table INTHRUSERSMAP
+  (
+    flduseruid CHAR(36) not null,
+    fldhrempid NVARCHAR2(256),
+    fldflags   VARCHAR2(256)
+  )
+  ;
+alter table INTHRUSERSMAP   add constraint INTHRUSERSMAP_PK primary key (FLDUSERUID);
+---------------------------------------------------------------------------     
+create table INTUPDATES
+(
+  fldservicename     VARCHAR2(50),
+  fldobjectid        VARCHAR2(256),
+  fldchangedcolumn   VARCHAR2(256),
+  fldtransactionid   VARCHAR2(256) not null,
+  fldtransactiondate DATE not null,
+  fldtransactiontype CHAR(1),
+  fldoldvalue        VARCHAR2(4000),
+  fldnewvalue        VARCHAR2(4000),
+  fldstatus          CHAR(1),
+  flduid             CHAR(36) not null
+);
+alter table INTUPDATES add constraint INTUPDATES_PK primary key (FLDUID);
+

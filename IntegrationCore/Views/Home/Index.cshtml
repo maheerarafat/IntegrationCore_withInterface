@@ -1,0 +1,115 @@
+﻿@model IntegrationCore.Models.SettingModel
+@{
+    ViewData["Title"] = "Home Page";
+    Layout = null;
+}
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <style type="text/css">
+    </style>
+</head>
+<body>
+    <div id="cover-spin"></div>
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-horizontal" id="LoadUserControl">
+            <h1 style="margin-left:2%;">Tarasol Integration Tool</h1>
+            <hr />
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+
+
+
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.LoginUser,"User Name", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-4">
+                    @Html.EditorFor(model => model.LoginUser, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.LoginUser, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.LoginPassword, "Password", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-4">
+                    @Html.EditorFor(model => model.LoginPassword, new { htmlAttributes = new { @class = "form-control", placeholder = "Password", Type = "password" } })
+                    @Html.ValidationMessageFor(model => model.LoginPassword, "", new { @class = "text-danger password" })
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    @*<button id="Login" value="Login" class="btn btn-default" style="padding-left:50px;padding-right:50px;">Login</button>*@
+                    <input id="Login" value="Login" class="btn btn-default" style="padding-left:50px;padding-right:50px;font-weight:bolder" readonly="readonly" />
+                </div>
+                <div>
+                    <span id="token" style="color:red;font-weight:bolder;padding: 210px;"></span>
+                </div>
+            </div>
+
+        </div>
+    }
+
+    <script src="~/js/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        $(document).ready(function () {
+            $("#LoginPassword").keypress(function (event) {
+                if (event.which == 13) {
+                    $("#Login").click();
+                }
+            });
+            $("#LoginUser").keypress(function (event) {
+                if (event.which == 13) {
+                    $("#Login").click();
+                }
+            });
+        });
+
+        $(function () {
+           
+        $("#Login").click(function () {
+            debugger;
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("GetToken", "Home")' + '?LoginUser=' + $("#LoginUser").val() + '&LoginPassword=' + $("#LoginPassword").val(),
+                //data: JSON.stringify({ "LoginUser": $("#LoginUser").val(), "LoginPassword": $("#LoginPassword").val() }),
+                    contentType: "application/json"
+            }).done(function (data) {
+                debugger;
+                if (data == "invalid user name or password") {
+                    $("#token").text(data);
+                } else {
+                    sessionStorage['token'] = data;
+                    window.location.href = '@Url.Action("Index", "Setting")';
+                    @*$.ajax({
+                    method: 'GET',
+                    url: '@Url.Action("Index", "Setting")',
+                    }).done(function (data) {
+                        $('#LoadUserControl').empty();
+                        $('#LoadUserControl').html(data);
+                    });*@
+                }
+
+                }).error(function (xhdr, statusText, errorText) {
+                    $("#token").text(errorText);
+                });
+            });
+
+
+        });
+    </script>
+
+</body>
+</html>

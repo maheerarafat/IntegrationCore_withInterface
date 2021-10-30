@@ -1,0 +1,15 @@
+CREATE OR REPLACE PACKAGE INTEGRATION iS
+
+  --type VacationList is table of intuservacation%rowtype;
+
+  Function GetLastUpdateDate(ServiceName varchar2) return date;
+  
+  PROCEDURE UpdateDepartments(SerialNumber varchar2,DepartmentID varchar2,TransactionType varchar2,ChangedColumn varchar2
+                              ,OldValue varchar2,NewValue varchar2,TransactionDate varchar2);
+  PROCEDURE UpdateUsers(SerialNumber varchar2,EmployeeID varchar2,TransactionType varchar2,ChangedColumn varchar2
+                              ,OldValue varchar2,NewValue varchar2,TransactionDate varchar2);
+  Function UpdateUserDepartmentPosition(EmpID varchar2,EmpNumber varchar2,Dept_ID varchar2
+           ,Pos_Name varchar2,SerialNumber varchar2,TransactionDate varchar2,TransactionType varchar2)return varchar2;
+  Function UpdateUserRank(EmpID varchar2,EmpNumber varchar2
+           ,Rank varchar2,SerialNumber varchar2,TransactionDate varchar2,TransactionType varchar2)return varchar2;
+END INTEGRATION;

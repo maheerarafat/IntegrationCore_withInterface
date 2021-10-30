@@ -1,0 +1,11 @@
+﻿@{
+    ViewData["Title"] = "DMSInterface";
+}
+
+<iframe name="IntFrame" src='@Url.Action("callDMSInteface",new { InterfaceUID = ViewBag.InterfaceUID, Direction = ViewBag.Direction})' style="width:100%;height: calc(100vh - 25px);">
+    
+</iframe>
+<p id="DMS_URL" style="display:none">@ViewBag.DMS_URL</p>
+
+
+

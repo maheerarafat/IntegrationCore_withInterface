@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+  <wsdl:definitions xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://tempuri.org/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+  <s:schema elementFormDefault="qualified" targetNamespace="http://tempuri.org/">
+  <s:element name="Outgoing">
+  <s:complexType>
+  <s:sequence>
+  <s:element minOccurs="0" maxOccurs="1" name="ToFaxNum" type="s:string" /> 
+  <s:element minOccurs="0" maxOccurs="1" name="Folder" type="s:string" /> 
+  </s:sequence>
+  </s:complexType>
+  </s:element>
+  <s:element name="OutgoingResponse">
+  <s:complexType>
+  <s:sequence>
+  <s:element minOccurs="0" maxOccurs="1" name="OutgoingResult" /> 
+  </s:sequence>
+  </s:complexType>
+  </s:element>
+  <s:element name="FaxStatus">
+  <s:complexType>
+  <s:sequence>
+  <s:element minOccurs="0" maxOccurs="1" name="FaxID" type="s:string" /> 
+  </s:sequence>
+  </s:complexType>
+  </s:element>
+  <s:element name="FaxStatusResponse">
+  <s:complexType>
+  <s:sequence>
+  <s:element minOccurs="0" maxOccurs="1" name="FaxStatusResult" type="s:string" /> 
+  </s:sequence>
+  </s:complexType>
+  </s:element>
+  <s:element name="MultiFaxStatus">
+  <s:complexType>
+  <s:sequence>
+  <s:element minOccurs="0" maxOccurs="1" name="FaxID" type="s:string" /> 
+  </s:sequence>
+  </s:complexType>
+  </s:element>
+  <s:complexType name="ArrayOfString">
+  <s:sequence>
+  <s:element minOccurs="0" maxOccurs="unbounded" name="string" nillable="true" type="s:string" /> 
+  </s:sequence>
+  </s:complexType>
+  <s:element name="MultiFaxStatusResponse">
+  <s:complexType>
+  <s:sequence>
+  <s:element minOccurs="0" maxOccurs="1" name="MultiFaxStatusResult" type="tns:ArrayOfString" /> 
+  </s:sequence>
+  </s:complexType>
+  </s:element>
+  <s:element name="anyType" nillable="true" /> 
+  <s:element name="string" nillable="true" type="s:string" /> 
+  <s:element name="ArrayOfString" nillable="true" type="tns:ArrayOfString" /> 
+  </s:schema>
+  </wsdl:types>
+  <wsdl:message name="OutgoingSoapIn">
+  <wsdl:part name="parameters" element="tns:Outgoing" /> 
+  </wsdl:message>
+  <wsdl:message name="OutgoingSoapOut">
+  <wsdl:part name="parameters" element="tns:OutgoingResponse" /> 
+  </wsdl:message>
+  <wsdl:message name="FaxStatusSoapIn">
+  <wsdl:part name="parameters" element="tns:FaxStatus" /> 
+  </wsdl:message>
+  <wsdl:message name="FaxStatusSoapOut">
+  <wsdl:part name="parameters" element="tns:FaxStatusResponse" /> 
+  </wsdl:message>
+  <wsdl:message name="MultiFaxStatusSoapIn">
+  <wsdl:part name="parameters" element="tns:MultiFaxStatus" /> 
+  </wsdl:message>
+  <wsdl:message name="MultiFaxStatusSoapOut">
+  <wsdl:part name="parameters" element="tns:MultiFaxStatusResponse" /> 
+  </wsdl:message>
+  <wsdl:message name="OutgoingHttpGetIn">
+  <wsdl:part name="ToFaxNum" type="s:string" /> 
+  <wsdl:part name="Folder" type="s:string" /> 
+  </wsdl:message>
+  <wsdl:message name="OutgoingHttpGetOut">
+  <wsdl:part name="Body" element="tns:anyType" /> 
+  </wsdl:message>
+  <wsdl:message name="FaxStatusHttpGetIn">
+  <wsdl:part name="FaxID" type="s:string" /> 
+  </wsdl:message>
+  <wsdl:message name="FaxStatusHttpGetOut">
+  <wsdl:part name="Body" element="tns:string" /> 
+  </wsdl:message>
+  <wsdl:message name="MultiFaxStatusHttpGetIn">
+  <wsdl:part name="FaxID" type="s:string" /> 
+  </wsdl:message>
+  <wsdl:message name="MultiFaxStatusHttpGetOut">
+  <wsdl:part name="Body" element="tns:ArrayOfString" /> 
+  </wsdl:message>
+  <wsdl:message name="OutgoingHttpPostIn">
+  <wsdl:part name="ToFaxNum" type="s:string" /> 
+  <wsdl:part name="Folder" type="s:string" /> 
+  </wsdl:message>
+  <wsdl:message name="OutgoingHttpPostOut">
+  <wsdl:part name="Body" element="tns:anyType" /> 
+  </wsdl:message>
+  <wsdl:message name="FaxStatusHttpPostIn">
+  <wsdl:part name="FaxID" type="s:string" /> 
+  </wsdl:message>
+  <wsdl:message name="FaxStatusHttpPostOut">
+  <wsdl:part name="Body" element="tns:string" /> 
+  </wsdl:message>
+  <wsdl:message name="MultiFaxStatusHttpPostIn">
+  <wsdl:part name="FaxID" type="s:string" /> 
+  </wsdl:message>
+  <wsdl:message name="MultiFaxStatusHttpPostOut">
+  <wsdl:part name="Body" element="tns:ArrayOfString" /> 
+  </wsdl:message>
+  <wsdl:portType name="ServiceSoap">
+  <wsdl:operation name="Outgoing">
+  <wsdl:input message="tns:OutgoingSoapIn" /> 
+  <wsdl:output message="tns:OutgoingSoapOut" /> 
+  </wsdl:operation>
+  <wsdl:operation name="FaxStatus">
+  <wsdl:input message="tns:FaxStatusSoapIn" /> 
+  <wsdl:output message="tns:FaxStatusSoapOut" /> 
+  </wsdl:operation>
+  <wsdl:operation name="MultiFaxStatus">
+  <wsdl:input message="tns:MultiFaxStatusSoapIn" /> 
+  <wsdl:output message="tns:MultiFaxStatusSoapOut" /> 
+  </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="ServiceHttpGet">
+  <wsdl:operation name="Outgoing">
+  <wsdl:input message="tns:OutgoingHttpGetIn" /> 
+  <wsdl:output message="tns:OutgoingHttpGetOut" /> 
+  </wsdl:operation>
+  <wsdl:operation name="FaxStatus">
+  <wsdl:input message="tns:FaxStatusHttpGetIn" /> 
+  <wsdl:output message="tns:FaxStatusHttpGetOut" /> 
+  </wsdl:operation>
+  <wsdl:operation name="MultiFaxStatus">
+  <wsdl:input message="tns:MultiFaxStatusHttpGetIn" /> 
+  <wsdl:output message="tns:MultiFaxStatusHttpGetOut" /> 
+  </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="ServiceHttpPost">
+  <wsdl:operation name="Outgoing">
+  <wsdl:input message="tns:OutgoingHttpPostIn" /> 
+  <wsdl:output message="tns:OutgoingHttpPostOut" /> 
+  </wsdl:operation>
+  <wsdl:operation name="FaxStatus">
+  <wsdl:input message="tns:FaxStatusHttpPostIn" /> 
+  <wsdl:output message="tns:FaxStatusHttpPostOut" /> 
+  </wsdl:operation>
+  <wsdl:operation name="MultiFaxStatus">
+  <wsdl:input message="tns:MultiFaxStatusHttpPostIn" /> 
+  <wsdl:output message="tns:MultiFaxStatusHttpPostOut" /> 
+  </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="ServiceSoap" type="tns:ServiceSoap">
+  <soap:binding transport="http://schemas.xmlsoap.org/soap/http" /> 
+  <wsdl:operation name="Outgoing">
+  <soap:operation soapAction="http://tempuri.org/Outgoing" style="document" /> 
+  <wsdl:input>
+  <soap:body use="literal" /> 
+  </wsdl:input>
+  <wsdl:output>
+  <soap:body use="literal" /> 
+  </wsdl:output>
+  </wsdl:operation>
+  <wsdl:operation name="FaxStatus">
+  <soap:operation soapAction="http://tempuri.org/FaxStatus" style="document" /> 
+  <wsdl:input>
+  <soap:body use="literal" /> 
+  </wsdl:input>
+  <wsdl:output>
+  <soap:body use="literal" /> 
+  </wsdl:output>
+  </wsdl:operation>
+  <wsdl:operation name="MultiFaxStatus">
+  <soap:operation soapAction="http://tempuri.org/MultiFaxStatus" style="document" /> 
+  <wsdl:input>
+  <soap:body use="literal" /> 
+  </wsdl:input>
+  <wsdl:output>
+  <soap:body use="literal" /> 
+  </wsdl:output>
+  </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="ServiceSoap12" type="tns:ServiceSoap">
+  <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" /> 
+  <wsdl:operation name="Outgoing">
+  <soap12:operation soapAction="http://tempuri.org/Outgoing" style="document" /> 
+  <wsdl:input>
+  <soap12:body use="literal" /> 
+  </wsdl:input>
+  <wsdl:output>
+  <soap12:body use="literal" /> 
+  </wsdl:output>
+  </wsdl:operation>
+  <wsdl:operation name="FaxStatus">
+  <soap12:operation soapAction="http://tempuri.org/FaxStatus" style="document" /> 
+  <wsdl:input>
+  <soap12:body use="literal" /> 
+  </wsdl:input>
+  <wsdl:output>
+  <soap12:body use="literal" /> 
+  </wsdl:output>
+  </wsdl:operation>
+  <wsdl:operation name="MultiFaxStatus">
+  <soap12:operation soapAction="http://tempuri.org/MultiFaxStatus" style="document" /> 
+  <wsdl:input>
+  <soap12:body use="literal" /> 
+  </wsdl:input>
+  <wsdl:output>
+  <soap12:body use="literal" /> 
+  </wsdl:output>
+  </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="ServiceHttpGet" type="tns:ServiceHttpGet">
+  <http:binding verb="GET" /> 
+  <wsdl:operation name="Outgoing">
+  <http:operation location="/Outgoing" /> 
+  <wsdl:input>
+  <http:urlEncoded /> 
+  </wsdl:input>
+  <wsdl:output>
+  <mime:mimeXml part="Body" /> 
+  </wsdl:output>
+  </wsdl:operation>
+  <wsdl:operation name="FaxStatus">
+  <http:operation location="/FaxStatus" /> 
+  <wsdl:input>
+  <http:urlEncoded /> 
+  </wsdl:input>
+  <wsdl:output>
+  <mime:mimeXml part="Body" /> 
+  </wsdl:output>
+  </wsdl:operation>
+  <wsdl:operation name="MultiFaxStatus">
+  <http:operation location="/MultiFaxStatus" /> 
+  <wsdl:input>
+  <http:urlEncoded /> 
+  </wsdl:input>
+  <wsdl:output>
+  <mime:mimeXml part="Body" /> 
+  </wsdl:output>
+  </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="ServiceHttpPost" type="tns:ServiceHttpPost">
+  <http:binding verb="POST" /> 
+  <wsdl:operation name="Outgoing">
+  <http:operation location="/Outgoing" /> 
+  <wsdl:input>
+  <mime:content type="application/x-www-form-urlencoded" /> 
+  </wsdl:input>
+  <wsdl:output>
+  <mime:mimeXml part="Body" /> 
+  </wsdl:output>
+  </wsdl:operation>
+  <wsdl:operation name="FaxStatus">
+  <http:operation location="/FaxStatus" /> 
+  <wsdl:input>
+  <mime:content type="application/x-www-form-urlencoded" /> 
+  </wsdl:input>
+  <wsdl:output>
+  <mime:mimeXml part="Body" /> 
+  </wsdl:output>
+  </wsdl:operation>
+  <wsdl:operation name="MultiFaxStatus">
+  <http:operation location="/MultiFaxStatus" /> 
+  <wsdl:input>
+  <mime:content type="application/x-www-form-urlencoded" /> 
+  </wsdl:input>
+  <wsdl:output>
+  <mime:mimeXml part="Body" /> 
+  </wsdl:output>
+  </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="Service">
+  <wsdl:port name="ServiceSoap" binding="tns:ServiceSoap">
+  <soap:address location="http://172.17.1.123/Rfwebservice/ECS.asmx" /> 
+  </wsdl:port>
+  <wsdl:port name="ServiceSoap12" binding="tns:ServiceSoap12">
+  <soap12:address location="http://172.17.1.123/Rfwebservice/ECS.asmx" /> 
+  </wsdl:port>
+  <wsdl:port name="ServiceHttpGet" binding="tns:ServiceHttpGet">
+  <http:address location="http://172.17.1.123/Rfwebservice/ECS.asmx" /> 
+  </wsdl:port>
+  <wsdl:port name="ServiceHttpPost" binding="tns:ServiceHttpPost">
+  <http:address location="http://172.17.1.123/Rfwebservice/ECS.asmx" /> 
+  </wsdl:port>
+  </wsdl:service>
+  </wsdl:definitions>

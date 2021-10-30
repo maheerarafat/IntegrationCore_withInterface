@@ -1,0 +1,637 @@
+﻿.route-container {
+    font-size: 1rem;
+    text-shadow: none;
+    line-height: 1.5;
+}
+
+.route-row-center {
+    display: inline-block;
+}
+
+.route-row:nth-child(odd) {
+    direction: ltr;
+    text-align: left;
+}
+
+.route-row:nth-child(even) {
+    direction: rtl;
+    text-align: right;
+}
+
+.route-row:nth-child(odd) .route-state-cell {
+    float: left;
+    width: 150px;
+    height: 160px; 
+}
+
+.route-row:nth-child(even) .route-state-cell {
+    float: right;
+    width: 150px;
+    height: 160px;
+}
+
+.route-row:nth-child(odd) .route-arrow-cell {
+    float: right;
+    width: 100px;
+    height: 150px;
+}
+
+.route-row:nth-child(even) .route-arrow-cell {
+    float: left;
+    width: 100px;
+    height: 150px;
+}
+
+.route-row:nth-child(odd) .route-arrow-image {
+    margin: 80% 10px 0;
+    text-align: right;
+}
+
+.route-row:nth-child(even) .route-arrow-image {
+    margin: 80% 10px 0;
+    text-align: left;
+}
+
+.route-row:nth-child(odd) .arrow-head {
+    border-left: 30px solid #d1d5d8;
+    margin-left: 100%
+}
+
+.route-row:nth-child(even) .arrow-head {
+    border-right: 30px solid #d1d5d8;
+    margin-right: 100%
+}
+
+.route-row:nth-child(odd) .route-user-arrow-container:last-child .arrow-last-container {
+    display: block;
+}
+
+.route-row:nth-child(even) .route-user-arrow-container:last-child .arrow-last-container {
+    display: block;
+}
+
+.route-row:nth-child(odd) .route-user-arrow-container:last-child .arrow-tail {
+    border-top-right-radius: 10px !important;
+}
+
+.route-row:nth-child(even) .route-user-arrow-container:last-child .arrow-tail {
+    border-top-left-radius: 10px !important;
+}
+
+.route-user-arrow-container:last-child .arrow-head {
+    display: none;
+}
+
+.route-row:nth-child(odd) .route-user-arrow-container:last-child .arrow-last-head {
+    margin-left: 69%;
+}
+
+.route-row:nth-child(even) .route-user-arrow-container:last-child .arrow-last-head {
+    margin-right: 69%;
+}
+
+.route-user-container {
+    position: relative;
+    text-align: center;
+}
+
+body[dir=ltr] .route-user-name,
+body[dir=ltr] .route-user-name-2,
+body[dir=ltr] .arrow-tail {
+    direction: ltr;
+}
+
+body[dir=rtl] .route-user-name,
+body[dir=rtl] .route-user-name-2,
+body[dir=rtl] .arrow-tail {
+    direction: rtl;
+}
+
+.route-user-name {
+    margin: .5em 1em;
+    position: absolute;
+    top: -3em;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+}
+
+.route-user-name-2 {
+    position: absolute;
+    top: -1.5em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    white-space: nowrap;
+}
+
+.route-user-image {
+    text-align: center;
+    margin-top: 25%;
+}
+
+.route-transaction-image {
+    text-align: center;
+}
+
+.route-user-arrow-container {
+    position: relative;
+    display: inline-block;
+}
+
+.route-arrow-date {
+    text-align: center;
+    font-size: 0.833rem;
+    display: inline-block;
+}
+
+.route-transaction-state-image {
+    position: absolute;
+    top: 0;
+    margin: .5em;
+}
+
+.route-arrow-container {
+    position: relative;
+}
+
+.route-user-arrow-container:not(:last-child) .route-arrow-container {
+    text-align: center;
+}
+
+.route-state-rect {
+    width: 64px;
+    background-color: #e14938;
+    color: white;
+    border-radius: 3px;
+    display: inline-block;
+    padding: 3px 6px;
+    text-align: center;
+    font-size: 0.833rem;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.transition-arrow {
+    height: 32px;
+    position: relative;
+    top: 30%;
+    margin-top: -10px;
+}
+
+.route-row:nth-child(odd) .arrow-tail {
+    background: -webkit-linear-gradient(270deg, #d1d5d8, #a1a5a8);
+    background: -moz-linear-gradient(270deg, #d1d5d8, #a1a5a8);
+    background: -o-linear-gradient(270deg, #d1d5d8, #a1a5a8);
+    background: linear-gradient(270deg, #d1d5d8, #a1a5a8);
+}
+
+.route-row:nth-child(even) .arrow-tail {
+    background: -webkit-linear-gradient(90deg, #d1d5d8, #a1a5a8);
+    background: -moz-linear-gradient(90deg, #d1d5d8, #a1a5a8);
+    background: -o-linear-gradient(90deg, #d1d5d8, #a1a5a8);
+    background: linear-gradient(90deg, #d1d5d8, #a1a5a8);
+}
+
+.arrow-tail {
+    height: 18px;
+    width: 100%;
+    float: left;
+    position: relative;
+    top: 18% !important;
+    font-size: 0.833rem;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    /*animation: arrow-move 3s ease infinite;*/
+}
+
+.arrow-head {
+    width: 0;
+    height: 0;
+    border-top: 16px solid transparent !important;
+    border-bottom: 16px solid transparent !important;
+}
+
+.arrow-last-container {
+    display: none;
+}
+
+.arrow-last-tail {
+    background: #d1d5d8;
+    width: 18px;
+    height: 20px;
+    display: inline-block;
+}
+
+.arrow-last-head {
+    border-top: 30px solid #d1d5d8;
+    border-right: 16px solid transparent !important;
+    border-left: 16px solid transparent !important;
+    margin-top: -3px;
+}
+
+.route-row:nth-child(odd) .route-arrow-cell .Creation .arrow-tail,
+.route-row:nth-child(odd) .route-state-cell .Creation .route-state-rect {
+    text-align: center;
+    color: #fff;
+    padding: 2% 0;
+    top: 22%;
+    border-radius: 2px 0 0 2px;
+    background: -webkit-linear-gradient(270deg, #f14938, #b11908);
+    background: -moz-linear-gradient(270deg, #f14938, #b11908);
+    background: -o-linear-gradient(270deg, #f14938, #b11908);
+    background: linear-gradient(270deg, #f14938, #b11908);
+}
+
+.route-row:nth-child(even) .route-arrow-cell  .arrow-tail,
+.route-row:nth-child(even) .route-state-cell .Creation .route-state-rect {
+    text-align: center;
+    color: #fff;
+    padding: 2% 0;
+    top: 22%;
+    border-radius: 0 2px 2px 0;
+    background: -webkit-linear-gradient(90deg, #f14938, #b11908);
+    background: -moz-linear-gradient(90deg, #f14938, #b11908);
+    background: -o-linear-gradient(90deg, #f14938, #b11908);
+    background: linear-gradient(90deg, #f14938, #b11908);
+}
+
+.route-row .Creation .arrow-head,
+.route-row .Creation .arrow-last-head {
+    border-color: #f14938;
+}
+
+.route-arrow-cell .Creation .arrow-last-tail {
+    background: #f14938;
+}
+
+.route-row:nth-child(odd) .route-arrow-cell .Finish .arrow-tail,
+.route-row:nth-child(odd) .route-state-cell .Finish .route-state-rect {
+    text-align: center;
+    color: #fff;
+    padding: 2% 0;
+    top: 22%;
+    border-radius: 2px 0 0 2px;
+    background: -webkit-linear-gradient(270deg, #1182d6, #0152a6);
+    background: -moz-linear-gradient(270deg, #1182d6, #0152a6);
+    background: -o-linear-gradient(270deg, #1182d6, #0152a6);
+    background: linear-gradient(270deg, #1182d6, #0152a6);
+}
+
+.route-row:nth-child(even) .route-arrow-cell .Finish .arrow-tail,
+.route-row:nth-child(even) .route-state-cell .Finish .route-state-rect {
+    text-align: center;
+    color: #fff;
+    padding: 2% 0;
+    top: 22%;
+    border-radius: 0 2px 2px 0;
+    background: -webkit-linear-gradient(90deg, #1182d6, #0152a6);
+    background: -moz-linear-gradient(90deg, #1182d6, #0152a6);
+    background: -o-linear-gradient(90deg, #1182d6, #0152a6);
+    background: linear-gradient(90deg, #1182d6, #0152a6);
+}
+
+.route-row .Finish .arrow-head,
+.route-row .Finish .arrow-last-head {
+    border-color: #1182d6;
+}
+
+.route-arrow-cell .Finish .arrow-last-tail {
+    background: #1182d6;
+}
+
+.route-row:nth-child(odd) .route-arrow-cell .Forward .arrow-tail {
+    text-align: center;
+    color: #fff;
+    padding: 2% 0;
+    top: 22%;
+    border-radius: 2px 0 0 2px;
+    background: -webkit-linear-gradient(270deg, #9365b8, #402275);
+    background: -moz-linear-gradient(270deg, #9365b8, #402275);
+    background: -o-linear-gradient(270deg, #9365b8, #402275);
+    background: linear-gradient(270deg, #9365b8, #402275);
+}
+
+.route-row:nth-child(even) .route-arrow-cell .Forward .arrow-tail {
+    text-align: center;
+    color: #fff;
+    padding: 2% 0;
+    top: 22%;
+    border-radius: 0 2px 2px 0;
+    background: -webkit-linear-gradient(90deg, #9365b8, #402275);
+    background: -moz-linear-gradient(90deg, #9365b8, #402275);
+    background: -o-linear-gradient(90deg, #9365b8, #402275);
+    background: linear-gradient(90deg, #9365b8, #402275);
+}
+
+.route-row .Forward .arrow-head,
+.route-row .Forward .arrow-last-head {
+    border-color: #9365b8;
+}
+
+.route-arrow-cell .Forward .arrow-last-tail {
+    background: #9365b8;
+}
+
+.route-row:nth-child(odd) .route-arrow-cell .Forward.multi .arrow-tail {
+    text-align: center;
+    color: #fff;
+    padding: 2% 0;
+    top: 22%;
+    border-radius: 2px 0 0 2px;
+    background: -webkit-linear-gradient(270deg, #018c8c, #015c5c);
+    background: -moz-linear-gradient(270deg, #018c8c, #015c5c);
+    background: -o-linear-gradient(270deg, #018c8c, #015c5c);
+    background: linear-gradient(270deg, #018c8c, #015c5c);
+}
+
+.route-row:nth-child(even) .route-arrow-cell .Forward.multi .arrow-tail {
+    text-align: center;
+    color: #fff;
+    padding: 2% 0;
+    top: 22%;
+    border-radius: 0 2px 2px 0;
+    background: -webkit-linear-gradient(90deg, #018c8c, #015c5c);
+    background: -moz-linear-gradient(90deg, #018c8c, #015c5c);
+    background: -o-linear-gradient(90deg, #018c8c, #015c5c);
+    background: linear-gradient(90deg, #018c8c, #015c5c);
+}
+
+.route-row .Forward.multi .arrow-head,
+.route-row .Forward.multi .arrow-last-head {
+    border-color: #018c8c;
+}
+
+.route-arrow-cell .Forward.multi .arrow-last-tail {
+    background: #018c8c;
+}
+
+.route-row:nth-child(odd) .route-arrow-cell .Approve_Forward .arrow-tail {
+    text-align: center;
+    color: #fff;
+    padding: 2% 0;
+    top: 22%;
+    border-radius: 2px 0 0 2px;
+    background: -webkit-linear-gradient(270deg, #65b882, #157832);
+    background: -moz-linear-gradient(270deg, #65b882, #157832);
+    background: -o-linear-gradient(270deg, #65b882, #157832);
+    background: linear-gradient(270deg, #65b882, #157832);
+}
+
+.route-row:nth-child(even) .route-arrow-cell .Approve_Forward .arrow-tail {
+    text-align: center;
+    color: #fff;
+    padding: 2% 0;
+    top: 22%;
+    border-radius: 0 2px 2px 0;
+    background: -webkit-linear-gradient(90deg, #65b882, #157832);
+    background: -moz-linear-gradient(90deg, #65b882, #157832);
+    background: -o-linear-gradient(90deg, #65b882, #157832);
+    background: linear-gradient(90deg, #65b882, #157832);
+}
+
+.route-row .Approve_Forward .arrow-head,
+.route-row .Approve_Forward .arrow-last-head {
+    border-color: #65b882;
+}
+
+.route-arrow-cell .Approve_Forward .arrow-last-tail {
+    background: #65b882;
+}
+
+.route-row:nth-child(odd) .route-arrow-cell .AutoGenerateCorrrespondence .arrow-tail {
+    text-align: center;
+    color: #fff;
+    padding: 2% 0;
+    top: 22%;
+    border-radius: 2px 0 0 2px;
+    background: -webkit-linear-gradient(270deg, #65b882, #157832);
+    background: -moz-linear-gradient(270deg, #65b882, #157832);
+    background: -o-linear-gradient(270deg, #65b882, #157832);
+    background: linear-gradient(270deg, #65b882, #157832);
+}
+
+.route-row:nth-child(even) .route-arrow-cell .AutoGenerateCorrrespondence .arrow-tail {
+    text-align: center;
+    color: #fff;
+    padding: 2% 0;
+    top: 22%;
+    border-radius: 0 2px 2px 0;
+    background: -webkit-linear-gradient(90deg, #65b882, #157832);
+    background: -moz-linear-gradient(90deg, #65b882, #157832);
+    background: -o-linear-gradient(90deg, #65b882, #157832);
+    background: linear-gradient(90deg, #65b882, #157832);
+}
+
+.route-row .AutoGenerateCorrrespondence .arrow-head,
+.route-row .AutoGenerateCorrrespondence .arrow-last-head {
+    border-color: #65b882;
+}
+
+.route-arrow-cell .AutoGenerateCorrrespondence .arrow-last-tail {
+    background: #65b882;
+}
+
+.route-row:nth-child(odd) .route-arrow-cell .Escalate .arrow-tail,
+.route-row:nth-child(odd) .route-arrow-cell .BackFromEscalate .arrow-tail {
+    text-align: center;
+    color: #fff;
+    padding: 2% 0;
+    top: 22%;
+    border-radius: 2px 0 0 2px;
+    background: -webkit-linear-gradient(270deg, #ff7f27, #af2f07);
+    background: -moz-linear-gradient(270deg, #ff7f27, #af2f07);
+    background: -o-linear-gradient(270deg, #ff7f27, #af2f07);
+    background: linear-gradient(270deg, #ff7f27, #af2f07);
+}
+
+.route-row:nth-child(even) .route-arrow-cell .Escalate .arrow-tail,
+.route-row:nth-child(even) .route-arrow-cell .BackFromEscalate .arrow-tail {
+    text-align: center;
+    color: #fff;
+    padding: 2% 0;
+    top: 22%;
+    border-radius: 0 2px 2px 0;
+    background: -webkit-linear-gradient(90deg, #ff7f27, #af2f07);
+    background: -moz-linear-gradient(90deg, #ff7f27, #af2f07);
+    background: -o-linear-gradient(90deg, #ff7f27, #af2f07);
+    background: linear-gradient(90deg, #ff7f27, #af2f07);
+}
+
+.route-row .Escalate .arrow-head,
+.route-row .Escalate .arrow-last-head,
+.route-row .BackFromEscalate .arrow-head,
+.route-row .BackFromEscalate .arrow-last-head {
+    border-color: #ff7f27;
+}
+
+.route-arrow-cell .Escalate .arrow-last-tail,
+.route-arrow-cell .BackFromEscalate .arrow-last-tail {
+    background: #ff7f27;
+}
+
+.route-row:nth-child(odd) .route-arrow-cell .Shared_forward .arrow-tail,
+.route-row:nth-child(odd) .route-arrow-cell .Shared_Create .arrow-tail {
+    text-align: center;
+    color: #fff;
+    padding: 2% 0;
+    top: 22%;
+    border-radius: 2px 0 0 2px;
+    background: -webkit-linear-gradient(270deg, #a30a0a, #730a0a);
+    background: -moz-linear-gradient(270deg, #a30a0a, #730a0a);
+    background: -o-linear-gradient(270deg, #a30a0a, #730a0a);
+    background: linear-gradient(270deg, #a30a0a, #730a0a);
+}
+
+.route-row:nth-child(even) .route-arrow-cell .Shared_forward .arrow-tail,
+.route-row:nth-child(even) .route-arrow-cell .Shared_Create .arrow-tail {
+    text-align: center;
+    color: #fff;
+    padding: 2% 0;
+    top: 22%;
+    border-radius: 0 2px 2px 0;
+    background: -webkit-linear-gradient(90deg, #a30a0a, #730a0a);
+    background: -moz-linear-gradient(90deg, #a30a0a, #730a0a);
+    background: -o-linear-gradient(90deg, #a30a0a, #730a0a);
+    background: linear-gradient(90deg, #a30a0a, #730a0a);
+}
+
+.route-row .Shared_forward .arrow-head,
+.route-row .Shared_forward .arrow-last-head,
+.route-row .Shared_Create .arrow-head,
+.route-row .Shared_Create .arrow-last-head {
+    border-color: #a30a0a;
+}
+
+.route-arrow-cell .Shared_forward .arrow-last-tail,
+.route-arrow-cell .Shared_Create .arrow-last-tail {
+    background: #a30a0a;
+}
+
+.route-row:nth-child(odd) .route-arrow-cell .ForceAssign .arrow-tail,
+.route-row:nth-child(odd) .route-arrow-cell .MoveToNextStep .arrow-tail {
+    text-align: center;
+    color: #fff;
+    padding: 2% 0;
+    top: 22%;
+    border-radius: 2px 0 0 2px;
+    background: -webkit-linear-gradient(270deg, #5de9c9, #2db999);
+    background: -moz-linear-gradient(270deg, #5de9c9, #2db999);
+    background: -o-linear-gradient(270deg, #5de9c9, #2db999);
+    background: linear-gradient(270deg, #5de9c9, #2db999);
+}
+
+.route-row:nth-child(even) .route-arrow-cell .ForceAssign .arrow-tail,
+.route-row:nth-child(even) .route-arrow-cell .MoveToNextStep .arrow-tail {
+    text-align: center;
+    color: #fff;
+    padding: 2% 0;
+    top: 22%;
+    border-radius: 0 2px 2px 0;
+    background: -webkit-linear-gradient(90deg, #5de9c9, #2db999);
+    background: -moz-linear-gradient(90deg, #5de9c9, #2db999);
+    background: -o-linear-gradient(90deg, #5de9c9, #2db999);
+    background: linear-gradient(90deg, #5de9c9, #2db999);
+}
+
+.route-row .ForceAssign .arrow-head,
+.route-row .ForceAssign .arrow-last-head,
+.route-row .MoveToNextStep .arrow-head,
+.route-row .MoveToNextStep .arrow-last-head {
+    border-color: #5de9c9;
+}
+
+.route-arrow-cell .ForceAssign .arrow-last-tail,
+.route-arrow-cell .MoveToNextStep .arrow-last-tail {
+    background: #5de9c9;
+}
+
+
+.route-row:nth-child(odd) .route-arrow-cell .AutoForward .arrow-tail {
+    text-align: center;
+    color: #fff;
+    padding: 2% 0;
+    top: 22%;
+    border-radius: 2px 0 0 2px;
+    background: -webkit-linear-gradient(270deg, #FFC430, #EAB12C);
+    background: -moz-linear-gradient(270deg, #FFC430, #EAB12C);
+    background: -o-linear-gradient(270deg, #FFC430, #EAB12C);
+    background: linear-gradient(270deg, #FFC430, #EAB12C);
+}
+
+.route-row:nth-child(even) .route-arrow-cell .AutoForward .arrow-tail {
+    text-align: center;
+    color: #fff;
+    padding: 2% 0;
+    top: 22%;
+    border-radius: 0 2px 2px 0;
+    background: -webkit-linear-gradient(90deg, #FFC430, #EAB12C);
+    background: -moz-linear-gradient(90deg, #FFC430, #EAB12C);
+    background: -o-linear-gradient(90deg, #FFC430, #EAB12C);
+    background: linear-gradient(90deg, #FFC430, #EAB12C);
+}
+
+.route-row .AutoForward .arrow-head,
+.route-row .AutoForward .arrow-last-head {
+    border-color: #FFC430;
+}
+
+.route-arrow-cell .AutoForward .arrow-last-tail {
+    background: #FFC430;
+}
+
+.route-row:nth-child(odd) .route-arrow-cell .Recall .arrow-tail {
+    text-align: center;
+    color: #fff;
+    padding: 2% 0;
+    top: 22%;
+    border-radius: 2px 0 0 2px;
+    background: -webkit-linear-gradient(270deg, #05e3f5, #05a3b5);
+    background: -moz-linear-gradient(270deg, #05e3f5, #05a3b5);
+    background: -o-linear-gradient(270deg, #05e3f5, #05a3b5);
+    background: linear-gradient(270deg, #05e3f5, #05a3b5);
+}
+
+.route-row:nth-child(even) .route-arrow-cell .Recall .arrow-tail {
+    text-align: center;
+    color: #fff;
+    padding: 2% 0;
+    top: 22%;
+    border-radius: 0 2px 2px 0;
+    background: -webkit-linear-gradient(90deg, #05e3f5, #05a3b5);
+    background: -moz-linear-gradient(90deg, #05e3f5, #05a3b5);
+    background: -o-linear-gradient(90deg, #05e3f5, #05a3b5);
+    background: linear-gradient(90deg, #05e3f5, #05a3b5);
+}
+
+.route-row .Recall .arrow-head,
+.route-row .Recall .arrow-last-head {
+    border-color: #05e3f5;
+}
+
+.route-arrow-cell .Recall .arrow-last-tail {
+    background: #05e3f5;
+}
+
+.route-container hr {
+    width: 75%;
+    border: 1px dashed #a69;
+}
+
+@keyframes arrow-move {
+    0% {
+        background-position: 50% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 5% 50%;
+    }
+}

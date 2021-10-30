@@ -1,0 +1,11 @@
+ul{ list-style-type: none; }
+.single-view { text-align: left; }
+.owl-pagination { display: none; visibility: hidden; }
+.owlnav { text-align: right; padding-bottom: 10px; padding-top: 10px}
+.owlnav-container { background-color: #ccc; }
+.controls-container { text-align: left; padding-bottom: 10px; padding-top: 10px; }
+.name-container { text-align: center; padding-bottom: 10px; padding-top: 10px; }
+
+.call-result-label, .call-result-details, .client-created-details, .mod-label, .mod-details, .phone-details, .phone-label { font-size: 12pt; }
+
+.prospect-information > tbody > tr > td { padding-right: 12px; padding-top: 10px; padding-bottom: 10px; font-size: 12pt;}

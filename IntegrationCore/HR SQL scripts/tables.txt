@@ -1,0 +1,323 @@
+-- Create table
+create table INTDEPARTMENTSUPDATES
+(
+  fldtransactionserial INTEGER not null,
+  fldtransactiondate   DATE not null,
+  flddepartmentid      VARCHAR2(100),
+  fldtransactiontype   CHAR(1),
+  fldchangedcolumn     VARCHAR2(100),
+  fldoldvalue          VARCHAR2(4000),
+  fldnewvalue          VARCHAR2(4000),
+  fldnotes             VARCHAR2(4000),
+  fldisdone            INTEGER
+)
+tablespace MOIECS_DATA
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+-- Create/Recreate indexes 
+create index INTDEPARTMENTSUPDATESS_DONE on INTDEPARTMENTSUPDATES (FLDISDONE)
+  tablespace MOIECS_DATA
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+-- Create/Recreate primary, unique and foreign key constraints 
+alter table INTDEPARTMENTSUPDATES
+  add constraint INTDEPARTMENTSUPDATESS_PK primary key (FLDTRANSACTIONSERIAL, FLDTRANSACTIONDATE)
+  using index 
+  tablespace MOIECS_DATA
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+-- Grant/Revoke object privileges 
+grant select, insert, update, delete on INTDEPARTMENTSUPDATES to TARASOLUAT3 with grant option;
+
+===============================================
+===========================================================
+==========
+-- Create table
+create table INTEMPLOYEESUPDATES
+(
+  fldtransactionserial INTEGER not null,
+  fldtransactiondate   DATE not null,
+  fldemployeeid        VARCHAR2(100),
+  fldtransactiontype   CHAR(1),
+  fldchangedcolumn     VARCHAR2(100),
+  fldoldvalue          VARCHAR2(4000),
+  fldnewvalue          VARCHAR2(4000),
+  fldnotes             VARCHAR2(4000),
+  fldisdone            INTEGER
+)
+tablespace MOIECS_DATA
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+-- Create/Recreate indexes 
+create index INTEMPLOYEESUPDATESS_DONE on INTEMPLOYEESUPDATES (FLDISDONE)
+  tablespace MOIECS_DATA
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+-- Create/Recreate primary, unique and foreign key constraints 
+alter table INTEMPLOYEESUPDATES
+  add constraint INTEMPLOYEESUPDATESS_PK primary key (FLDTRANSACTIONSERIAL, FLDTRANSACTIONDATE)
+  using index 
+  tablespace MOIECS_DATA
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+-- Grant/Revoke object privileges 
+grant select, insert, update, delete on INTEMPLOYEESUPDATES to TARASOLUAT3 with grant option;
+===============================
+=
+===========================
+======================================
+====================================================
+=============
+-- Create table
+create table INTOCCUPATIONSUPDATES
+(
+  fldtransactiondate       DATE not null,
+  fldoccupationid          VARCHAR2(100),
+  fldtransactiontype       CHAR(1),
+  fldoccupationgroupid     VARCHAR2(100),
+  fldoccupationarabicname  VARCHAR2(4000),
+  fldoccupationenglishname VARCHAR2(4000),
+  fldnotes                 VARCHAR2(4000),
+  fldisdone                INTEGER
+)
+tablespace MOIECS_DATA
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+-- Create/Recreate indexes 
+create index INTOCCUPATIONSUPDATESS_DONE on INTOCCUPATIONSUPDATES (FLDISDONE)
+  tablespace MOIECS_DATA
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+-- Create/Recreate primary, unique and foreign key constraints 
+alter table INTOCCUPATIONSUPDATES
+  add constraint INTOCCUPATIONSUPDATESS_PK primary key (FLDTRANSACTIONDATE)
+  using index 
+  tablespace MOIECS_DATA
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+-- Grant/Revoke object privileges 
+grant select, insert, update, delete on INTOCCUPATIONSUPDATES to TARASOLUAT3 with grant option;
+========================
+=================
+========================
+===========================
+========================================
+===============
+-- Create table
+create table INTUPDATES
+(
+  fldservicename     VARCHAR2(50),
+  fldobjectid        CHAR(36),
+  fldchangedcolumn   VARCHAR2(256),
+  fldtransactionid   VARCHAR2(256),
+  fldtransactiondate DATE,
+  fldtransactiontype CHAR(1),
+  fldoldvalue        VARCHAR2(4000),
+  fldnewvalue        VARCHAR2(4000),
+  fldstatus          CHAR(1)
+)
+tablespace MOIECS_DATA
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+-- Grant/Revoke object privileges 
+grant select, insert, update, delete on INTUPDATES to TARASOLUAT3 with grant option;
+=====================
+==================================
+==========================================
+============
+=
+=
+=
+=
+=
+
+-- Create table
+create table INTUSERVACATION
+(
+  fldtransactionserial INTEGER not null,
+  fldtransactiondate   DATE not null,
+  fldmilitarynumber    VARCHAR2(100) not null,
+  fldstartdate         DATE,
+  fldenddate           DATE,
+  fldnotes             VARCHAR2(4000),
+  fldisdone            INTEGER,
+  fldemployeeid        NUMBER
+)
+tablespace MOIECS_DATA
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+-- Create/Recreate indexes 
+create index INTUSERVACATIONS_DONE on INTUSERVACATION (FLDISDONE)
+  tablespace MOIECS_DATA
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+-- Create/Recreate primary, unique and foreign key constraints 
+alter table INTUSERVACATION
+  add constraint INTUSERVACATIONS_PK primary key (FLDTRANSACTIONSERIAL, FLDTRANSACTIONDATE)
+  using index 
+  tablespace MOIECS_DATA
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+-- Grant/Revoke object privileges 
+grant select, insert, update, delete on INTUSERVACATION to TARASOLUAT3 with grant option;
+--------------------------------------------------------
+-- Create table INTHRUSERMAP
+create table INTHRUSERMAP
+(
+  tempuid CHAR(36) not null,
+  empid   NUMBER,
+  done    NUMBER
+)
+tablespace T4_2
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+-- Create/Recreate primary, unique and foreign key constraints 
+alter table INTHRUSERMAP
+  add constraint INTMAPPKEY primary key (TEMPUID)
+  using index 
+  tablespace T4_2
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+----===============================
+--==========================
+--==============================================
+CREATE OR REPLACE TRIGGER update_map_record_sts
+AFTER INSERT
+ON tsusers
+FOR EACH ROW
+BEGIN
+update inthrusermap set done =1 where tempuid = :new.flduid
+
+END;
+
+
+--==============================
+CREATE OR REPLACE TRIGGER delete_map_record
+before delete
+ON tsusers
+FOR EACH ROW
+BEGIN
+delete from inthrusermap where tempuid = :new.flduid
+
+END;
+--===============================================
