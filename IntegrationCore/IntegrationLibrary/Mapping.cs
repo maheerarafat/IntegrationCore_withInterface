@@ -34,6 +34,15 @@ namespace IntegrationCore.IntegrationLibrary
                     PostToType = new TarasolItem() { Value = "0" },
                     AddressTo = AddressTo
                 };
+
+                foreach (var item in AddressTo)
+                {
+                    if (item?.GlobalIDs != null && tarasolDocument != null && tarasolDocument?.Sender != null)
+                    {
+                        Logger.AddToLogFile("CorrespondenceImport From => to", Logger.Enum_LogType._Info, $"{item?.GlobalIDs?.MainParentGlobalID}@{tarasolDocument?.Sender.GlobalID} =>  {item?.GlobalIDs?.GlobalID}", TrackInterface: true);
+                    }
+                }
+
                 return documentObject;
             }
             catch (Exception ex)
@@ -47,16 +56,17 @@ namespace IntegrationCore.IntegrationLibrary
         {
             try
             {
+                bool EnableLoggingInfo = (bool)IntegrationSettings.GetSetting("EnableLoggingInfo");
                 if (string.IsNullOrEmpty(Globalid)) return false;
 
                 string Tarasol_Token = Cache.GetSession().Token;
                 string Session_ID = Cache.GetSession().SessionID;
                 string ApiUrl = IntegrationSettings.GetSetting("APIURL").ToString() + "/Config/DepartmentPositionsListGet";
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "ApiUrl : " + ApiUrl);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "ApiUrl : " + ApiUrl, TrackInterface: true);
 
                 if (string.IsNullOrEmpty(Tarasol_Token))
                 {
-                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Tarasol_Token : Unauthorized user");
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Tarasol_Token : Unauthorized user");
                     return false;
                 }
                 List<SearchCls> searchList = new List<SearchCls>();
@@ -70,12 +80,12 @@ namespace IntegrationCore.IntegrationLibrary
                 {
                     SearchList = searchList
                 };
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Tarasol_Token : " + Tarasol_Token.Length);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Tarasol_Token : " + Tarasol_Token.Length, TrackInterface: true);
                 string jsondata = JsonConvert.SerializeObject(departmentPositionsReqCls);
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "ApiUrl post data : " + jsondata);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "ApiUrl post data : " + jsondata, TrackInterface: EnableLoggingInfo);
 
                 DepartmentPositionList jsonResponse = JsonConvert.DeserializeObject<DepartmentPositionList>(CallExternalAPI.CallPostAPI(ApiUrl, jsondata, Tarasol_Token).ToString());
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "ApiUrl post data : " + JsonConvert.SerializeObject(jsonResponse));
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "ApiUrl post data : " + JsonConvert.SerializeObject(jsonResponse), TrackInterface: true);
                 return jsonResponse.CountofRecords != "0";
             }
             catch (Exception ex)

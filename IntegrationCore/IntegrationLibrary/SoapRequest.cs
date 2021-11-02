@@ -19,7 +19,7 @@ namespace IntegrationCore.Models
         {
             try
             {
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Soap - CreateWebRequest url :" + url);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Soap - CreateWebRequest url :" + url, TrackInterface: true);
                 //ServicePointManager.ServerCertificateValidationCallback = delegate { return true; }; 
                 HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
                 httpWebRequest.ContentType = ContentType;
@@ -82,7 +82,7 @@ namespace IntegrationCore.Models
                         XmlDocument xml = new XmlDocument();
                         xml.LoadXml(result);
                         string ResponseNode = xml.GetElementsByTagName("Body")[0].InnerXml;
-                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, " response string :" + ResponseNode);
+                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, " response string :" + ResponseNode, TrackInterface: true);
                         return ResponseNode;
                         //Vacations vacation111 = Serializer.Desrializer<Vacations>(ResponseNode);
                         //string JsonResult = JsonConvert.SerializeXmlNode(xml);
@@ -102,6 +102,7 @@ namespace IntegrationCore.Models
             try
             {
                 string ESBHRPass = Encryption.DecryptString(IntegrationSettings.GetSetting("ESBHRPass").ToString());
+                bool EnableLoggingInfo = (bool)IntegrationSettings.GetSetting("EnableLoggingInfo");
                 XmlDocument xmlDocument = new XmlDocument();
                 string ParameterString = "";
                 if (Parameters != null)
@@ -115,7 +116,7 @@ namespace IntegrationCore.Models
                    IntegrationSettings.GetSetting("ESBHRUser").ToString() + @"</wsse:Username><wsse:Password Type =""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText"">" +
                    ESBHRPass + @"</wsse:Password><wsse:Nonce EncodingType=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary"">rWYoctMstXil8ckAYlvARw==</wsse:Nonce><wsu:Created>2019-10-17T11:39:15.723Z</wsu:Created></wsse:UsernameToken></wsse:Security></soapenv:Header><soapenv:Body><hrm:" + Request + @">" + ParameterString + "</hrm:" + Request + @"></soapenv:Body></soapenv:Envelope>";
                 xmlDocument.LoadXml(str);
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, " request string :" + str);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, " request string :" + str, TrackInterface: EnableLoggingInfo);
                 return xmlDocument;
             }
             catch (Exception)
@@ -136,27 +137,27 @@ namespace IntegrationCore.Models
                 XmlDocument xmlDocument = CreateECSSoapEnvelope(Request);
                 ///ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
                 HttpWebRequest httpWebRequest = CreateWebRequest(_HRurl);
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Soap - InsertEnvelopeIntoWebRequest :");
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Soap - InsertEnvelopeIntoWebRequest :", TrackInterface: true);
                 InsertEnvelopeIntoWebRequest(xmlDocument, httpWebRequest);
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Soap - end InsertEnvelopeIntoWebRequest :");
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Soap - end InsertEnvelopeIntoWebRequest :", TrackInterface: true);
                 IAsyncResult asyncResult = httpWebRequest.BeginGetResponse(null, null);
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Soap - asyncResult finish :");
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Soap - asyncResult finish :", TrackInterface: true);
                 asyncResult.AsyncWaitHandle.WaitOne();
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Soap - asyncResult wait finish :" + asyncResult.IsCompleted.ToString());
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Soap - asyncResult wait finish :" + asyncResult.IsCompleted.ToString(), TrackInterface: true);
                 string result;
                 using (WebResponse webResponse = httpWebRequest.EndGetResponse(asyncResult))
                 {
-                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Soap - reading Response :");
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Soap - reading Response :", TrackInterface: true);
                     using (StreamReader rd = new StreamReader(webResponse.GetResponseStream()))
                     {
-                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Soap - start reading Response :");
+                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Soap - start reading Response :", TrackInterface: true);
                         result = rd.ReadToEnd();
-                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Soap - Response : " + result);
+                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Soap - Response : " + result, TrackInterface: true);
                         XmlDocument xml = new XmlDocument();
                         xml.LoadXml(result);
                         string ResponseNode = xml.GetElementsByTagName("tns:AddNewDocumentResponse")[0].InnerXml.Replace("xmlns:tns=\"http://www.moi.gov.ae/2018/MoiIntegration/MOICorrespondenceServiceSchema\"", "").Replace("tns:", "");
                         Ecs_DocumentAddResponse Objectresult = XMLProcessing.Deserializer<Ecs_DocumentAddResponse>(ResponseNode);
-                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Objectresult.RequestStatus :" + Objectresult.RequestStatus);
+                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Objectresult.RequestStatus :" + Objectresult.RequestStatus, TrackInterface: true);
                         if (Objectresult.RequestStatus == 1 || Objectresult.StatusMessage.ToLower() == "Success".ToLower())
                         {
                             return IntResultLib.GetResult(1);
@@ -194,6 +195,7 @@ namespace IntegrationCore.Models
             try
             {
                 string _HRurl = IntegrationSettings.GetSetting("ESBURL").ToString() + "/MOICorrespondenceService";
+                bool EnableLoggingInfo = (bool)IntegrationSettings.GetSetting("EnableLoggingInfo");
                 XmlDocument xmlDocument = CreateECSSoapEnvelope(Request);
                 //ServicePointManager.ServerCertificateValidationCallback = delegate { return true; }; 
                 HttpWebRequest httpWebRequest = CreateWebRequest(_HRurl);
@@ -206,7 +208,7 @@ namespace IntegrationCore.Models
                     using (StreamReader rd = new StreamReader(webResponse.GetResponseStream()))
                     {
                         result = rd.ReadToEnd();
-                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "result  : " + result);
+                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "result  : " + result, TrackInterface: EnableLoggingInfo);
                         XmlDocument xml = new XmlDocument();
                         xml.LoadXml(result);
                         string ResponseNode = xml.GetElementsByTagName("tns:DeliveryReportResponse")[0].InnerXml.Replace("xmlns:SOAP-ENC=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:tns=\"http://www.moi.gov.ae/2018/MoiIntegration/MOICorrespondenceServiceSchema\"", "").Replace("tns:", "");
@@ -241,7 +243,7 @@ namespace IntegrationCore.Models
                                 + IntegrationSettings.GetSetting("ESBECSUser").ToString() + @"</wsse:Username><wsse:Password Type =""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText"">" 
                                 + ESBECSPass + @"</wsse:Password><wsse:Nonce EncodingType = ""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary"">eFACcvctRERFHgmsuxGrGw==</wsse:Nonce><wsu:Created>2019-12-16T06:46:02.502Z</wsu:Created></wsse:UsernameToken></wsse:Security></soapenv:Header><soapenv:Body>" + Request + @" </soapenv:Body></soapenv:Envelope>";
                 envelope = envelope.Replace("moic_x003A_", "moic:").Replace("ECSAttachment>", "moic:Attachment>");
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End - Logenvelope : " + envelope + " /Logenvelope");
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End - Logenvelope : " + envelope + " /Logenvelope", TrackInterface: true);
                 xmlDocument.LoadXml(envelope);
                 return xmlDocument;
             }
@@ -316,7 +318,7 @@ namespace IntegrationCore.Models
                                 + ESBSMSPass + @"</wsse:Password><wsse:Nonce EncodingType = ""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary"">eFACcvctRERFHgmsuxGrGw==</wsse:Nonce><wsu:Created>2019-12-16T06:46:02.502Z</wsu:Created></wsse:UsernameToken></wsse:Security></soapenv:Header><soapenv:Body>"
                  + Request + @" </soapenv:Body></soapenv:Envelope>";
                 envelope = envelope.Replace("sen_x003A_", "sen:").Replace(@"<?xml version=""1.0"" encoding=""utf-16""?>", "");
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End - Logenvelope : " + envelope + " /Logenvelope");
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End - Logenvelope : " + envelope + " /Logenvelope", TrackInterface: true);
                 xmlDocument.LoadXml(envelope);
                 return xmlDocument;
             }
@@ -379,7 +381,7 @@ namespace IntegrationCore.Models
                                 + ESBECSPass + @"</wsse:Password><wsse:Nonce EncodingType = ""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary"">eFACcvctRERFHgmsuxGrGw==</wsse:Nonce><wsu:Created>2019-12-16T06:46:02.502Z</wsu:Created></wsse:UsernameToken></wsse:Security></soapenv:Header><soapenv:Body>" + Request + @" </soapenv:Body></soapenv:Envelope>";
                 
                 envelope = envelope.Replace("ema_x003A_", "ema:").Replace(@"<?xml version=""1.0"" encoding=""utf-16""?>", "").Replace("SoapEMialAttachment>", "ema:Attachment>");
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End - Logenvelope : " + envelope + " /Logenvelope");
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End - Logenvelope : " + envelope + " /Logenvelope", TrackInterface: true);
                 xmlDocument.LoadXml(envelope);
                 return xmlDocument;
             }

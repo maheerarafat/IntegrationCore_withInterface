@@ -13,6 +13,7 @@ namespace IntegrationCore.IntegrationLibrary
         public static object GetUserInfo(SearchObject searchObject)
         {
             object result = null;
+            bool EnableLoggingInfo = (bool)IntegrationSettings.GetSetting("EnableLoggingInfo");
             try
             {
                 
@@ -83,7 +84,7 @@ namespace IntegrationCore.IntegrationLibrary
                     };
                     return user1;
                 }
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "hREmployeeDetails: " + objStr);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "hREmployeeDetails: " + objStr, TrackInterface: EnableLoggingInfo);
                 ed = hREmployeeDetails.HREmployeeDetailsList[0];
                 if (ed.EmployeeID == "")
                 {
@@ -120,7 +121,7 @@ namespace IntegrationCore.IntegrationLibrary
 
                 //Check if user is already in Tarasol
                 string DecPass = Encryption.DecryptString(IntegrationSettings.GetSetting("DBPassword").ToString());
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Connect to Database: " + IntegrationSettings.GetSetting("ConnectionString").ToString() /*+ "@#$11"+ DecPass*/);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Connect to Database: " + IntegrationSettings.GetSetting("ConnectionString").ToString() /*+ "@#$11"+ DecPass*/, TrackInterface: EnableLoggingInfo);
                 ///OracleConnection conn = new OracleConnection(IntegrationSettings.GetSetting("ConnectionString").ToString() + DecPass);
                 using (OracleConnection conn = new OracleConnection(IntegrationSettings.GetSetting("ConnectionString").ToString() + DecPass))
                 {
@@ -133,7 +134,7 @@ namespace IntegrationCore.IntegrationLibrary
                     OracleCommand cmd = conn.CreateCommand();
                     cmd.CommandType = CommandType.Text;
                     cmd.CommandText = "select u.flduid,u.fldname cnt from INTHRUSERSMAP m inner join tsusers u on u.flduid = m.flduseruid where fldhrempid = " + ed.EmployeeID;
-                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, cmd.CommandText);
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, cmd.CommandText, TrackInterface: EnableLoggingInfo);
                     var reader = cmd.ExecuteReader();
                     string UUID = "0";
                     string fldname = "0";
@@ -145,11 +146,11 @@ namespace IntegrationCore.IntegrationLibrary
                     if (UUID == "0")
                     {
                         cmd.CommandText = "delete from INTHRUSERSMAP where fldhrempid = " + ed.EmployeeID + "";
-                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, cmd.CommandText);
+                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, cmd.CommandText, TrackInterface: EnableLoggingInfo);
                         cmd.ExecuteNonQuery();
 
                         cmd.CommandText = "insert into INTHRUSERSMAP(flduseruid,fldhrempid) values('" + GUID + "'," + ed.EmployeeID + ")";
-                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, cmd.CommandText);
+                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, cmd.CommandText, TrackInterface: EnableLoggingInfo);
                         cmd.ExecuteNonQuery();
 
                         //Check if Position title already exists and take its code
@@ -162,7 +163,7 @@ namespace IntegrationCore.IntegrationLibrary
                         }
                         if (Ecode != "")
                         {
-                            Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Existing position title: " + Ecode);
+                            Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Existing position title: " + Ecode, TrackInterface: true);
                             user.HRPOSCODE = Ecode;
                         }
                         user.FldName = "hr_" + ed.EmployeeID;
@@ -176,9 +177,9 @@ namespace IntegrationCore.IntegrationLibrary
                         user.LMessage = "المستخدم موجود مسبقاً في تراسل";
                         user.EMessage = "User already exists in Tarasol";
                     }
-                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "UUID: " + UUID);
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "UUID: " + UUID, TrackInterface: true);
 
-                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "user.FldName " + user.FldName);
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "user.FldName " + user.FldName, TrackInterface: true);
                     result = user;
                 }
                 

@@ -40,9 +40,9 @@ namespace IntegrationCore.Controllers
                 var userId = claimsIdentity.FindFirst("name")?.Value;
                 if(userId.ToString() == IntegrationSettings.GetSetting("DMSUser").ToString())
                 {
-                    Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start - Interface:" + InterfaceID);
+                    Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start - Interface:" + InterfaceID, TrackInterface: true);
                     MemoryStream jsonResult = TarasolFiles.GetStreamFileFromTarasol(InterfaceID, _cache);
-                    Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End");
+                    Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End", TrackInterface: true);
                     return File(jsonResult.GetBuffer(), "application/octet-stream");
                 }
                 else
@@ -68,14 +68,14 @@ namespace IntegrationCore.Controllers
             try
             {
 
-                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start");
+                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start", TrackInterface: true);
                 var claimsIdentity = this.User.Identity as ClaimsIdentity;
                 var userId = claimsIdentity.FindFirst("name")?.Value;
                 if (userId.ToString() == IntegrationSettings.GetSetting("DMSUser").ToString())
                 {
                     List<SendFileToTarasolReturnedData> jsonResult = await TarasolFiles.SendFilesStreamToTarasolAsync(Request.Form.Files, InterfaceID);
 
-                    Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End");
+                    Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End", TrackInterface: true);
                     return Json(jsonResult);
                 }
                 else
@@ -132,7 +132,7 @@ namespace IntegrationCore.Controllers
         [HttpGet]
         public RedirectResult callDMSInteface(string InterfaceUID,string Direction)
         {
-            Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "InterfaceUID:" + InterfaceUID);
+            Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "InterfaceUID:" + InterfaceUID, TrackInterface: true);
             return RedirectPermanent(IntegrationSettings.GetSetting("DMSInterfaceURL").ToString() + "/#/login/" + ((Direction == "1")? "import/" : "download/") + InterfaceUID);
         }
         
@@ -140,7 +140,7 @@ namespace IntegrationCore.Controllers
         public ActionResult DMSInterface(string SessionID, string DocUID,string Direction,string PageGUID)
         {
             
-            Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "session:" + SessionID + " - Docuid:" + DocUID + " - Direction:" + Direction + " - PageGUID:" + PageGUID);
+            Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "session:" + SessionID + " - Docuid:" + DocUID + " - Direction:" + Direction + " - PageGUID:" + PageGUID, TrackInterface: true);
             DownloadUploadRequest downloadUploadRequest = new DownloadUploadRequest() { SessionID = SessionID, DocUID = DocUID,PageGUID = PageGUID };
             string InterfaceUID = Guid.NewGuid().ToString();
             ViewBag.InterfaceUID = InterfaceUID;

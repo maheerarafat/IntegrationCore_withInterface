@@ -40,7 +40,7 @@ namespace IntegrationCore.Controllers
         [HttpPost]
         public IActionResult JWTLogin([FromHeader]string UserName, [FromHeader]string Password)
         {
-            Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." +System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start");
+            Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." +System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start", TrackInterface: true);
             IActionResult response = Unauthorized();
             UserModel userModel = new UserModel
             {
@@ -54,7 +54,7 @@ namespace IntegrationCore.Controllers
                 var tokenString = GenerateJSONWebToken(user);
                 response = Ok(new { token = tokenString });
             }
-            Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End");
+            Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End", TrackInterface: true);
             return response;
         }
 

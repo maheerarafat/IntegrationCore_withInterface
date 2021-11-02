@@ -35,10 +35,10 @@ namespace IntegrationCore.Controllers
             try
             {
                 string Objstring = Newtonsoft.Json.JsonConvert.SerializeObject(sMSObject);
-                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start - Objstring : " + Objstring);
+                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start - Objstring : " + Objstring, TrackInterface: true);
                 //Expose SMS Service
                 object jsonResult = SMS.SendSMS(sMSObject);
-                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End");
+                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End", TrackInterface: true);
                 return Json(jsonResult);
             }
             catch (Exception ex)

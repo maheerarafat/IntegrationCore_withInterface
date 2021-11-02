@@ -97,7 +97,7 @@ namespace IntegrationCore.IntegrationLibrary
                 if (TarasolSession_object != null && isNew == false)
                 {
                     string objStr = JsonConvert.SerializeObject(TarasolSession_object);
-                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start -cache TarasolSession_object : " + objStr);
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start -cache TarasolSession_object : " + objStr, TrackInterface: true);
                     return TarasolSession_object;
                 }
                 else
@@ -114,7 +114,7 @@ namespace IntegrationCore.IntegrationLibrary
                     TarasolSession_object = JsonConvert.DeserializeObject<LoginResponse>(jsonResult.ToString());
                     _cache.Set("TarasolSession", TarasolSession_object);
                     string objStr = Newtonsoft.Json.JsonConvert.SerializeObject(TarasolSession_object);
-                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start - TarasolSession_object : " + objStr);
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start - TarasolSession_object : " + objStr, TrackInterface: true);
                 }
 
                 return TarasolSession_object;

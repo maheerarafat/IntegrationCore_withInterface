@@ -42,6 +42,7 @@ namespace IntegrationCore.IntegrationLibrary
                     Cache.SetCache("APIURL", xdoc.SelectSingleNode("Configuration_Properties/APIURL").InnerText);
                     Cache.SetCache("DataFolder", xdoc.SelectSingleNode("Configuration_Properties/DataFolder").InnerText);
                     Cache.SetCache("EnableLogging", xdoc.SelectSingleNode("Configuration_Properties/EnableLogging").InnerText);
+                    Cache.SetCache("EnableLoggingInfo", xdoc.SelectSingleNode("Configuration_Properties/EnableLoggingInfo").InnerText);
                     //Cache.SetCache("Logs", xdoc.SelectSingleNode("Configuration_Properties/log4net/appender/file").InnerText);
                     Cache.SetCache("IntegrationDataFolder", xdoc.SelectSingleNode("Configuration_Properties/IntegrationDataFolder").InnerText);
                     Cache.SetCache("DMSInterfaceURL", xdoc.SelectSingleNode("Configuration_Properties/DMSInterfaceURL").InnerText);
@@ -131,6 +132,7 @@ namespace IntegrationCore.IntegrationLibrary
                     xdoc.SelectSingleNode("Configuration_Properties/ConnectionString").InnerText = settingModel.ConnectionString;
                     if (settingModel.DBPassword != null) xdoc.SelectSingleNode("Configuration_Properties/DBPassword").InnerText = settingModel.DBPassword;
                     //xdoc.SelectSingleNode("Configuration_Properties/EnableLogging").InnerText = settingModel.EnableLogging.ToString();
+                    xdoc.SelectSingleNode("Configuration_Properties/EnableLoggingInfo").InnerText = settingModel.EnableLoggingInfo.ToString();
                     xdoc.SelectSingleNode("Configuration_Properties/IntegrationDataFolder").InnerText = settingModel.IntegrationDataFolder;
                     xdoc.SelectSingleNode("Configuration_Properties/DMSInterfaceURL").InnerText = settingModel.DMSInterfaceURL;
                     xdoc.SelectSingleNode("Configuration_Properties/SiteEndPoint").InnerText = settingModel.SiteEndPoint;

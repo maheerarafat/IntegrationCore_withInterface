@@ -42,7 +42,7 @@ namespace IntegrationCore.Controllers
         {
             try
             {
-                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start");
+                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start", TrackInterface: true);
                 SettingModel settingModel = new SettingModel();
                 settingModel.LoginUser = _cache.Get("LoginUser").ToString();
                 settingModel.UserName = _cache.Get("UserName").ToString();
@@ -51,6 +51,7 @@ namespace IntegrationCore.Controllers
                 settingModel.APIURL = _cache.Get("APIURL").ToString();
                 settingModel.DataFolder = _cache.Get("DataFolder").ToString();
                 settingModel.EnableLogging = Convert.ToBoolean( _cache.Get("EnableLogging").ToString());
+                settingModel.EnableLoggingInfo = Convert.ToBoolean(_cache.Get("EnableLoggingInfo").ToString()); // new settings
                 //settingModel.Logs = _cache.Get("Logs").ToString();
                 settingModel.IntegrationDataFolder = _cache.Get("IntegrationDataFolder").ToString();
                 settingModel.ESBECSUser =  _cache.Get("ESBECSUser").ToString();
@@ -91,7 +92,7 @@ namespace IntegrationCore.Controllers
                 //settingModel.MOISMSPass = Encryption.DecryptString(_cache.Get("MOISMSPass").ToString());
                 //settingModel.TimeStartSendEmail = _cache.Get("TimeStartSendEmail").ToString();
 
-                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End");
+                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End", TrackInterface: true);
                 return Json(settingModel);
             }
             catch (Exception ex)
@@ -110,7 +111,7 @@ namespace IntegrationCore.Controllers
             {
                 if (setting != null && ModelState.IsValid)
                 {
-                    Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start");
+                    Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start", TrackInterface: true);
                     SettingModel UpdateModel = new SettingModel();
                     if(setting.Password != "") UpdateModel.Password = Encryption.EncryptString(setting.Password);
                     UpdateModel.UserName = setting.UserName;
@@ -120,6 +121,7 @@ namespace IntegrationCore.Controllers
                     UpdateModel.APIURL = setting.APIURL;
                     //UpdateModel.DataFolder = setting.DataFolder;
                     UpdateModel.EnableLogging = setting.EnableLogging;
+                    UpdateModel.EnableLoggingInfo = setting.EnableLoggingInfo;
                     UpdateModel.IntegrationDataFolder = setting.IntegrationDataFolder;
                     UpdateModel.ESBECSUser = setting.ESBECSUser;
                     if (setting.ESBECSPass != "") UpdateModel.ESBECSPass = Encryption.EncryptString(setting.ESBECSPass);
@@ -157,7 +159,7 @@ namespace IntegrationCore.Controllers
                     IntegrationSettings.SetSetting(UpdateModel);
                     Cache cache = new Cache(_cache);
                     IntegrationSettings.LoadSettings(_hostingEnvironment);
-                    Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End");
+                    Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End", TrackInterface: true);
                 }
                 return Json(IntResultLib.GetResult(200));
             }
@@ -173,12 +175,12 @@ namespace IntegrationCore.Controllers
         {
             try
             {
-                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start");
+                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start", TrackInterface: true);
                 ViewData["Message"] = "Your Settings page.";
                 //"ConnectionString":"data source=localhost:1521/orcl;user id=T4_2;password=","DBPassword":"T4_2"
                 IntegrationSettings.testConnection(settingModel.ConnectionString, settingModel.DBPassword);
                 ViewData["EditMessage"] = "Saved Successfully";
-                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End");
+                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End", TrackInterface: true);
                 return Json(IntResultLib.GetResult(200));
             }
             catch (Exception ex)

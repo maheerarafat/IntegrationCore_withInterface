@@ -151,7 +151,7 @@
                 <input type="text" class="form-control" id="ESBURL" name="ESBURL" />
             </div>
         </div>
-        <label >ESB ECS User</label>
+        <label>ESB ECS User</label>
         <div class="form-group">
             <div class="col-md-10">
                 <input type="text" class="form-control" id="ESBECSUser" name="ESBECSUser" />
@@ -257,6 +257,13 @@
                 <input type="text" class="form-control" id="TokenPeriod" name="TokenPeriod" />
             </div>
         </div>
+
+        <label>Enable Logging Info</label>
+        <div class="form-group">
+            <div class="col-md-10">
+                <input type="checkbox" id="EnableLoggingInfo" name="EnableLoggingInfo" />
+            </div>
+        </div>
         <div class="form-group">
             <button style="        width: 33%;
         font-weight: bolder;
@@ -325,7 +332,7 @@
             //$('#ESBEmailPassword').val(data.esbEmailPassword);
             $('#SiteEndPoint').val(data.siteEndPoint);
             $('#DefaultReference').val(data.defaultReference);
-            
+
             $('#EntityPrefix').val(data.entityPrefix);
             $('#DMSInterfaceURL').val(data.dmsInterfaceURL);
             $('#DMSUser').val(data.dmsUser);
@@ -339,6 +346,8 @@
             //$('#FaxPassword').val(data.faxPass);
 
             $('#TokenPeriod').val(data.tokenPeriod);
+            
+            $('#EnableLoggingInfo').prop('checked', data.enableLoggingInfo);
             if (data.dbType == 1)
                 $('#Oracle').prop('checked', data.dbType);
             else
@@ -346,15 +355,17 @@
             $('#DBPassword').val('');
         }).error(function (xhdr, statusText, errorText) {
             $('.alert').css('display', 'block');
-            if (xhr.responseText != "") {
-                $('#resMessage').text(xhr.responseJSON.value.eMessage);
+            if (xhdr.responseText != "") {
+                $('#resMessage').text(errorText);
+                $('#resMessage').text(xhdr.responseJSON.value.eMessage);
             } else
-                $('#resMessage').text(xhr.statusText);
+                $('#resMessage').text(xhdr.statusText);
         });
     }
     function save_setting() {
         debugger;
         let dbType = 1;
+        let EnableLoggingInfo = false;
         //let enableLogging = false;
         if ($('#Oracle').prop('checked')) {
             dbType = 1;
@@ -391,6 +402,9 @@
         }
         if ($('#ESBEmailPassword').val() != '') {
             ESBEmailPassword = $('#ESBEmailPassword').val();
+        }
+        if ($('#EnableLoggingInfo').prop('checked')) {
+            EnableLoggingInfo = true;
         }
         //'timeStartSendEmail': $('#TimeStartSendEmail').val()
         let request = JSON.stringify({
@@ -433,7 +447,8 @@
             'TarasolINTPassword': TarasolINTPassword,
             'ESBEmail': $('#ESBEmail').val(),
             'ESBEmailUser': $('#ESBEmailUser').val(),
-            'ESBEmailPassword': ESBEmailPassword
+            'ESBEmailPassword': ESBEmailPassword,
+            'EnableLoggingInfo': EnableLoggingInfo,
         });
         $.ajax({
                 type: 'POST',
@@ -463,18 +478,18 @@
 
     function test_Connection() {
         debugger;
-        
+
 
         if ($('#DBPassword').val() != '' ) {
             DBPassword = $('#DBPassword').val();
         }
-        
+
         //'timeStartSendEmail': $('#TimeStartSendEmail').val()
         let request = JSON.stringify({
             'ConnectionString': $('#ConnectionString').val(),
-            
+
             'DBPassword': DBPassword
-            
+
         });
         $.ajax({
                 type: 'POST',
@@ -489,7 +504,7 @@
             }).done(function (data) {
 
                 alert('Connected Successfully');
-                
+
             }).error(function (xhdr, statusText, errorText) {
 
                 //$('.alert').css('display', 'block');

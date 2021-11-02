@@ -229,7 +229,7 @@ namespace IntegrationCore.IntegrationLibrary
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
                     ScanFileResponse scanFileResponse =  await response.Content.ReadAsAsync<ScanFileResponse>(new[] { new JsonMediaTypeFormatter() });
-                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Scan File Response : " + scanFileResponse.Value);
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Scan File Response : " + scanFileResponse.Value, TrackInterface: true);
                     SendFileToTarasolReturnedData sendFileToTarasolReurnedData = new SendFileToTarasolReturnedData()
                     {
                         FileID = scanFileResponse.Value,
@@ -240,7 +240,7 @@ namespace IntegrationCore.IntegrationLibrary
                 else
                 {
                     ScanFileResponse scanFileResponse = await response.Content.ReadAsAsync<ScanFileResponse>(new[] { new JsonMediaTypeFormatter() });
-                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Scan File Response : " + scanFileResponse.Value);
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Scan File Response : " + scanFileResponse.Value, TrackInterface: true);
                     SendFileToTarasolReturnedData senFileToTarasolReurnedData = new SendFileToTarasolReturnedData()
                     {
                         FileID = "",

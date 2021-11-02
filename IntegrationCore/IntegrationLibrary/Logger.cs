@@ -19,9 +19,9 @@ public class Logger : IDisposable
     private static bool _EnableLogging = false;
     private static bool _EnableDBLogging = false;
     private static log4net.ILog _Log;
-    
 
-    
+
+
     public static bool EnableLogging
     {
         get
@@ -51,7 +51,7 @@ public class Logger : IDisposable
         }
     }
 
-   
+
     public static bool EnableDBLogging
     {
         get
@@ -82,7 +82,7 @@ public class Logger : IDisposable
             _EnableDBLogging = value;
         }
     }
-   
+
 
     public static log4net.ILog Log
     {
@@ -125,7 +125,7 @@ public class Logger : IDisposable
         }
     }
     public static bool DirectoryExistsChecked = false;
-   
+
     public Logger(string FunctionScope, string Message = "", bool WriteMsgAtTheEnd = false)
     {
         string _Scope = "";
@@ -224,7 +224,7 @@ public class Logger : IDisposable
                             Log.Info(str);
                     }
                     else
-                        System.IO.File.AppendAllText(AppDomain.CurrentDomain.BaseDirectory + @"Logs\" +"loggingError.txt", "Log is nothing : Date:" + DateTime.Now.ToString() + " scope:" + _FunctionScope + Constants.vbCrLf);
+                        System.IO.File.AppendAllText(AppDomain.CurrentDomain.BaseDirectory + @"Logs\" + "loggingError.txt", "Log is nothing : Date:" + DateTime.Now.ToString() + " scope:" + _FunctionScope + Constants.vbCrLf);
                 }
             }
             catch (Exception ex)
@@ -236,28 +236,26 @@ public class Logger : IDisposable
             return;
     }
 
-    public static void AddToLogFile(string Scope, Enum_LogType Type, string Message, string AdditionalInfo = "")
+    public static void AddToLogFile(string Scope, Enum_LogType Type, string Message, string AdditionalInfo = "", bool TrackInterface = false)
     {
+        // Loggrr typr info
+        int CurrThread = System.Threading.Thread.CurrentThread.ManagedThreadId;
+        string ScopeWithThread = Scope + ":" + CurrThread;
+
         if (EnableLogging || Type == Enum_LogType._Error /*|| Type == Enum_LogType._Info*/)
         {
-            int CurrThread = System.Threading.Thread.CurrentThread.ManagedThreadId;
-            string ScopeWithThread = Scope + ":" + CurrThread;
-
             // Dim FilePath As String = ""
             string FolderPath;
             // Dim SR As System.IO.StreamWriter = Nothing
-
             Performance currentfunctionPerformance = new Performance();
-
-
 
 
             try
             {
                 if (!string.IsNullOrEmpty(LogFolder))
-                    FolderPath = LogFolder + @"\Logs" ;
+                    FolderPath = LogFolder + @"\Logs";
                 else
-                    FolderPath = AppDomain.CurrentDomain.BaseDirectory + @"Logs\" ;
+                    FolderPath = AppDomain.CurrentDomain.BaseDirectory + @"Logs\";
                 if (!string.IsNullOrEmpty(FolderPath))
                 {
                     System.IO.DirectoryInfo LogDirectoryInfo = new System.IO.DirectoryInfo(FolderPath);
@@ -293,17 +291,20 @@ public class Logger : IDisposable
                         str.Append(";" + AdditionalInfo + ";");
 
                     // Beacuse we depend on new line as line separator, we must remove any new line in the message
-                    // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                    str.Append(Message.Replace(Constants.vbCrLf, @"\n"));
+                    // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^                    
+                    if ((Type == Enum_LogType._Error) || (Type == Enum_LogType._Info && TrackInterface))
+                    {
+                        str.Append(Message.Replace(Constants.vbCrLf, @"\n"));
+                    }
+
                     str.Append(Constants.vbNewLine);
                     if (Log != null)
                     {
                         // If Type = Enum_LogType._InfoStart Or Type = Enum_LogType._InfoEnd Or Type = Enum_LogType._Info Then
-                       
-                            Log.Info(str);
+                        Log.Info(str);
                     }
                     else
-                        System.IO.File.AppendAllText(AppDomain.CurrentDomain.BaseDirectory + @"Logs\" +"loggingError.txt", "Log is nothing : Date:" + DateTime.Now.ToString() + " scope:" + Scope + Constants.vbCrLf);
+                        System.IO.File.AppendAllText(AppDomain.CurrentDomain.BaseDirectory + @"Logs\" + "loggingError.txt", "Log is nothing : Date:" + DateTime.Now.ToString() + " scope:" + Scope + Constants.vbCrLf);
                 }
             }
             catch (Exception ex)
@@ -314,6 +315,7 @@ public class Logger : IDisposable
         else
             return;
     }
+
     private void AddToLogAsnc()
     {
     }

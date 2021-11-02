@@ -89,14 +89,14 @@ namespace IntegrationCore.Controllers
         [HttpGet]
         public JsonResult GetToken(string LoginUser,string LoginPassword)
         {
-            Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start");
+            Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start", TrackInterface: true);
             string UserName = IntegrationSettings.GetSetting("LoginUser").ToString();
             string Password = IntegrationSettings.GetSetting("LoginPassword").ToString();
             
             
             if (UserName == LoginUser && Encryption.DecryptString(Password) == LoginPassword)
             {
-                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End");
+                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End", TrackInterface: true);
                 UserModel userModel = new UserModel()
                 {
                     Username = UserName,
@@ -105,7 +105,7 @@ namespace IntegrationCore.Controllers
                string Token =  GenerateJSONWebToken(userModel);
                return Json(Token);
             }
-            Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Invalid user name or password");
+            Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Invalid user name or password");
             return Json("invalid user name or password");
         }
         private string GenerateJSONWebToken(UserModel userInfo)
@@ -127,7 +127,7 @@ namespace IntegrationCore.Controllers
         {
             try
             {
-                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start");
+                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start", TrackInterface: true);
                 ViewData["Message"] = "Your Settings page.";
                 SettingModel settingModel = new SettingModel();
                 settingModel.LoginUser = IntegrationSettings.GetSetting("LoginUser").ToString();
@@ -144,7 +144,7 @@ namespace IntegrationCore.Controllers
                 settingModel.Logs = IntegrationSettings.GetSetting("Logs").ToString();
                 settingModel.IntegrationDataFolder = IntegrationSettings.GetSetting("IntegrationDataFolder").ToString();
 
-                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End");
+                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End", TrackInterface: true);
                 return View(settingModel);
             }
             catch (Exception ex)
@@ -160,7 +160,7 @@ namespace IntegrationCore.Controllers
         {
             try
             {
-                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start");
+                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start", TrackInterface: true);
                 ViewData["Message"] = "Your Settings page.";
                 SettingModel UpdateModel = new SettingModel();
                 UpdateModel.LoginUser = settingModel.LoginUser;
@@ -178,7 +178,7 @@ namespace IntegrationCore.Controllers
                 UpdateModel.IntegrationDataFolder = settingModel.IntegrationDataFolder;
                 IntegrationSettings.SetSetting(settingModel);
                 ViewData["EditMessage"] = "Saved Successfully";
-                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End");
+                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End", TrackInterface: true);
                 return View(UpdateModel);
             }
             catch (Exception ex)

@@ -44,14 +44,16 @@ namespace IntegrationCore.Controllers
             {
                 var claimsIdentity = this.User.Identity as ClaimsIdentity;
                 var userId = claimsIdentity.FindFirst("name")?.Value;
+                bool EnableLoggingInfo = (bool)_cache.Get("EnableLoggingInfo");
                 if (userId.ToString() == IntegrationSettings.GetSetting("UserName").ToString())
                 {
                     string objStr = Newtonsoft.Json.JsonConvert.SerializeObject(tarasolDocument);
-                    Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start - Obj : " + objStr);
+                    Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start", TrackInterface:true);
+                    Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start - Obj : " + objStr, TrackInterface: EnableLoggingInfo);
                     TarasolDocument eSBDocument = tarasolDocument;
                     //read post data correspondence and files
                     object jsonResult = Correspondence.ImportToFolder(eSBDocument);
-                    Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End");
+                    Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End", TrackInterface:true);
                     return Json(jsonResult);
                 }
                 else
@@ -79,13 +81,16 @@ namespace IntegrationCore.Controllers
             {
                 var claimsIdentity = this.User.Identity as ClaimsIdentity;
                 var userId = claimsIdentity.FindFirst("name")?.Value;
+                bool EnableLoggingInfo = (bool)_cache.Get("EnableLoggingInfo");
+
                 if (userId.ToString() == IntegrationSettings.GetSetting("UserName").ToString())
                 {
                     string objStr = Newtonsoft.Json.JsonConvert.SerializeObject(acknowledegment);
-                    Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start - Obj : " + objStr);
+                    Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start", TrackInterface: true);
+                    Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start - Obj : " + objStr, TrackInterface: EnableLoggingInfo);
                     Correspondence correspondence = new Correspondence();
                     object jsonResult = correspondence.WriteAck(acknowledegment);
-                    Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End");
+                    Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End", TrackInterface: true);
                     return Json(jsonResult);
                 }
                 else
@@ -111,11 +116,11 @@ namespace IntegrationCore.Controllers
             try
             {
 
-                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start");
+                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start", TrackInterface: true);
                 TarasolDocument eSBDocument = tarasolDocument;
                 //read post data correspondence and files
                 object jsonResult = Correspondence.ImportFaxToFolder(eSBDocument);
-                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End");
+                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End", TrackInterface: true);
                 return Json(jsonResult);
             }
             catch (Exception ex)
@@ -135,12 +140,14 @@ namespace IntegrationCore.Controllers
             try
             {
                 string objStr = Newtonsoft.Json.JsonConvert.SerializeObject(scanRequest);
-                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start - Obj : " + objStr);
+                bool EnableLoggingInfo = (bool)_cache.Get("EnableLoggingInfo");
+                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start", TrackInterface: true);
+                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start - Obj : " + objStr, TrackInterface: EnableLoggingInfo);
                 var task = new[]
                 {
                    Task.Run(()=>Correspondence.ExportFromFolder(_hostingEnvironment, scanRequest)) 
                 };
-                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End");
+                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End", TrackInterface: true);
                 return Json(IntResultLib.GetResult(200));
             }
             catch (Exception ex)
@@ -159,9 +166,11 @@ namespace IntegrationCore.Controllers
             try
             {
                 string objStr = Newtonsoft.Json.JsonConvert.SerializeObject(faxInquiries);
-                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start - Obj : " + objStr);
+                bool EnableLoggingInfo = (bool)_cache.Get("EnableLoggingInfo");
+                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start", TrackInterface: true);
+                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start - Obj : " + objStr, TrackInterface: EnableLoggingInfo);
                 Correspondence.FaxInquiry(ref faxInquiries);
-                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End");
+                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End", TrackInterface: true);
                 return Json(IntResultLib.GetResult(200));
             }
             catch (Exception ex)
@@ -180,7 +189,9 @@ namespace IntegrationCore.Controllers
             try
             {
                 string objStr = Newtonsoft.Json.JsonConvert.SerializeObject(scanRequest);
-                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start - Obj : " + objStr);
+                bool EnableLoggingInfo = (bool)_cache.Get("EnableLoggingInfo");
+                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start", TrackInterface: true);
+                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start - Obj : " + objStr, TrackInterface: EnableLoggingInfo);
 
                 //scan ack folder to push read notification to esb
                 // will expose ESB service for push notification
@@ -189,7 +200,7 @@ namespace IntegrationCore.Controllers
                    Task.Run(()=>Correspondence.SendAck(_hostingEnvironment, scanRequest))
                 };
                 
-                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End");
+                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End", TrackInterface: true);
                 return Json(IntResultLib.GetResult(1));
             }
             catch (Exception ex)

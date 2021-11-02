@@ -50,7 +50,7 @@ namespace IntegrationCore.IntegrationLibrary
             object result = null;
             try
             {
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start");
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start", TrackInterface: true);
                 List<Models.Department> departmentList = new List<Models.Department>();
                 if(string.IsNullOrEmpty(searchObject.SearchKey.Trim()))
                 {
@@ -119,37 +119,37 @@ namespace IntegrationCore.IntegrationLibrary
                 {
                     string[] DepartmentID = { searchObject.FieldName, searchObject.SearchKey.Trim() };
                     Parameters.Add(DepartmentID);
-                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start request");
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start request", TrackInterface: true);
                     
                     string res = SoapRequest.CallHRWebService("GetListOfAllDepartmentsRequest", Parameters: Parameters).ToString();
                     
                     HRDepartments hRDepartments = XMLProcessing.Deserializer<HRDepartments>(res);
-                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "end request");
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "end request", TrackInterface: true);
                     Department dept = new Department();
                     foreach (var hRDepartment in hRDepartments.HRDepartmentsList)
                     {
                         string OldDeptStatus = "N";
                         if (!string.IsNullOrEmpty(hRDepartment.OldDepartmentID))
                         {
-                            Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "get status for old dept :" + hRDepartment.OldDepartmentID);
+                            Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "get status for old dept :" + hRDepartment.OldDepartmentID, TrackInterface: true);
                             Parameters = new List<string[]>();
                             string[] OldDepartmentID = { searchObject.FieldName, hRDepartment.OldDepartmentID };
                             Parameters.Add(OldDepartmentID);
                             try
                             {
-                                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start request -old");
+                                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start request -old", TrackInterface: true);
                                 res = SoapRequest.CallHRWebService("GetListOfAllDepartmentsRequest", Parameters: Parameters).ToString();
                                 //xml = new XmlDocument();
                                 //xml.LoadXml(res);
                                 //res = xml.GetElementsByTagName("soap-env:Body")[0].InnerXml.ToString().Replace(@"xmlns=""http://www.moi.gov.ae/2018/MoiIntegration/HRMurasalatBSSchema""", "");
                                 HRDepartments OldhRDepartments = XMLProcessing.Deserializer<HRDepartments>(res);
-                                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "end request -old");
+                                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "end request -old", TrackInterface: true);
                                 if (OldhRDepartments.HRDepartmentsList.Count != 0)
                                 {
                                     OldDeptStatus = OldhRDepartments.HRDepartmentsList.First().DepartmentStatus;
                                 }
 
-                                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Old sts:" + OldDeptStatus);
+                                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Old sts:" + OldDeptStatus, TrackInterface: true);
                             }
                             catch (Exception)
                             {

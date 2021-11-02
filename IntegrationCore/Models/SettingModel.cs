@@ -16,6 +16,7 @@ namespace IntegrationCore.Models
         public string APIURL { get; set; }
         public string DataFolder { get; set; }
         public bool EnableLogging { get; set; }
+        public bool EnableLoggingInfo { get; set; }
         public string Logs { get; set; }
         public string IntegrationDataFolder { get; set; }
         public string IsSettingsLoaded { get; set; }

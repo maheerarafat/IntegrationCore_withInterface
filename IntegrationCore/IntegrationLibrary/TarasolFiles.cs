@@ -20,7 +20,7 @@ namespace IntegrationCore.IntegrationLibrary
             
             try
             {
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "InterfaceID:" + InterfaceID);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "InterfaceID:" + InterfaceID, TrackInterface: true);
                 if (getSession(InterfaceID) == null)
                 {
                     throw new NullReferenceException("Invalid or Expired Session");
@@ -29,7 +29,7 @@ namespace IntegrationCore.IntegrationLibrary
                 //Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "GetFromCache(InterfaceID):" + getSession(InterfaceID).ToString());
                 Cache.GetSession();
                 string RequestURL = Cache.GetFromCache("APIURL") + "/Corr/ExportCorrespondenceZip?" + "SessionID=" + Cache.GetSession().SessionID + "&downloadzipfile=true&DocUID=" + downloadUploadRequest.DocUID;
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "RequestURL:" + RequestURL);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "RequestURL:" + RequestURL, TrackInterface: true);
                 MemoryStream memoryStream = CallExternalAPI.CallGetFileAPI(RequestURL, Cache.GetSession().Token);
                 return memoryStream;
             }
@@ -100,7 +100,7 @@ namespace IntegrationCore.IntegrationLibrary
                     throw e2;
                 }
                 DownloadUploadRequest downloadUploadRequest = (DownloadUploadRequest)Interface;
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "PageGUID : " + downloadUploadRequest.PageGUID);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "PageGUID : " + downloadUploadRequest.PageGUID, TrackInterface: true);
 
                 foreach (var file in Files)
                 {
@@ -123,7 +123,7 @@ namespace IntegrationCore.IntegrationLibrary
                             File.WriteAllBytes(tempPath, FileBytes);
                             ZipFile.ExtractToDirectory(tempPath, tempPath.Replace(name, ""));
                             string[] subFiles = Directory.GetFiles(tempPath.Replace(name, ""));
-                            Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "fILE cOUNT: " + subFiles.Count());
+                            Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "fILE cOUNT: " + subFiles.Count(), TrackInterface: true);
                             
                             if (subFiles.Length > 0)
                             {
@@ -134,10 +134,10 @@ namespace IntegrationCore.IntegrationLibrary
                                     {
                                         try
                                         {
-                                            Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "fILE name: " + Path.GetFileName(filePath));
+                                            Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "fILE name: " + Path.GetFileName(filePath), TrackInterface: true);
                                             string RequestURL = Cache.GetFromCache("APIURL") + "/Corr/ScanFileUpload?" + "PageGUID=" + downloadUploadRequest.PageGUID
                                                 + "&OrignalFileName=" + Path.GetFileName(filePath);
-                                            Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Request URL: " + RequestURL);
+                                            Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Request URL: " + RequestURL, TrackInterface: true);
                                             byte[] fileBytes = File.ReadAllBytes(filePath);
                                             SendFileToTarasolReturnedData senFileToTarasolReurnedData = await CallExternalAPI.CallPostFileAPIAsync(fileBytes, Path.GetFileName(filePath), RequestURL, "");
                                             SenFileToTarasolReurnedDataList.Add(senFileToTarasolReurnedData);

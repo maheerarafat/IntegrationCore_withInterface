@@ -36,7 +36,7 @@ namespace IntegrationCore.BGServices
             {
                 //await _randomStringProvider.UpdateString(cancellationToken);
                 Cache.GetSession(true);
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "cancellationToken : " + cancellationToken);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "cancellationToken : " + cancellationToken, TrackInterface: true);
                 await Task.Delay(TimeSpan.FromMinutes(2), cancellationToken);
             }
         }

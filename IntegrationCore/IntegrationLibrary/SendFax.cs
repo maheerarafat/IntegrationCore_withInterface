@@ -77,7 +77,7 @@ namespace IntegrationCore.IntegrationLibrary
         /// </summary>
         static async Task<SendJob> WaitForJob(HttpClient client, string jobUrl)
         {
-            Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Job processing - Fax Operation ");
+            Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Job processing - Fax Operation ", TrackInterface: true);
 
             SendJob job;
             do
@@ -90,7 +90,7 @@ namespace IntegrationCore.IntegrationLibrary
 
             } while (job.Condition != "Succeeded" && job.Condition != "Cancelled" && job.Condition != "Failed");
 
-            Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, $"Job processing - Fax Operation status {job.Status}");
+            Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, $"Job processing - Fax Operation status {job.Status}", TrackInterface: true);
 
             return job;
         }
