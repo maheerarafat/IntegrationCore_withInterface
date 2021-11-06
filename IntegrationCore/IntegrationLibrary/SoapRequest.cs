@@ -102,7 +102,7 @@ namespace IntegrationCore.Models
             try
             {
                 string ESBHRPass = Encryption.DecryptString(IntegrationSettings.GetSetting("ESBHRPass").ToString());
-                bool EnableLoggingInfo = (bool)IntegrationSettings.GetSetting("EnableLoggingInfo");
+                ////bool EnableLoggingInfo = (bool)IntegrationSettings.GetSetting("EnableLoggingInfo");
                 XmlDocument xmlDocument = new XmlDocument();
                 string ParameterString = "";
                 if (Parameters != null)
@@ -116,7 +116,7 @@ namespace IntegrationCore.Models
                    IntegrationSettings.GetSetting("ESBHRUser").ToString() + @"</wsse:Username><wsse:Password Type =""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText"">" +
                    ESBHRPass + @"</wsse:Password><wsse:Nonce EncodingType=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary"">rWYoctMstXil8ckAYlvARw==</wsse:Nonce><wsu:Created>2019-10-17T11:39:15.723Z</wsu:Created></wsse:UsernameToken></wsse:Security></soapenv:Header><soapenv:Body><hrm:" + Request + @">" + ParameterString + "</hrm:" + Request + @"></soapenv:Body></soapenv:Envelope>";
                 xmlDocument.LoadXml(str);
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, " request string :" + str, TrackInterface: EnableLoggingInfo);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, " request string :" + str,TrackInterface: Logger.EnableLoggingInfo);
                 return xmlDocument;
             }
             catch (Exception)
@@ -195,7 +195,7 @@ namespace IntegrationCore.Models
             try
             {
                 string _HRurl = IntegrationSettings.GetSetting("ESBURL").ToString() + "/MOICorrespondenceService";
-                bool EnableLoggingInfo = (bool)IntegrationSettings.GetSetting("EnableLoggingInfo");
+                ////bool EnableLoggingInfo = (bool)IntegrationSettings.GetSetting("EnableLoggingInfo");
                 XmlDocument xmlDocument = CreateECSSoapEnvelope(Request);
                 //ServicePointManager.ServerCertificateValidationCallback = delegate { return true; }; 
                 HttpWebRequest httpWebRequest = CreateWebRequest(_HRurl);
@@ -208,7 +208,7 @@ namespace IntegrationCore.Models
                     using (StreamReader rd = new StreamReader(webResponse.GetResponseStream()))
                     {
                         result = rd.ReadToEnd();
-                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "result  : " + result, TrackInterface: EnableLoggingInfo);
+                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "result  : " + result,TrackInterface: Logger.EnableLoggingInfo);
                         XmlDocument xml = new XmlDocument();
                         xml.LoadXml(result);
                         string ResponseNode = xml.GetElementsByTagName("tns:DeliveryReportResponse")[0].InnerXml.Replace("xmlns:SOAP-ENC=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:tns=\"http://www.moi.gov.ae/2018/MoiIntegration/MOICorrespondenceServiceSchema\"", "").Replace("tns:", "");

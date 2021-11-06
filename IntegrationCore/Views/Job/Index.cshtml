@@ -1,0 +1,336 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+}
+
+<style type="text/css">
+    .list-group-item {
+        cursor: pointer;
+    }
+</style>
+
+
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-2">
+
+            <!--Side panel-->
+            <div class="card">
+
+                <ul class="list-group list-group-flush">
+                    <li id="enqueued" class="list-group-item" onclick="active_menu('1')">
+                        Enqueued
+                    </li>
+                    <li id="scheduled" class="list-group-item " onclick="active_menu('2')">
+                        Scheduled
+                    </li>
+                    <li id="processing" class="list-group-item" onclick="active_menu('3')">
+                        Processing
+                    </li>
+                    <li id="succeeded" class="list-group-item active" onclick="active_menu('4')">
+                        Succeeded
+                        <i style="float:right;"> <span onclick="get_success_log()" class="glyphicon glyphicon-refresh"></span></i>
+                    </li>
+                    <li id="failed" class="list-group-item" onclick="active_menu('5')">
+                        Failed
+                        @*<span class="badge badge-pill badge-danger" style="float: right;">
+                                0
+                            </span>*@
+                    </li>
+                    <li id="deleted" class="list-group-item" onclick="active_menu('6')">
+                        Deleted
+                    </li>
+                    <li id="awaiting" class="list-group-item" onclick="active_menu('7')">
+                        Awaiting
+                    </li>
+                </ul>
+            </div>
+            <!--End Side panel-->
+
+        </div>
+        <div class="col-sm-10">
+
+            <div class="alert alert-danger" role="alert" style="display:none">
+                <p id="resMessage"></p>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div id="table_before_render" style="display:block;">
+                <div class="post">
+                    <div class="avatar"></div>
+                </div>
+                <div class="post">
+                    <div class="line"></div>
+                    <div class="line"></div>
+                    <div class="line"></div>
+                </div>
+            </div>
+
+            <div id="tables_render" style="display:none;">
+
+                <!--Queues-->
+                <div class="tbl-detail" id="queue" style="display:none;">
+                    <h1>Queues</h1>
+                </div>
+                <!--End Queues-->
+                <!--Succeeded Jobs-->
+                <div class="tbl-detail" id="succeeded-job" style="display:block;">
+                    <h1>Succeeded Jobs</h1>
+                    <table id="success_log" class="table table-striped table-bordered dt-responsive nowrap" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>flduid</th>
+                                <th>Function Name</th>
+                                <th>Description</th>
+                                <th>Succeeded</th>
+                            </tr>
+                        </thead>
+                    </table>
+
+                </div>
+                <!--End Succeeded Jobs-->
+                <!--Failed Jobs-->
+                <div class="tbl-detail" id="failed-job" style="display:none;">
+                    <h1>Failed Jobs</h1>
+                    <table id="failed_log" class="table table-striped table-bordered dt-responsive nowrap" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>flduid</th>
+                                <th>Function Name</th>
+                                <th>Message</th>
+                                <th>Failed</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <!--End Failed Jobs-->
+                <!--Waiting Jobs-->
+                <div class="tbl-detail" id="wait-job" style="display:none;">
+                    <h1>Awaiting Jobs</h1>
+                    <table id="wait_log" class="table table-striped table-bordered dt-responsive nowrap" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>flduid</th>
+                                <th>Function Name</th>
+                                <th>Message</th>
+                                <th>Failed</th>
+                                <th>Manual Submit</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <!--End Failed Jobs-->
+                <!--processing Jobs-->
+                <div class="tbl-detail" id="process-job" style="display:none;">
+                    <h1>Processing Jobs</h1>
+                    <table id="process_log" class="table table-striped table-bordered dt-responsive nowrap" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>flduid</th>
+                                <th>Function Name</th>
+                                <th>Message</th>
+                                <th>Started</th>
+                                <th>Number of execute</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <!--End Failed Jobs-->
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+
+    var initial_error_log = false;
+    var initial_wait_log = false;
+    var initial_process_log = false;
+
+
+    $(document).ready(function () {
+
+        get_success_log();
+        
+    });
+
+
+    function get_success_log() {
+
+        let columns = [
+            { "data": "flduid", "name": "flduid", "autoWidth": true },
+            { "data": "fldname", "name": "Function Name", "autoWidth": true },
+            { "data": "flddescription", "name": "Description", "autoWidth": true },
+            {
+                "data": "flddateStart", "name": "Date and Time - Start", "autoWidth": true, render: function (data, type, row) {
+                    if (type == 'sort' || type == 'type') {
+
+                    }
+                    return time_ago(data);
+                    //return convertString2Date(data);
+                }
+            },
+        ]
+
+        let urlRequest = '@Url.Action("GetLogJobESBSuccuss", "Job")';
+        render_dataTable(urlRequest, "success_log", columns, 'cover-spin');
+    }
+
+    function get_faild_log() {
+
+        initial_error_log = true;
+        let columns = [
+            { "data": "flduid", "name": "flduid", "autoWidth": true },
+            { "data": "fldname", "name": "Function Name", "autoWidth": true },
+            { "data": "flddescription", "name": "Description", "autoWidth": true },
+            {
+                "data": "flddateStart", "name": "Date and Time - Start", "autoWidth": true, render: function (data, type, row) {
+                    if (type == 'sort' || type == 'type') {
+
+                    }
+                    return time_ago(data);
+                    //return convertString2Date(data);
+                }
+            }
+        ]
+        let urlRequest = '@Url.Action("GetLogJobESBFaild", "Job")';
+        render_dataTable(urlRequest, "failed_log", columns, 'cover-spin');
+    }
+
+    function get_wait_log() {
+
+        initial_wait_log = true;
+        let columns = [
+            { "data": "flduid", "name": "flduid", "autoWidth": true },
+            { "data": "fldname", "name": "Function Name", "autoWidth": true },
+            { "data": "flddescription", "name": "Description", "autoWidth": true },
+            {
+                "data": "flddateStart", "name": "Date and Time - Start", "autoWidth": true, render: function (data, type, row) {
+                    if (type == 'sort' || type == 'type') {
+
+                    }
+                    return time_ago(data);
+                    //return convertString2Date(data);
+                }
+            },
+            {
+                data: null, render: function (data, type, row) {
+                    return "<a href='#' class='btn btn-warning' onclick=run_submit_error('" + row.flduid + "','" + row.fldname + "','" + row.fldbodyrequest + "'); >Re-submit</a>";
+                }
+            }
+        ]
+        let urlRequest = '@Url.Action("GetLogJobESBWait", "Job")';
+        render_dataTable(urlRequest, "wait_log", columns, 'cover-spin');
+    }
+
+    function get_process_log() {
+
+        initial_process_log = true;
+        let columns = [
+            { "data": "flduid", "name": "flduid", "autoWidth": true },
+            { "data": "fldname", "name": "Function Name", "autoWidth": true },
+            { "data": "flddescription", "name": "Description", "autoWidth": true },
+            {
+                "data": "flddateStart", "name": "Started", "autoWidth": true, render: function (data, type, row) {
+                    if (type == 'sort' || type == 'type') {
+
+                    }
+                    return time_ago(data);
+                    //return convertString2Date(data);
+                }
+            },
+            { "data": "fldnumbertimesendschudle", "name": "Number", "autoWidth": true }
+        ]
+        let urlRequest = '@Url.Action("GetLogJobESBInProgress", "Job")';
+        render_dataTable(urlRequest, "process_log", columns, 'cover-spin');
+    }
+
+    function active_menu(item) {
+
+
+        switch (item) {
+            case '1':
+                $('.tbl-detail').css({ 'display': 'none' });
+                $('#queue').css({ 'display': 'block' });
+                $('.list-group-item').removeClass('active');
+                $('#enqueued').addClass('active');
+                // code block
+                break;
+            case '3':
+                $('.tbl-detail').css({ 'display': 'none' });
+                $('#process-job').css({ 'display': 'block' });
+                $('.list-group-item').removeClass('active');
+                $('#processing').addClass('active');
+                if (!initial_process_log) {
+                    get_process_log();
+                }
+                // code block
+                break;
+            case '4':
+                $('.tbl-detail').css({ 'display': 'none' });
+                $('#succeeded-job').css({ 'display': 'block' });
+                $('.list-group-item').removeClass('active');
+                $('#succeeded').addClass('active');
+                // code block
+                break;
+            case '5':
+                $('.tbl-detail').css({ 'display': 'none' });
+                $('#failed-job').css({ 'display': 'block' });
+                $('.list-group-item').removeClass('active');
+                $('#failed').addClass('active');
+                if (!initial_error_log) {
+                    get_faild_log();
+                }
+                // code block
+                break;
+            case '7':
+                $('.tbl-detail').css({ 'display': 'none' });
+                $('#wait-job').css({ 'display': 'block' });
+                $('.list-group-item').removeClass('active');
+                $('#awaiting').addClass('active');
+                if (!initial_wait_log) {
+                    get_wait_log();
+                }
+                // code block
+                break;
+            default:
+                $('.tbl-detail').css({ 'display': 'none' });
+            // code block
+        }
+    }
+
+
+    function run_submit_error(id, methodName, dataRequest) {
+        
+        $('#cover-spin').show(0);
+        $.post('@Url.Action("ExcuteManualRequest", "Job")',
+            {Id: id, MethodName: methodName, BodyRequest: dataRequest },
+            function (data, status) {
+                
+                $('#cover-spin').css('display', 'none');
+                if (status = 'success') {
+
+                } else {
+                    $('.alert').css('display', 'block');
+                    $('#resMessage').text("Data: " + data + "\nStatus: " + status);
+                }
+            }).
+            fail(function (xhr, status, error) {
+                $('#cover-spin').css('display', 'none');
+                $('.alert').css('display', 'block');
+                $('#resMessage').text("Data: " + xhr.responseText + "\nStatus: " + error);
+            });
+    }
+
+</script>
+
+
+
+

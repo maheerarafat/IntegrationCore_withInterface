@@ -56,7 +56,7 @@ namespace IntegrationCore.IntegrationLibrary
         {
             try
             {
-                bool EnableLoggingInfo = (bool)IntegrationSettings.GetSetting("EnableLoggingInfo");
+                ////bool EnableLoggingInfo = (bool)IntegrationSettings.GetSetting("EnableLoggingInfo");
                 if (string.IsNullOrEmpty(Globalid)) return false;
 
                 string Tarasol_Token = Cache.GetSession().Token;
@@ -82,7 +82,7 @@ namespace IntegrationCore.IntegrationLibrary
                 };
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Tarasol_Token : " + Tarasol_Token.Length, TrackInterface: true);
                 string jsondata = JsonConvert.SerializeObject(departmentPositionsReqCls);
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "ApiUrl post data : " + jsondata, TrackInterface: EnableLoggingInfo);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "ApiUrl post data : " + jsondata,TrackInterface: Logger.EnableLoggingInfo);
 
                 DepartmentPositionList jsonResponse = JsonConvert.DeserializeObject<DepartmentPositionList>(CallExternalAPI.CallPostAPI(ApiUrl, jsondata, Tarasol_Token).ToString());
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "ApiUrl post data : " + JsonConvert.SerializeObject(jsonResponse), TrackInterface: true);

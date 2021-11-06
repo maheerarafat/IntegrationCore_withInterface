@@ -20,9 +20,9 @@ namespace IntegrationCore.IntegrationLibrary
         {
             try
             {
-                bool EnableLoggingInfo = (bool)IntegrationSettings.GetSetting("EnableLoggingInfo");
+                ////bool EnableLoggingInfo = (bool)IntegrationSettings.GetSetting("EnableLoggingInfo");
                 //Check Required fields
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start - tarasolDocument.Subject : " + tarasolDocument.Subject, TrackInterface: EnableLoggingInfo);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start - tarasolDocument.Subject : " + tarasolDocument.Subject,TrackInterface: Logger.EnableLoggingInfo);
                 if (string.IsNullOrEmpty(tarasolDocument.Subject) || string.IsNullOrEmpty(tarasolDocument.CorrespondenceNo) || tarasolDocument.Date == null)
                 {
                     throw new System.Data.DataException();
@@ -40,44 +40,54 @@ namespace IntegrationCore.IntegrationLibrary
                     Directory.Delete(path,true);
                 }
                 path += "/" + GUID;
-                DirectoryInfo di = Directory.CreateDirectory(path);
-                List<Attachment> attachments = tarasolDocument.Files;
-                if(tarasolDocument.Files != null)
+                try
                 {
-                    foreach (var data in attachments)
+                    DirectoryInfo di = Directory.CreateDirectory(path);
+                    List<Attachment> attachments = tarasolDocument.Files;
+                    if (tarasolDocument.Files != null)
                     {
-                        var base64string = data.FileContent;
-                        var base64array = Convert.FromBase64String(base64string);
-                        string filePath = path + "/" + ((data.FileName.Contains("___Main___PDF___T04File")) ? GUID + ".pdf" : data.FileName) + "." + data.FileExtension;
-                        System.IO.File.WriteAllBytes(filePath, base64array);
+                        foreach (var data in attachments)
+                        {
+                            var base64string = data.FileContent;
+                            var base64array = Convert.FromBase64String(base64string);
+                            string filePath = path + "/" + ((data.FileName.Contains("___Main___PDF___T04File")) ? GUID + ".pdf" : data.FileName) + "." + data.FileExtension;
+                            System.IO.File.WriteAllBytes(filePath, base64array);
+                        }
                     }
+
+
+                    DocumentObject documentObject = Mapping.MapImportedFile(tarasolDocument);
+                    if (documentObject.AddressTo.Count == 0)
+                    {
+                        Directory.Delete(path, true);
+                        return IntResultLib.GetResult(2);
+                    }
+                    string jsondata = JsonConvert.SerializeObject(documentObject);
+
+                    Logger.AddToLogFile("Correspondence." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, $"GUID : {GUID} ", TrackInterface: true, PrintInterface: true);
+                    // Write that JSON to  file,  
+                    File.WriteAllText(path + "/" + GUID + ".json", jsondata, encoding: Encoding.UTF8);
+                    // Create zip file for correspondence
+                    ZipFile.CreateFromDirectory(path, path + ".zip");
+                    File.Move(path + ".zip", Path.ChangeExtension(path + ".zip", ".tarasol"));
+                    Directory.Delete(path, true);
+                    // Call Correspondence Import API from Tarasol
+                    string corrImportResult = TarasolCorrespondencesImport();
+                    //
+                    Logger.AddToLogFile("Correspondence." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, corrImportResult);
+
+                    return IntResultLib.GetResult(1); // if operation succeeded
+                }
+                catch (Exception)
+                {
+                    Directory.Delete(path, true);
+                    throw;
                 }
                 
-
-                DocumentObject documentObject = Mapping.MapImportedFile(tarasolDocument);
-                if(documentObject.AddressTo.Count == 0)
-                {
-                    return IntResultLib.GetResult(2);
-                }
-                string jsondata = JsonConvert.SerializeObject(documentObject);
-
-                Logger.AddToLogFile("Correspondence." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, $"GUID : {GUID} ", TrackInterface: true);
-                // Write that JSON to  file,  
-                File.WriteAllText(path + "/"+ GUID + ".json", jsondata,encoding:Encoding.UTF8);
-                // Create zip file for correspondence
-                ZipFile.CreateFromDirectory(path, path + ".zip");
-                File.Move(path + ".zip", Path.ChangeExtension(path + ".zip", ".tarasol"));
-                Directory.Delete(path,true);
-                // Call Correspondence Import API from Tarasol
-                string corrImportResult = TarasolCorrespondencesImport();
-                //
-                Logger.AddToLogFile("Correspondence." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, corrImportResult);
-
-                return IntResultLib.GetResult(1); // if operation succeeded
             }
             catch (Exception ex)
             {
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message, PrintInterface: true);
                 throw ex;
             }
            
@@ -102,7 +112,7 @@ namespace IntegrationCore.IntegrationLibrary
             }
             catch (Exception ex)
             {
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message, PrintInterface: true);
                 throw ex;
             }
             
@@ -139,30 +149,40 @@ namespace IntegrationCore.IntegrationLibrary
                 //    string filePath = path + "/" + data.FileName + "." + data.FileExtension;
                 //    System.IO.File.WriteAllBytes(filePath, base64array);
                 //}
-                string filePath = path + "/" + GUID + ".pdf";
-                CallExternalAPI.CallGetFaxFile(tarasolDocument.faxurl, tarasolDocument.faxAuth, filePath);
-                
-                DocumentObject documentObject = Mapping.MapImportedFax(tarasolDocument);
-                if (documentObject.AddressTo.Count == 0)
+                try
                 {
-                    return IntResultLib.GetResult(2);
-                }
-                string jsondata = JsonConvert.SerializeObject(documentObject);
+                    string filePath = path + "/" + GUID + ".pdf";
+                    CallExternalAPI.CallGetFaxFile(tarasolDocument.faxurl, tarasolDocument.faxAuth, filePath);
 
-                // Write that JSON to  file,  
-                File.WriteAllText(path + "/" + GUID + ".json", jsondata,encoding:Encoding.UTF8);
-                // Create zip file for correspondence
-                ZipFile.CreateFromDirectory(path, path + ".zip");
-                File.Move(path + ".zip", Path.ChangeExtension(path + ".zip", ".tarasol"));
-                Directory.Delete(path, true);
-                // Call Correspondence Import API from Tarasol
-                TarasolCorrespondencesImport();
-                //
-                return IntResultLib.GetResult(1); // if operation succeeded
+                    DocumentObject documentObject = Mapping.MapImportedFax(tarasolDocument);
+                    if (documentObject.AddressTo.Count == 0)
+                    {
+                        Directory.Delete(path, true);
+                        return IntResultLib.GetResult(2);
+                    }
+                    string jsondata = JsonConvert.SerializeObject(documentObject);
+
+                    // Write that JSON to  file,  
+                    File.WriteAllText(path + "/" + GUID + ".json", jsondata, encoding: Encoding.UTF8);
+                    // Create zip file for correspondence
+                    ZipFile.CreateFromDirectory(path, path + ".zip");
+                    File.Move(path + ".zip", Path.ChangeExtension(path + ".zip", ".tarasol"));
+                    Directory.Delete(path, true);
+                    // Call Correspondence Import API from Tarasol
+                    TarasolCorrespondencesImport();
+                    //
+                    return IntResultLib.GetResult(1); // if operation succeeded
+                }
+                catch (Exception)
+                {
+                    Directory.Delete(path, true);
+                    throw;
+                }
+                
             }
             catch (Exception ex)
             {
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message, PrintInterface: true);
                 throw ex;
             }
         }
@@ -192,6 +212,7 @@ namespace IntegrationCore.IntegrationLibrary
                     };
                     if(tarasolAck.ExternalExchangeNo is null || string.IsNullOrEmpty(tarasolAck.LastParentGlobalID) || tarasolAck.AckDate is null)
                     {
+                        Directory.Delete(path, true);
                         return IntResultLib.GetResult(2);
                     }
                     string JsonAck = JsonConvert.SerializeObject(tarasolAck);
@@ -206,7 +227,7 @@ namespace IntegrationCore.IntegrationLibrary
             }
             catch (Exception ex)
             {
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message, PrintInterface: true);
                 throw ex;
             }
         }
@@ -257,7 +278,7 @@ namespace IntegrationCore.IntegrationLibrary
                                                 strJSONdata = reader.ReadToEnd();
                                                 reader.Dispose();
                                                 DocumentObject document = JsonConvert.DeserializeObject<DocumentObject>(strJSONdata);
-                                                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Document - Obj : " + strJSONdata, TrackInterface: true);
+                                                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Document - Obj : " + strJSONdata, TrackInterface: Logger.EnableLoggingInfo);
                                                 List<string> EntityCodes = new List<string>();
 
                                                 string[] Files = Directory.GetFiles(subDirectory, "*.*");
@@ -300,7 +321,7 @@ namespace IntegrationCore.IntegrationLibrary
 
                                                 }
 
-                                                Logger.AddToLogFile("Correspondence." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, $"CorrUID  : {CorrItem.CorrUID} ", TrackInterface: true);
+                                                Logger.AddToLogFile("Correspondence." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, $"CorrUID  : {CorrItem.CorrUID} ", TrackInterface: true, PrintInterface: true);
 
                                                 foreach (string item in Files)
                                                 {
@@ -345,7 +366,7 @@ namespace IntegrationCore.IntegrationLibrary
                                                         catch (Exception ex)
                                                         {
                                                             SendNotificationToTarasol(addressTo.Exchange_no_fax, CorrItem.CorrUID, 0, 0, ex.Message, ex.Message);
-                                                            Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message);
+                                                            Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message, PrintInterface: true);
                                                             //throw ex;
                                                         }
                                                     }
@@ -380,7 +401,7 @@ namespace IntegrationCore.IntegrationLibrary
                                                         catch (Exception ex)
                                                         {
                                                             SendNotificationToTarasol(addressTo.Exchange_no_email, CorrItem.CorrUID, 0, 0, ex.Message, ex.Message);
-                                                            Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message);
+                                                            Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message, PrintInterface: true);
                                                             //throw ex;
                                                         }
                                                     }
@@ -415,7 +436,7 @@ namespace IntegrationCore.IntegrationLibrary
                                                     {
                                                         if (document.PostFromID != null && trackElem != null)
                                                         {
-                                                            Logger.AddToLogFile("Correspondence." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, $"{document?.PostFromID?.GlobalIDs} => {entity}@{trackElem?.DestinationValue}", TrackInterface: true);
+                                                            Logger.AddToLogFile("Correspondence." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, $"{document?.PostFromID?.GlobalIDs} => {entity}@{trackElem?.DestinationValue}", TrackInterface: true, PrintInterface: true);
                                                         }
                                                     }
 
@@ -536,7 +557,7 @@ namespace IntegrationCore.IntegrationLibrary
             }
             catch (Exception ex)
             {
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message, PrintInterface: true);
                 throw ex;
             }
 
@@ -569,7 +590,7 @@ namespace IntegrationCore.IntegrationLibrary
             }
             catch (Exception ex)
             {
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message, PrintInterface: true);
                 throw ex;
             }
 
@@ -611,6 +632,7 @@ namespace IntegrationCore.IntegrationLibrary
                                     string EntityCode = string.IsNullOrEmpty(tarasolAck.LastParentGlobalID) ? tarasolAck.SenderGlobalID : tarasolAck.LastParentGlobalID.Replace(IntegrationSettings.GetSetting("EntityPrefix").ToString(), "");
                                     if (tarasolAck.ExternalExchangeNo is null || string.IsNullOrEmpty(EntityCode) || tarasolAck.AckDate is null)
                                     {
+
                                         return IntResultLib.GetResult(2);
                                     }
 
@@ -649,7 +671,7 @@ namespace IntegrationCore.IntegrationLibrary
             }
             catch (Exception ex)
             {
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message, PrintInterface: true);
                 throw ex;
             }
 
@@ -659,14 +681,17 @@ namespace IntegrationCore.IntegrationLibrary
         {
             try
             {
-                bool EnableLoggingInfo = (bool)IntegrationSettings.GetSetting("EnableLoggingInfo");
+                Logger.Enum_LogType t = Logger.Enum_LogType._Info;
+                ////bool EnableLoggingInfo = (bool)IntegrationSettings.GetSetting("EnableLoggingInfo");
                 if (status == 0)
                 {
+                    t = Logger.Enum_LogType._Error;
                     lMessage = "›‘·  ’œÌ— «·„—«”·… »”»» „‘ﬂ·… ›Ì »Ì«‰« Â«";
                     eMessage = "correspondence export failed due to metadata error";
                 }
                 else if (status == 2)
                 {
+                    t = Logger.Enum_LogType._Error;
                     lMessage = "›‘·  ’œÌ— «·„—«”·… »”»» „‘ﬂ·… »«·« ’«· ⁄»— ESB";
                     eMessage = "correspondence export failed due to ESB connection error";
                 }
@@ -685,8 +710,8 @@ namespace IntegrationCore.IntegrationLibrary
                     ""FailReasonLmsg"":""" + lMessage + @""",
                     }";
 
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "NotificationURL : " + NotificationURL, TrackInterface: true);
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Notification data : " + json, TrackInterface: EnableLoggingInfo);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, t, "NotificationURL : " + NotificationURL, TrackInterface: true);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, t, "Notification data : " + json,TrackInterface: Logger.EnableLoggingInfo, PrintInterface: true);
                 string Tarasol_Token = Cache.GetSession().Token;
                 if (string.IsNullOrEmpty(Tarasol_Token))
                 {
@@ -700,7 +725,7 @@ namespace IntegrationCore.IntegrationLibrary
             }
             catch (Exception ex)
             {
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message, PrintInterface: true);
                 return null;
                 //throw ex;
             }
@@ -727,7 +752,7 @@ namespace IntegrationCore.IntegrationLibrary
             }
             catch (Exception ex)
             {
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message, PrintInterface: true);
                 throw ex;
             }
         }

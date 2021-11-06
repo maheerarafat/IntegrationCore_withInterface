@@ -17,6 +17,7 @@ public class Logger : IDisposable
     public bool WriteMsgAtTheEnd = false;
     public string Message = "";
     private static bool _EnableLogging = false;
+    private static bool _EnableLoggingInfo = false;
     private static bool _EnableDBLogging = false;
     private static log4net.ILog _Log;
 
@@ -50,7 +51,34 @@ public class Logger : IDisposable
             _EnableLogging = value;
         }
     }
+    public static bool EnableLoggingInfo
+    {
+        get
+        {
+            if (!_EnableLoggingInfo)
+            {
+                string EnableLoggingElement;
+                IntegrationSettings.LoadSettings();
+                EnableLoggingElement = (string)IntegrationSettings.GetSetting("EnableLoggingInfo");
 
+                if (EnableLoggingElement != null)
+                {
+                    bool Result;
+                    if (bool.TryParse(EnableLoggingElement, out Result))
+                        _EnableLoggingInfo = Result;
+                    else
+                        _EnableLoggingInfo = false;
+                }
+                else
+                    _EnableLoggingInfo = false;
+            }
+            return _EnableLoggingInfo;
+        }
+        set
+        {
+            _EnableLoggingInfo = value;
+        }
+    }
 
     public static bool EnableDBLogging
     {
@@ -104,8 +132,9 @@ public class Logger : IDisposable
         _PerfEnd = 1,
         _Error = 2,
         _Info = 3,
-        _Critical = 4
-    }
+        _Critical = 4,
+        _file = 5
+     }
 
     class Performance
     {
@@ -236,11 +265,23 @@ public class Logger : IDisposable
             return;
     }
 
-    public static void AddToLogFile(string Scope, Enum_LogType Type, string Message, string AdditionalInfo = "", bool TrackInterface = false)
+    public static void AddToLogFile(string Scope, Enum_LogType Type, string Message, string AdditionalInfo = "", bool TrackInterface = false, bool PrintInterface = false)
     {
         // Loggrr typr info
         int CurrThread = System.Threading.Thread.CurrentThread.ManagedThreadId;
         string ScopeWithThread = Scope + ":" + CurrThread;
+
+        if (PrintInterface)
+        {
+            if (Type == Enum_LogType._Info)
+            {
+                Jobs.AddLogJobESB(ScopeWithThread, Message, (int)IntegrationCore.Helper.Enum.responseCode.Success, DateTime.Now, DateTime.Now, 0, Message, (int)IntegrationCore.Helper.Enum.scheduleType.Done );
+            }
+            else if (Type == Enum_LogType._Error)
+            {
+                Jobs.AddLogJobESB(ScopeWithThread, Message, (int)IntegrationCore.Helper.Enum.responseCode.Failed, DateTime.Now, DateTime.Now, 0, Message, (int)IntegrationCore.Helper.Enum.scheduleType.Done);
+            }
+        }
 
         if (EnableLogging || Type == Enum_LogType._Error /*|| Type == Enum_LogType._Info*/)
         {

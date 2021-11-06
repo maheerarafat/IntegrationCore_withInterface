@@ -37,9 +37,9 @@ namespace IntegrationCore.Controllers
             try
             {
                 string objStr = Newtonsoft.Json.JsonConvert.SerializeObject(mail);
-                bool EnableLoggingInfo = (bool)_cache.Get("EnableLoggingInfo");
+                //bool EnableLoggingInfo = (bool)_cache.Get("EnableLoggingInfo");
                 Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start", TrackInterface: true);
-                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start - Obj : " + objStr, TrackInterface: EnableLoggingInfo);
+                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start - Obj : " + objStr,TrackInterface: Logger.EnableLoggingInfo);
                 object jsonResult = IntegrationLibrary.Mail.SendEmail(mail);
                 Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End", TrackInterface: true);
                 return Json(jsonResult);

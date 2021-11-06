@@ -13,7 +13,7 @@ namespace IntegrationCore.IntegrationLibrary
         public static object GetUserInfo(SearchObject searchObject)
         {
             object result = null;
-            bool EnableLoggingInfo = (bool)IntegrationSettings.GetSetting("EnableLoggingInfo");
+            ////bool EnableLoggingInfo = (bool)IntegrationSettings.GetSetting("EnableLoggingInfo");
             try
             {
                 
@@ -84,7 +84,7 @@ namespace IntegrationCore.IntegrationLibrary
                     };
                     return user1;
                 }
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "hREmployeeDetails: " + objStr, TrackInterface: EnableLoggingInfo);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "hREmployeeDetails: " + objStr,TrackInterface: Logger.EnableLoggingInfo);
                 ed = hREmployeeDetails.HREmployeeDetailsList[0];
                 if (ed.EmployeeID == "")
                 {
@@ -121,7 +121,7 @@ namespace IntegrationCore.IntegrationLibrary
 
                 //Check if user is already in Tarasol
                 string DecPass = Encryption.DecryptString(IntegrationSettings.GetSetting("DBPassword").ToString());
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Connect to Database: " + IntegrationSettings.GetSetting("ConnectionString").ToString() /*+ "@#$11"+ DecPass*/, TrackInterface: EnableLoggingInfo);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Connect to Database: " + IntegrationSettings.GetSetting("ConnectionString").ToString() /*+ "@#$11"+ DecPass*/,TrackInterface: Logger.EnableLoggingInfo);
                 ///OracleConnection conn = new OracleConnection(IntegrationSettings.GetSetting("ConnectionString").ToString() + DecPass);
                 using (OracleConnection conn = new OracleConnection(IntegrationSettings.GetSetting("ConnectionString").ToString() + DecPass))
                 {
@@ -134,7 +134,7 @@ namespace IntegrationCore.IntegrationLibrary
                     OracleCommand cmd = conn.CreateCommand();
                     cmd.CommandType = CommandType.Text;
                     cmd.CommandText = "select u.flduid,u.fldname cnt from INTHRUSERSMAP m inner join tsusers u on u.flduid = m.flduseruid where fldhrempid = " + ed.EmployeeID;
-                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, cmd.CommandText, TrackInterface: EnableLoggingInfo);
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, cmd.CommandText,TrackInterface: Logger.EnableLoggingInfo);
                     var reader = cmd.ExecuteReader();
                     string UUID = "0";
                     string fldname = "0";
@@ -146,11 +146,11 @@ namespace IntegrationCore.IntegrationLibrary
                     if (UUID == "0")
                     {
                         cmd.CommandText = "delete from INTHRUSERSMAP where fldhrempid = " + ed.EmployeeID + "";
-                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, cmd.CommandText, TrackInterface: EnableLoggingInfo);
+                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, cmd.CommandText,TrackInterface: Logger.EnableLoggingInfo);
                         cmd.ExecuteNonQuery();
 
                         cmd.CommandText = "insert into INTHRUSERSMAP(flduseruid,fldhrempid) values('" + GUID + "'," + ed.EmployeeID + ")";
-                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, cmd.CommandText, TrackInterface: EnableLoggingInfo);
+                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, cmd.CommandText,TrackInterface: Logger.EnableLoggingInfo);
                         cmd.ExecuteNonQuery();
 
                         //Check if Position title already exists and take its code

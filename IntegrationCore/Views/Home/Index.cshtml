@@ -78,7 +78,7 @@
         });
 
         $(function () {
-           
+
         $("#Login").click(function () {
             debugger;
             $.ajax({
@@ -92,7 +92,7 @@
                     $("#token").text(data);
                 } else {
                     sessionStorage['token'] = data;
-                    window.location.href = '@Url.Action("Index", "Setting")';
+                    window.location.href = '@Url.Action("Index", "Job")';
                     @*$.ajax({
                     method: 'GET',
                     url: '@Url.Action("Index", "Setting")',
