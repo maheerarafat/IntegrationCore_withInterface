@@ -34,8 +34,9 @@ namespace IntegrationCore.Controllers
         {
             try
             {
+                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start", TrackInterface: true);
                 string Objstring = Newtonsoft.Json.JsonConvert.SerializeObject(sMSObject);
-                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start - Objstring : " + Objstring, TrackInterface: true);
+                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start - Objstring : " + Objstring, TrackInterface: Logger.EnableLoggingInfo);
                 //Expose SMS Service
                 object jsonResult = SMS.SendSMS(sMSObject);
                 Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End", TrackInterface: true);

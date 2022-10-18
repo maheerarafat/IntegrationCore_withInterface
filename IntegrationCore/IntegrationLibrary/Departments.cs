@@ -50,13 +50,19 @@ namespace IntegrationCore.IntegrationLibrary
             object result = null;
             try
             {
+                var SampleData = Convert.ToBoolean(IntegrationSettings.GetSetting("SampleData"));
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start", TrackInterface: true);
                 List<Models.Department> departmentList = new List<Models.Department>();
                 if(string.IsNullOrEmpty(searchObject.SearchKey.Trim()))
                 {
                     return result;
                 }
+
                 Models.Department department = new Models.Department();
+                if (SampleData)
+                {
+
+               
                 if (searchObject.SearchKey == "0000")
                 {
                     department.FLDLNAME = "قسم تجريبي";//dept_name
@@ -109,6 +115,7 @@ namespace IntegrationCore.IntegrationLibrary
                     departmentList.Add(department);
                     return departmentList;
                 }
+                }
                 //Expose HR service from ESB to get Department Data
                 if (searchObject.FieldName.ToLower() == "fldcode") 
                 { 
@@ -160,12 +167,12 @@ namespace IntegrationCore.IntegrationLibrary
                         }
                         dept = new Department
                         {
-                            FLDCODE = hRDepartment.DepartmentID,
-                            FLDLNAME = hRDepartment.DepartmentArabicName,
-                            FLDENAME = /*(string.IsNullOrEmpty(hRDepartment.DepartmentEnglishName)) ? "-" :*/ hRDepartment.DepartmentEnglishName,
-                            FLDPARENTID = hRDepartment.DepartmentParentID,
+                            FLDCODE = hRDepartment.DepartmentID.Trim(),
+                            FLDLNAME = hRDepartment.DepartmentArabicName.Trim(),
+                            FLDENAME = /*(string.IsNullOrEmpty(hRDepartment.DepartmentEnglishName)) ? "-" :*/ hRDepartment.DepartmentEnglishName.Trim(),
+                            FLDPARENTID = hRDepartment.DepartmentParentID.Trim(),
                             FLDACTIVE = (hRDepartment.DepartmentStatus == "A") ? "1" : "0",
-                            FLDOLDDEPTID = hRDepartment.OldDepartmentID,
+                            FLDOLDDEPTID = hRDepartment.OldDepartmentID.Trim(),
                             FLDOLDDEPTACTIVE = (OldDeptStatus == "A") ? "1" : "0"
                         };
 

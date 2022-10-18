@@ -2,39 +2,44 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using System.Text.RegularExpressions;
+
 namespace IntegrationCore.IntegrationLibrary
 {
     public class Mapping
     {
-        public static DocumentObject MapImportedFile(TarasolDocument tarasolDocument)
+        public static DocumentObject MapImportedFile(TarasolDocument tarasolDocument, List<TarasolTargetItem> AddressTo)
         {
             try
             {
-                List<TarasolTargetItem> AddressTo = new List<TarasolTargetItem>();
-                foreach (var item in tarasolDocument.TransactionIDs)
-                {
-                    GlobalIDs globalIDs = new GlobalIDs { GlobalID = item.Split('@')[1],MainParentGlobalID = IntegrationSettings.GetSetting("EntityPrefix").ToString() + item.Split('@')[2] };
-                    if(ChechDepartmentGlobalID(item.Split('@')[1], "GlobalId")) AddressTo.Add(new TarasolTargetItem() { GlobalIDs = globalIDs ,ExchangeNo = item.Split('@')[0] ,ExchangeStatus = "1"});
-                }
+                //List<TarasolTargetItem> AddressTo = new List<TarasolTargetItem>();
+                //foreach (var item in tarasolDocument.TransactionIDs)
+                //{
+                //    if (string.IsNullOrEmpty(item)) continue;
+                //        GlobalIDs globalIDs = new GlobalIDs { GlobalID = item.Split('@')[1],MainParentGlobalID = IntegrationSettings.GetSetting("EntityPrefix").ToString() + item.Split('@')[2] };//MainParentGlobalID shouldn't be filled
+                //    if (ChechDepartmentGlobalID(item.Split('@')[1], "GlobalId") && !string.IsNullOrEmpty(item.Split('@')[0])) AddressTo.Add(new TarasolTargetItem() { GlobalIDs = globalIDs ,ExchangeNo = item.Split('@')[0] ,ExchangeStatus = "1"});
+                //}
                 
                 DocumentObject documentObject = new DocumentObject
                 {
                     //GlobalID = tarasolDocument.Global_ID,
-                    ImportanceID = new TarasolItem { Value = tarasolDocument.Importance.ToString() },
+                    ImportanceID = new TarasolItem { Value = (tarasolDocument.Importance>3?3: tarasolDocument.Importance).ToString() },
                     Notes = new TarasolItem() { Value = tarasolDocument.Notes },
-                    Subject = new TarasolItem() { Value = tarasolDocument.Subject.Trim() },
+                    Subject = new TarasolItem() { Value = (tarasolDocument.Subject.Trim() == null) ? "empty" : Regex.Replace((string.IsNullOrEmpty(tarasolDocument.Subject.Trim())) ? "empty" : tarasolDocument.Subject.Trim(), "<.*?>", String.Empty).Replace("\n", " ").Replace("&nbsp", " ").Replace(";", "").Replace("PrintingDateTime", "") },
                     ExternalRefNumber = new TarasolItem() { Value = tarasolDocument.CorrespondenceNo.ToString().Trim() },
-                    SecrecyID = new TarasolItem() { Value = (tarasolDocument.Secrecy + 1).ToString() },
-                    PriorityID = new TarasolItem() { Value = tarasolDocument.Priority.ToString() },
+                    SecrecyID = new TarasolItem() { Value = (tarasolDocument.Secrecy>3?4:tarasolDocument.Secrecy + 1).ToString() },
+                    PriorityID = new TarasolItem() { Value = (tarasolDocument.Priority>3?3:tarasolDocument.Priority).ToString() },
                     ClassificationID = new Classification() { Code = IntegrationSettings.GetSetting("DefaultReference").ToString()/*tarasolDocument.ClassificationID*/ },
-                    Body = new TarasolItem() { Value = tarasolDocument.Body.Trim() } ,
+                    Body = new TarasolItem() { Value = (tarasolDocument.Body?.Trim() == null) ? "empty" : Regex.Replace((string.IsNullOrEmpty(tarasolDocument.Body.Trim())) ? "empty" : tarasolDocument.Body.Trim(), "<.*?>", String.Empty).Replace("\n", " ").Replace("&nbsp", " ").Replace(";", "").Replace("PrintingDateTime", "") } ,
                     DBCreationDate = new TarasolItem() { Value = ConvertToDateString(tarasolDocument.Date) },
-                    PostFromID = new TarasolTargetItem() { GlobalIDs = new GlobalIDs { GlobalID = tarasolDocument.Sender.GlobalID }, ExchangeStatus = "1" },
+                    CreationDate = new TarasolItem() { Value = ConvertToDateString(tarasolDocument.Date)  },
+                    PostFromID = new TarasolTargetItem() { GlobalIDs = new GlobalIDs { GlobalID = tarasolDocument.Sender.GlobalID/*, MainParentGlobalID = IntegrationSettings.GetSetting("EntityPrefix").ToString() + tarasolDocument.TransactionIDs[0].Split('@')[2] */}, ExchangeStatus = "1" },
                     PostFromType = new TarasolItem() { Value = "1" },
                     PostToType = new TarasolItem() { Value = "0" },
                     AddressTo = AddressTo
                 };
-
+                //documentObject.Variables = new List<TarasolItem>();
+                //documentObject.Variables.Add(new TarasolItem() { Name = IntegrationSettings.GetSetting("ImportDate").ToString(), Value = tarasolDocument.Date.ToString("DD-MM-yyyy HH:mm:ss") });
                 foreach (var item in AddressTo)
                 {
                     if (item?.GlobalIDs != null && tarasolDocument != null && tarasolDocument?.Sender != null)
@@ -83,14 +88,22 @@ namespace IntegrationCore.IntegrationLibrary
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Tarasol_Token : " + Tarasol_Token.Length, TrackInterface: true);
                 string jsondata = JsonConvert.SerializeObject(departmentPositionsReqCls);
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "ApiUrl post data : " + jsondata,TrackInterface: Logger.EnableLoggingInfo);
-
-                DepartmentPositionList jsonResponse = JsonConvert.DeserializeObject<DepartmentPositionList>(CallExternalAPI.CallPostAPI(ApiUrl, jsondata, Tarasol_Token).ToString());
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "ApiUrl post data : " + JsonConvert.SerializeObject(jsonResponse), TrackInterface: true);
-                return jsonResponse.CountofRecords != "0";
+                try
+                {
+                    DepartmentPositionList jsonResponse = JsonConvert.DeserializeObject<DepartmentPositionList>(CallExternalAPI.CallPostAPI(ApiUrl, jsondata, Tarasol_Token).ToString());
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "ApiUrl post data : " + JsonConvert.SerializeObject(jsonResponse), TrackInterface: true);
+                    return jsonResponse.CountofRecords != "0";
+                }
+                catch (Exception)
+                {
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, " error occured in  : Calling Tarasol API ");
+                    throw;
+                }
+                
             }
             catch (Exception ex)
             {
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, " error occured in  :  " + ex.Message);
                 throw ex;
             }
 
@@ -102,7 +115,7 @@ namespace IntegrationCore.IntegrationLibrary
                 List<TarasolTargetItem> AddressTo = new List<TarasolTargetItem>();
                 foreach (var item in tarasolDocument.Receiver)
                 {
-                    if (ChechDepartmentGlobalID(item.FaxNo, "Fax")) AddressTo.Add(new TarasolTargetItem() { Fax = item.FaxNo /*,ExchangeNo = tarasolDocument.TransactionIDs[0]*/, ExchangeStatus = "3",GlobalIDs = new GlobalIDs()});
+                    if (ChechDepartmentGlobalID(item.FaxNo, "Fax")) AddressTo.Add(new TarasolTargetItem() { Fax = item.FaxNo ,Exchange_no_fax = tarasolDocument.TransactionIDs[0], ExchangeStatus = "4",GlobalIDs = new GlobalIDs()});
                 }
                 List<TarasolItem> variabels = new List<TarasolItem>();
                 variabels.Add(new TarasolItem() { Name = (string)IntegrationSettings.GetSetting("FromFaxField"), Value = tarasolDocument.Sender.Name });

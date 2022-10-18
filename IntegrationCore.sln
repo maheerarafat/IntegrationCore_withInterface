@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2010
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31825.309
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationCore", "IntegrationCore\IntegrationCore.csproj", "{3F10FBD2-70F1-45F1-95B6-812B2A5FAE05}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationCore", "IntegrationCore\IntegrationCore.csproj", "{3F10FBD2-70F1-45F1-95B6-812B2A5FAE05}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A03A574E-0641-4993-97B9-5EEF89F9CEAE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -29,6 +29,7 @@ namespace IntegrationCore.IntegrationLibrary
             {
 
                 Exception exception = new Exception("Unable to send SMS - ex:" + ex.Message);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + exception.Message, PrintInterface: true);
                 throw exception;
             }
         }

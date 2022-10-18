@@ -64,7 +64,9 @@ namespace IntegrationCore.Controllers
             try
             {
                 Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start", TrackInterface: true);
-                object jsonResult = Departments.GetDepartmentInfo(searchObject);
+                object jsonResult = Departments.GetDepartmentInfo
+                    
+                    (searchObject);
                 string objStr = Newtonsoft.Json.JsonConvert.SerializeObject(jsonResult);
                 Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End : result : " + objStr, TrackInterface: true);
                 return Json(jsonResult);

@@ -16,12 +16,15 @@ namespace IntegrationCore.IntegrationLibrary
             ////bool EnableLoggingInfo = (bool)IntegrationSettings.GetSetting("EnableLoggingInfo");
             try
             {
-                
+                var SampleData = Convert.ToBoolean( IntegrationSettings.GetSetting("SampleData"));
+                Models.User sampleUser = new Models.User();
                 string GUID = Guid.NewGuid().ToString();
                 List<string[]> Parameters = new List<string[]>();
                 if (searchObject.SearchKey == "0000")
                 {
-                    Models.User user1 = new Models.User
+                    
+                    sampleUser = new Models.User
+
                     {
                         FldNickName = "0000",//Emp_no Militery Number
                         FldName = "HR_00000",
@@ -39,11 +42,10 @@ namespace IntegrationCore.IntegrationLibrary
                         FldUserCode = "foo",
                         ResponseCode = "200"
                     };
-                    return user1;
                 }
                 else if (searchObject.SearchKey == "0001")
                 {
-                    Models.User user1 = new Models.User
+                    sampleUser = new Models.User
                     {
                         FldNickName = "0001",//Emp_no Militery Number
                         FldName = "HR_00001",
@@ -62,28 +64,29 @@ namespace IntegrationCore.IntegrationLibrary
                         ResponseCode = "200"
                     };
                     
-                    return user1;
                 }
                 string[] searchPar = { (searchObject.FieldName == "MNum") ?"MilitaryNumber":"EmiratesID" , searchObject.SearchKey.Trim() };
                 Parameters.Add(searchPar);
-                HREmployeeDetail ed;
+                HREmployeeDetail ed=new HREmployeeDetail() ;
                 HREmployeeDetails hREmployeeDetails = new HREmployeeDetails();
                 string objStr;
-                try
+                if (! SampleData)
                 {
-                    hREmployeeDetails = XMLProcessing.Deserializer<HREmployeeDetails>(SoapRequest.CallHRWebService("GetEmployeeDetailsRequest", Parameters: Parameters).ToString());
-                    objStr = Newtonsoft.Json.JsonConvert.SerializeObject(hREmployeeDetails);
-                }
-                catch
-                {
-                    Models.User user1 = new Models.User()
+                    try
                     {
-                        ResponseCode = "0",
-                        LMessage = "لايوجد نتائج",
-                        EMessage = "No results"
-                    };
-                    return user1;
-                }
+                        hREmployeeDetails = XMLProcessing.Deserializer<HREmployeeDetails>(SoapRequest.CallHRWebService("GetEmployeeDetailsRequest", Parameters: Parameters).ToString());
+                        objStr = Newtonsoft.Json.JsonConvert.SerializeObject(hREmployeeDetails);
+                    }
+                    catch
+                    {
+                        Models.User user1 = new Models.User()
+                        {
+                            ResponseCode = "0",
+                            LMessage = "لايوجد نتائج",
+                            EMessage = "No results"
+                        };
+                        return user1;
+                    }
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "hREmployeeDetails: " + objStr,TrackInterface: Logger.EnableLoggingInfo);
                 ed = hREmployeeDetails.HREmployeeDetailsList[0];
                 if (ed.EmployeeID == "")
@@ -96,6 +99,8 @@ namespace IntegrationCore.IntegrationLibrary
                     };
                     return user1;
                 }
+                }
+           
                 
                 Models.User user = new Models.User
                 {
@@ -116,12 +121,21 @@ namespace IntegrationCore.IntegrationLibrary
                             : (ed.OccupationGroupID + "_" + ed.OccupationJobID + "_A")),// need to check in service
                     HRPOSNAME = ((string.IsNullOrEmpty(ed.OccupationGroupID)) ? ((ed.JobTileGroupID != "999")?ed.JobTileGroupName:ed.JobTitleName) : (ed.OccupationGroupName)),// need to check in service
                     FldUserCode = (string.IsNullOrEmpty(ed.EmiratesID))?"-":ed.EmiratesID ,
+                    FldName  = "hr_" + ed.EmployeeID,
                     ResponseCode = "200"
-                };
 
-                //Check if user is already in Tarasol
+                };
+                
+                if (SampleData)
+                {
+                    ed.EmployeeID = sampleUser.HREMPID;
+                    user = sampleUser;
+
+                }
+
+             //   Check if user is already in Tarasol
                 string DecPass = Encryption.DecryptString(IntegrationSettings.GetSetting("DBPassword").ToString());
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Connect to Database: " + IntegrationSettings.GetSetting("ConnectionString").ToString() /*+ "@#$11"+ DecPass*/,TrackInterface: Logger.EnableLoggingInfo);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Connect to Database: " + IntegrationSettings.GetSetting("ConnectionString").ToString() /*+ "@#$11"+ DecPass*/, TrackInterface: Logger.EnableLoggingInfo);
                 ///OracleConnection conn = new OracleConnection(IntegrationSettings.GetSetting("ConnectionString").ToString() + DecPass);
                 using (OracleConnection conn = new OracleConnection(IntegrationSettings.GetSetting("ConnectionString").ToString() + DecPass))
                 {
@@ -134,7 +148,7 @@ namespace IntegrationCore.IntegrationLibrary
                     OracleCommand cmd = conn.CreateCommand();
                     cmd.CommandType = CommandType.Text;
                     cmd.CommandText = "select u.flduid,u.fldname cnt from INTHRUSERSMAP m inner join tsusers u on u.flduid = m.flduseruid where fldhrempid = " + ed.EmployeeID;
-                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, cmd.CommandText,TrackInterface: Logger.EnableLoggingInfo);
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, cmd.CommandText, TrackInterface: Logger.EnableLoggingInfo);
                     var reader = cmd.ExecuteReader();
                     string UUID = "0";
                     string fldname = "0";
@@ -146,11 +160,11 @@ namespace IntegrationCore.IntegrationLibrary
                     if (UUID == "0")
                     {
                         cmd.CommandText = "delete from INTHRUSERSMAP where fldhrempid = " + ed.EmployeeID + "";
-                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, cmd.CommandText,TrackInterface: Logger.EnableLoggingInfo);
+                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, cmd.CommandText, TrackInterface: Logger.EnableLoggingInfo);
                         cmd.ExecuteNonQuery();
 
                         cmd.CommandText = "insert into INTHRUSERSMAP(flduseruid,fldhrempid) values('" + GUID + "'," + ed.EmployeeID + ")";
-                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, cmd.CommandText,TrackInterface: Logger.EnableLoggingInfo);
+                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, cmd.CommandText, TrackInterface: Logger.EnableLoggingInfo);
                         cmd.ExecuteNonQuery();
 
                         //Check if Position title already exists and take its code
@@ -164,7 +178,7 @@ namespace IntegrationCore.IntegrationLibrary
                         if (Ecode != "")
                         {
                             Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Existing position title: " + Ecode, TrackInterface: true);
-                            user.HRPOSCODE = Ecode;
+                            user.HRPOSCODE = user.HRDEPTCODE + "_" + Ecode;
                         }
                         user.FldName = "hr_" + ed.EmployeeID;
                     }
@@ -173,16 +187,16 @@ namespace IntegrationCore.IntegrationLibrary
                         user.FldUID = UUID;
                         user.FldName = fldname;
                         // return error message to tarasol
-                        user.ResponseCode = "201";
-                        user.LMessage = "المستخدم موجود مسبقاً في تراسل";
-                        user.EMessage = "User already exists in Tarasol";
+                        //user.ResponseCode = "201";
+                        //user.LMessage = "المستخدم موجود مسبقاً في تراسل";
+                        //user.EMessage = "User already exists in Tarasol";
                     }
                     Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "UUID: " + UUID, TrackInterface: true);
 
                     Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "user.FldName " + user.FldName, TrackInterface: true);
                     result = user;
                 }
-                
+
             }
             catch (Exception ex)
             {

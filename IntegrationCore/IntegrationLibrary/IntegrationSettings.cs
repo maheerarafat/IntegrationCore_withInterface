@@ -78,7 +78,10 @@ namespace IntegrationCore.IntegrationLibrary
 
                     Cache.SetCache("DMSUser", xdoc.SelectSingleNode("Configuration_Properties/DMSUser").InnerText);
                     Cache.SetCache("DMSPass", xdoc.SelectSingleNode("Configuration_Properties/DMSPass").InnerText);
-                    
+                    Cache.SetCache("OldEntities", xdoc.SelectSingleNode("Configuration_Properties/OldEntities").InnerText);
+                    Cache.SetCache("SampleData", xdoc.SelectSingleNode("Configuration_Properties/SampleData").InnerText);
+                    //Cache.SetCache("ImportDate", xdoc.SelectSingleNode("Configuration_Properties/ImportDate").InnerText);
+
 
                     Cache.SetCache("IsSettingsLoaded", true);
                     return true;
@@ -95,6 +98,39 @@ namespace IntegrationCore.IntegrationLibrary
                 throw ex;
             }
            
+        }
+        public static string GetTarasolGeneralSetting()
+        {
+            try
+            {
+                if (GetSetting("TarasolGeneralSetting") == null || string.IsNullOrEmpty(GetSetting("TarasolGeneralSetting")?.ToString()))
+                {
+                    string Tarasol_Token = Cache.GetSession().Token;
+                    string Session_ID = Cache.GetSession().SessionID;
+                    string ImportURL = IntegrationSettings.GetSetting("APIURL").ToString() + "/Corr/GeneralSettingGet?SessionId=" + Session_ID;
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "ImportURL : " + ImportURL, TrackInterface: true);
+                    /*b8a862d1-ed8a-487c-bd44-0ebe1b0f6cf8&CurrentPosition=016b10b9-7930-44b4-96d7-07b6f58cb357*/
+                    if (Tarasol_Token == "")
+                    {
+                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Tarasol_Token : Unauthorized user");
+                        return null;
+                    }
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Tarasol_Token : " + Tarasol_Token.Length, TrackInterface: true);
+                    object jsonResponse = CallExternalAPI.CallGetAPI(ImportURL, Tarasol_Token);
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "jsonResponse : " + jsonResponse, TrackInterface: true);
+                    Cache.SetCache("TarasolGeneralSetting", jsonResponse);
+                }
+                return GetSetting("TarasolGeneralSetting").ToString();
+                
+                
+                //return jsonResponse.ToString();
+            }
+            catch (Exception ex)
+            {
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message, PrintInterface: true);
+                throw ex;
+            }
+
         }
         public static object GetSetting(string SettingsCacheKey, IHostingEnvironment _hostingEnvironment = null)
         {
@@ -165,7 +201,10 @@ namespace IntegrationCore.IntegrationLibrary
                     xdoc.SelectSingleNode("Configuration_Properties/FromFaxField").InnerText = settingModel.FromFaxField;
                     //xdoc.SelectSingleNode("Configuration_Properties/RightFaxFolderPath").InnerText = settingModel.RightFaxFolderPath;
                     xdoc.SelectSingleNode("Configuration_Properties/TarasolINTUser").InnerText = settingModel.TarasolINTUser;
+                    //xdoc.SelectSingleNode("Configuration_Properties/TarasolGeneralSettings").InnerText = settingModel.TarasolGeneralSettings;
                     if (settingModel.TarasolINTPassword != null) xdoc.SelectSingleNode("Configuration_Properties/TarasolINTPassword").InnerText = settingModel.TarasolINTPassword;
+                    if (settingModel.OldEntities != null) xdoc.SelectSingleNode("Configuration_Properties/OldEntities").InnerText = settingModel.OldEntities;
+                    
                     //if(settingModel.DataFolder == null)xdoc.SelectSingleNode("Configuration_Properties/DataFolder").InnerText= settingModel.DataFolder;
                     //xdoc.SelectSingleNode("Configuration_Properties/ConfigPath").InnerText= settingModel.ConfigPath;
                     xdoc.Save(ConfigPath);

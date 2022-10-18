@@ -18,12 +18,14 @@ namespace IntegrationCore.IntegrationLibrary
 
             try
             {
-                //var dyParam = new OracleDynamicParameters();
-                //dyParam.Add("EMP_ID", OracleDbType.Int32, ParameterDirection.Input, empId);
-                //dyParam.Add("EMP_DETAIL_CURSOR", OracleDbType.RefCursor, ParameterDirection.Output);
-                using (var cnm = new ConnectionManager())
+                
+                using (var conn = ConnectionManager.GetConnection())
                 {
-                    var conn = cnm.GetConnectionDisposal();
+                    if (conn.State == ConnectionState.Closed)
+                    {
+                        conn.Open();
+                    }
+
                     if (conn.State == ConnectionState.Open)
                     {
 
@@ -45,8 +47,12 @@ namespace IntegrationCore.IntegrationLibrary
                         {
                             recordsTotal = count_result.ElementAt(0).FLDCOUNT;
                         }
+                        conn.Close();
+                        
                     }
+
                 }
+                
 
 
             }
@@ -65,21 +71,22 @@ namespace IntegrationCore.IntegrationLibrary
 
             try
             {
-                //var dyParam = new OracleDynamicParameters();
-                //dyParam.Add("EMP_ID", OracleDbType.Int32, ParameterDirection.Input, empId);
-                //dyParam.Add("EMP_DETAIL_CURSOR", OracleDbType.RefCursor, ParameterDirection.Output);
-
-                using (var cnm = new ConnectionManager())
+               
+                using (var conn = ConnectionManager.GetConnection())
                 {
-                    var conn = cnm.GetConnectionDisposal();
+                    if (conn.State == ConnectionState.Closed)
+                    {
+                        conn.Open();
+                    }
 
                     if (conn.State == ConnectionState.Open)
                     {
+
                         var query = String.Format("SELECT flduid, FLDname, Flddescription, Fldtype, Flddatestart, Flddateend, Fldduration, fldbodyrequest" +
-                            " FROM (SELECT a.*, rownum r__ FROM (SELECT flduid, FLDname, Flddescription, Fldtype, Flddatestart, Flddateend, Fldduration, fldbodyrequest " +
-                            $" FROM INTJobEsb WHERE Fldtype = {(int)Helper.Enum.responseCode.Failed} ORDER BY Flddatestart DESC ) a" +
-                            " WHERE rownum < (({0} * {1}) + 1 ) ) WHERE r__ >= ((({0}-1) * {1}) + 1)",
-                            pageNumber + 1, pageSize);
+                             " FROM (SELECT a.*, rownum r__ FROM (SELECT flduid, FLDname, Flddescription, Fldtype, Flddatestart, Flddateend, Fldduration, fldbodyrequest " +
+                             $" FROM INTJobEsb WHERE Fldtype = {(int)Helper.Enum.responseCode.Failed} ORDER BY Flddatestart DESC ) a" +
+                             " WHERE rownum < (({0} * {1}) + 1 ) ) WHERE r__ >= ((({0}-1) * {1}) + 1)",
+                             pageNumber + 1, pageSize);
 
                         object instance = Activator.CreateInstance(typeof(IntJobEsb), false);
                         result = SqlMapper.Query<IntJobEsb>(conn, query, commandType: CommandType.Text).ToList();
@@ -93,10 +100,10 @@ namespace IntegrationCore.IntegrationLibrary
                         {
                             recordsTotal = count_result.ElementAt(0).FLDCOUNT;
                         }
-
-
+                        conn.Close();
                     }
                 }
+                
             }
             catch (Exception ex)
             {
@@ -113,16 +120,17 @@ namespace IntegrationCore.IntegrationLibrary
 
             try
             {
-                //var dyParam = new OracleDynamicParameters();
-                //dyParam.Add("EMP_ID", OracleDbType.Int32, ParameterDirection.Input, empId);
-                //dyParam.Add("EMP_DETAIL_CURSOR", OracleDbType.RefCursor, ParameterDirection.Output);
-
-                using (var cnm = new ConnectionManager())
+                
+                using (var conn = ConnectionManager.GetConnection())
                 {
-                    var conn = cnm.GetConnectionDisposal();
+                    if (conn.State == ConnectionState.Closed)
+                    {
+                        conn.Open();
+                    }
 
                     if (conn.State == ConnectionState.Open)
                     {
+
                         var query = String.Format("SELECT flduid, FLDname, Flddescription, Fldtype, Flddatestart, Flddateend, Fldduration, fldbodyrequest" +
                             " FROM (SELECT a.*, rownum r__ FROM (SELECT flduid, FLDname, Flddescription, Fldtype, Flddatestart, Flddateend, Fldduration, fldbodyrequest " +
                             $" FROM INTJobEsb WHERE Fldtype = {(int)Helper.Enum.responseCode.Failed} " +
@@ -150,9 +158,10 @@ namespace IntegrationCore.IntegrationLibrary
                         {
                             recordsTotal = count_result.ElementAt(0).FLDCOUNT;
                         }
-
+                        conn.Close();
                     }
                 }
+                
             }
             catch (Exception ex)
             {
@@ -169,15 +178,17 @@ namespace IntegrationCore.IntegrationLibrary
 
             try
             {
-                //var dyParam = new OracleDynamicParameters();
-                //dyParam.Add("EMP_ID", OracleDbType.Int32, ParameterDirection.Input, empId);
-                //dyParam.Add("EMP_DETAIL_CURSOR", OracleDbType.RefCursor, ParameterDirection.Output);
-
-                using (var cnm = new ConnectionManager())
+                
+                using (var conn = ConnectionManager.GetConnection())
                 {
-                    var conn = cnm.GetConnectionDisposal();
+                    if (conn.State == ConnectionState.Closed)
+                    {
+                        conn.Open();
+                    }
+
                     if (conn.State == ConnectionState.Open)
                     {
+
                         var query = String.Format("SELECT flduid, FLDname, Flddescription, Fldtype, Flddatestart, Flddateend, Fldduration, fldbodyrequest, fldnumbertimesendschudle" +
                             " FROM (SELECT a.*, rownum r__ FROM (SELECT flduid, FLDname, Flddescription, Fldtype, Flddatestart, Flddateend, Fldduration, fldbodyrequest, fldnumbertimesendschudle " +
                             $" FROM INTJobEsb WHERE Fldtype = {(int)Helper.Enum.responseCode.Failed} " +
@@ -198,10 +209,10 @@ namespace IntegrationCore.IntegrationLibrary
                         {
                             recordsTotal = count_result.ElementAt(0).FLDCOUNT;
                         }
-
-
+                        conn.Close();
                     }
                 }
+                
             }
             catch (Exception ex)
             {
@@ -216,26 +227,29 @@ namespace IntegrationCore.IntegrationLibrary
             object result = null;
             try
             {
-                //var dyParam = new OracleDynamicParameters();
-                //dyParam.Add("EMP_ID", OracleDbType.Int32, ParameterDirection.Input, empId);
-                //dyParam.Add("EMP_DETAIL_CURSOR", OracleDbType.RefCursor, ParameterDirection.Output);
-                using (var cnm = new ConnectionManager())
+                
+                using (var conn = ConnectionManager.GetConnection())
                 {
-                    var conn = cnm.GetConnectionDisposal();
+                    if (conn.State == ConnectionState.Closed)
+                    {
+                        conn.Open();
+                    }
 
                     if (conn.State == ConnectionState.Open)
                     {
+
                         string startDateStr = startDate.ToString("dd/MM/yyyy HH:mm:ss");
                         string endDateStr = endDate.ToString("dd/MM/yyyy HH:mm:ss");
 
                         var query = String.Format("INSERT INTO INTJobEsb (FLDname, Flddescription, Fldtype, Flddatestart, Flddateend, Fldduration, FLDBODYREQUEST, FLDSENDSCHUDLE, FLDNUMBERTIMESENDSCHUDLE) " +
                             "VALUES ('{0}', '{1}',{2}, TO_DATE('{3}', 'DD/MM/YYYY HH24:MI:SS') , TO_DATE('{4}', 'DD/MM/YYYY HH24:MI:SS'), {5}, '{6}', {7}, {8})",
                             name, description, type, startDateStr, endDateStr, duration, bodyRequest, statusSchedule, 1);
+                        //Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Job query : " + query, TrackInterface: Logger.EnableLoggingInfo, PrintInterface: Logger.EnableLoggingInfo);
                         int res = conn.Execute(query);
-
-
+                        conn.Close();
                     }
                 }
+                
 
             }
             catch (Exception ex)
@@ -249,30 +263,32 @@ namespace IntegrationCore.IntegrationLibrary
 
         public static void UpdateProccessScheduleStatus(string fldid, int status)
         {
-            List<IntJobEsb> result = null;
+            
 
             try
             {
-                //var dyParam = new OracleDynamicParameters();
-                //dyParam.Add("EMP_ID", OracleDbType.Int32, ParameterDirection.Input, empId);
-                //dyParam.Add("EMP_DETAIL_CURSOR", OracleDbType.RefCursor, ParameterDirection.Output);
-                using (var cnm = new ConnectionManager())
+                
+                using (var conn = ConnectionManager.GetConnection())
                 {
-                    var conn = cnm.GetConnectionDisposal();
+                    if (conn.State == ConnectionState.Closed)
+                    {
+                        conn.Open();
+                    }
 
                     if (conn.State == ConnectionState.Open)
                     {
+
                         var query = String.Format("update INTJobEsb set fldsendschudle = {0} where flduid = {1} ", status, fldid);
                         // 
                         int res = conn.Execute(query);
+                        conn.Close();
                     }
                 }
+               
 
             }
             catch (Exception ex)
             {
-                //if (conn.State == ConnectionState.Open)
-                //    conn.Close();
                 throw ex;
             }
 

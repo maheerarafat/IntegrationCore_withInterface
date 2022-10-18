@@ -12,6 +12,20 @@ namespace IntegrationCore.Models
         public bool IsFirstTry { get; set; }
         
         public List<TarasolTargetItem> ResendTo { get; set; }
+       
+    }
+
+    public class RejectCorr
+    {
+        public string CorrUID { get; set; }        
+        public List<Transaction> Transactions { get; set; }
+        public bool IsFirstTry { get; set; }
+
+    }
+    public class Transaction
+    {
+        public string ExchangeNo { get; set; }
+        public string GlobalID { get; set; }
     }
     public class FaxInquiry
     {

@@ -23,8 +23,9 @@ namespace IntegrationCore.IntegrationLibrary
         {
             try
             {
-
+                //
                 var httpWebRequest = (HttpWebRequest)WebRequest.Create(APIURL);
+                httpWebRequest.Timeout = 600000;
                 if (Tarasol_Token != "")
                 {
                     httpWebRequest.Headers["Authorization"] = "Bearer " + Tarasol_Token;
@@ -47,6 +48,7 @@ namespace IntegrationCore.IntegrationLibrary
                 using (StreamReader streamReader = new StreamReader(httpResponse.GetResponseStream()))
                 {
                     string result = streamReader.ReadToEnd();
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Tarasol Result  : " + result);
                     streamReader.Dispose();
                     streamReader.Close();
                     //object jsonResponse = JsonConvert.DeserializeObject<object>(result);
@@ -83,6 +85,7 @@ namespace IntegrationCore.IntegrationLibrary
             {
 
                 HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(APIURL);
+                httpWebRequest.Timeout = 600000;
                 if (Tarasol_Token != "")
                 {
                     httpWebRequest.Headers["Authorization"] = "Bearer " + Tarasol_Token;
@@ -157,6 +160,7 @@ namespace IntegrationCore.IntegrationLibrary
             {
 
                 HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(APIURL);
+                httpWebRequest.Timeout = 600000;
                 if (Tarasol_Token != "")
                 {
                     httpWebRequest.Headers["Authorization"] = "Bearer " + Tarasol_Token;
@@ -187,6 +191,7 @@ namespace IntegrationCore.IntegrationLibrary
                     //{                        
                     //}
                     //return null;
+
                     using (Stream responseStream = httpResponse.GetResponseStream())
                     {
                         MemoryStream memoryStream = new MemoryStream();
@@ -197,6 +202,7 @@ namespace IntegrationCore.IntegrationLibrary
                             byteCount = responseStream.Read(buffer, 0, buffer.Length);
                             memoryStream.Write(buffer, 0, byteCount);
                         } while (byteCount > 0);
+                        memoryStream.Seek(0, SeekOrigin.Begin);
                         return memoryStream;
                     }
                 }
@@ -225,6 +231,7 @@ namespace IntegrationCore.IntegrationLibrary
                 ByteArrayContent byteArrayContent = new ByteArrayContent(FileBytes);
                 multiForm.Add(byteArrayContent, "file", fileName);
                 HttpClient httpClient = new HttpClient();
+                httpClient.Timeout = TimeSpan.FromMinutes(10) ;
                 var response = await httpClient.PostAsync(APIURL, multiForm);
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
@@ -270,6 +277,7 @@ namespace IntegrationCore.IntegrationLibrary
                 ByteArrayContent byteArrayContent = new ByteArrayContent(base64array);
                 multiForm.Add(byteArrayContent, "file", fileName);
                 HttpClient httpClient = new HttpClient();
+                httpClient.Timeout = TimeSpan.FromMinutes(10);
                 var response = await httpClient.PostAsync(APIURL, multiForm);
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Scan File Response : " + response);
                 return IntResultLib.GetResult(1);
@@ -288,6 +296,7 @@ namespace IntegrationCore.IntegrationLibrary
             {
 
                 HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(APIURL);
+                httpWebRequest.Timeout = 600000;
                 if (Tarasol_Token != "")
                 {
                     httpWebRequest.Headers["Authorization"] = "Bearer " + Tarasol_Token;
@@ -342,7 +351,7 @@ namespace IntegrationCore.IntegrationLibrary
             try
             {
                 HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(APIURL);
-                
+                httpWebRequest.Timeout = 600000;
                 httpWebRequest.Headers.Add("Authorization", "Basic " + Auth);
                 WebResponse httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
                 using (StreamReader streamReader = new StreamReader(httpResponse.GetResponseStream()))

@@ -15,7 +15,10 @@ namespace IntegrationCore.IntegrationLibrary
         /// </summary>
         public static async Task Send(string ExchangeNo,string CorrUID, List<MultipartFormDataContent> files, string faxNumber, string url, string username, string password, string nameRecipient = "MOI", DirectoryInfo downloadDirectory = null)
         {
-            // Create HTTP client
+            try
+            {
+
+           // Create HTTP client
             var client = await HttpClientFax.CreateClient(username, password, url);
 
             // Get API root, which provides links to other API resources.
@@ -52,6 +55,12 @@ namespace IntegrationCore.IntegrationLibrary
                 
             else
                 Correspondence.SendNotificationToTarasol(ExchangeNo, CorrUID, 1, 0, "", "");
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message.ToString());
+            }
 
         }
 
@@ -60,6 +69,10 @@ namespace IntegrationCore.IntegrationLibrary
         /// </summary>
         static async Task<List<string>> UploadAttachments(HttpClient client, string attachmentsUrl, List<MultipartFormDataContent> files)
         {
+            try
+            {
+
+           
             List<string> attachmentUrls = new List<string>();
             // Upload the file using standard multipart form data.
             foreach (var content in files)
@@ -70,6 +83,12 @@ namespace IntegrationCore.IntegrationLibrary
             }
 
             return attachmentUrls;
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message.ToString());
+            }
         }
 
         /// <summary>
@@ -78,21 +97,29 @@ namespace IntegrationCore.IntegrationLibrary
         static async Task<SendJob> WaitForJob(HttpClient client, string jobUrl)
         {
             Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Job processing - Fax Operation ", TrackInterface: true);
-
-            SendJob job;
-            do
+            try
             {
-                await Task.Delay(TimeSpan.FromSeconds(1));
+                SendJob job;
+                do
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(1));
 
-                job = await client.Get<SendJob>(jobUrl);
+                    job = await client.Get<SendJob>(jobUrl);
 
-                Console.Write(".");
+                    Console.Write(".");
 
-            } while (job.Condition != "Succeeded" && job.Condition != "Cancelled" && job.Condition != "Failed");
+                } while (job.Condition != "Succeeded" && job.Condition != "Cancelled" && job.Condition != "Failed");
 
-            Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, $"Job processing - Fax Operation status {job.Status}", TrackInterface: true);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, $"Job processing - Fax Operation status {job.Status}", TrackInterface: true, PrintInterface: true);
 
-            return job;
+                return job;
+            }
+            catch (Exception ex)
+            {
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message, TrackInterface: true, PrintInterface: true);
+                throw ex;
+            }
+           
         }
 
 

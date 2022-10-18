@@ -1,0 +1,3 @@
+2022-06-28	 Remove special characters from the attachments file name 
+2022-06-05	 - Support telegram document type
+			 - Stop the export proccess if the destination dose not have globalID	

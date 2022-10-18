@@ -22,6 +22,10 @@ namespace IntegrationCore.IntegrationLibrary
         /// </summary>
         public static async Task<HttpClient> CreateClient(string username, string password, string url = null)
         {
+            try
+            {
+
+           
             if (string.IsNullOrEmpty(username))
                 throw new ArgumentException("Can't be null or empty.", "username");
 
@@ -44,6 +48,12 @@ namespace IntegrationCore.IntegrationLibrary
             }
 
             return client;
+            }
+            catch (Exception ex)
+            {
+
+                 throw new Exception(ex.Message.ToString()); ;
+            }
         }
 
         /// <summary>

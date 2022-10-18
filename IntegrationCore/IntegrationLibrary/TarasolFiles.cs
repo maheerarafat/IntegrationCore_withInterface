@@ -27,10 +27,10 @@ namespace IntegrationCore.IntegrationLibrary
                 }
                 DownloadUploadRequest downloadUploadRequest = (DownloadUploadRequest)getSession(InterfaceID);
                 //Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "GetFromCache(InterfaceID):" + getSession(InterfaceID).ToString());
-                Cache.GetSession();
+                //Cache.GetSession();
                 string RequestURL = Cache.GetFromCache("APIURL") + "/Corr/ExportCorrespondenceZip?" + "SessionID=" + Cache.GetSession().SessionID + "&downloadzipfile=true&DocUID=" + downloadUploadRequest.DocUID;
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "RequestURL:" + RequestURL, TrackInterface: true);
-                MemoryStream memoryStream = CallExternalAPI.CallGetFileAPI(RequestURL, Cache.GetSession().Token);
+                MemoryStream memoryStream = CallExternalAPI.CallGetFileAPI(RequestURL, Cache.GetSession(isNew: true).Token);
                 return memoryStream;
             }
             catch (Exception ex)
@@ -86,6 +86,43 @@ namespace IntegrationCore.IntegrationLibrary
             //Return File Stream
             
         }
+
+        //public static MemoryStream GetStreamFileFromTarasolByUID(string CorrUID, IMemoryCache memoryCache)
+        //{
+
+        //    try
+        //    {
+                
+        //        Cache.GetSession();
+        //        string RequestURL = Cache.GetFromCache("APIURL") + "/Corr/ExportCorrespondenceZip?" + "SessionID=" + Cache.GetSession().SessionID + "&downloadzipfile=true&DocUID=" + CorrUID;
+        //        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "RequestURL:" + RequestURL, TrackInterface: true);
+        //        MemoryStream memoryStream = CallExternalAPI.CallGetFileAPI(RequestURL, Cache.GetSession().Token);
+        //        return memoryStream;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message);
+        //        throw ex;
+        //    }        
+
+        //}
+
+        //public static void WriteJson()
+        //{
+        //    DocumentObject documentObject = new DocumentObject()
+        //    {
+        //        AddressTo = new List<TarasolTargetItem>(),
+        //        Body = new TarasolItem(),
+        //        CreationDate = new TarasolItem(),
+        //        DBCreationDate = new TarasolItem(),
+        //        ExternalRefNumber = new TarasolItem(),
+        //        ReferenceNo = new TarasolItem(),
+        //        Subject = new TarasolItem(),
+        //        PriorityID = new TarasolItem(),
+        //        SecrecyID = new TarasolItem(),
+        //        PostFromID = new TarasolTargetItem()
+        //    };
+        //}
         public static async Task<List<SendFileToTarasolReturnedData>> SendFilesStreamToTarasolAsync(IFormFileCollection Files, string InterfaceID)
         {
             try
@@ -100,11 +137,13 @@ namespace IntegrationCore.IntegrationLibrary
                     throw e2;
                 }
                 DownloadUploadRequest downloadUploadRequest = (DownloadUploadRequest)Interface;
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "PageGUID : " + downloadUploadRequest.PageGUID, TrackInterface: true);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "PageGUID : " + downloadUploadRequest.PageGUID, TrackInterface: true,PrintInterface:true);
 
                 foreach (var file in Files)
                 {
                     string name = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "file name :" + name, TrackInterface: true, PrintInterface: true);
+
                     //Service only works with zip files
                     if (file.Length > 0 && name.EndsWith(".zip"))
                     {
@@ -140,6 +179,9 @@ namespace IntegrationCore.IntegrationLibrary
                                             Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Request URL: " + RequestURL, TrackInterface: true);
                                             byte[] fileBytes = File.ReadAllBytes(filePath);
                                             SendFileToTarasolReturnedData senFileToTarasolReurnedData = await CallExternalAPI.CallPostFileAPIAsync(fileBytes, Path.GetFileName(filePath), RequestURL, "");
+                                            Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "file name :" + senFileToTarasolReurnedData.Name, TrackInterface: true, PrintInterface: true);
+                                            Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "file id :" + senFileToTarasolReurnedData.FileID, TrackInterface: true, PrintInterface: true);
+
                                             SenFileToTarasolReurnedDataList.Add(senFileToTarasolReurnedData);
                                             //SendFileToTarasolReurnedData senFileToTarasolReurnedData = new SendFileToTarasolReurnedData() { FileID = "asasder3-34234-234234-werwe", Name = Path.GetFileName(filePath) };
                                             //SenFileToTarasolReurnedDataList.Add(senFileToTarasolReurnedData);
@@ -297,6 +339,7 @@ namespace IntegrationCore.IntegrationLibrary
                         d.DocUID = reader.GetValue(1).ToString();
                         d.PageGUID = reader.GetValue(2).ToString();
                     }
+
                     conn.Close();
                     return d;
                 }

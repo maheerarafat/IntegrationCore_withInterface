@@ -153,6 +153,7 @@ namespace IntegrationCore.Controllers
                     UpdateModel.FromFaxField = setting.FromFaxField;
                     
                     UpdateModel.TarasolINTUser = setting.TarasolINTUser;
+                    
                     if (setting.TarasolINTPassword != "") UpdateModel.TarasolINTPassword = Encryption.EncryptString(setting.TarasolINTPassword);
                     //UpdateModel.TimeStartSendEmail = setting.TimeStartSendEmail;
                     //UpdateModel.ConfigPath = settingModel.ConfigPath;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace IntegrationCore.Models
 {
@@ -9,6 +10,8 @@ namespace IntegrationCore.Models
         public string faxurl { get; set; }
         public Target Sender { get; set; }
         public List<Target> Receiver { get; set; }
+        
+        [Required]
         public List<string> TransactionIDs { get; set; }
         //public string Global_ID  { get; set; }
         public string Subject { get; set; }

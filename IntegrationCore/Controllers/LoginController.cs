@@ -48,11 +48,15 @@ namespace IntegrationCore.Controllers
                 Password = Password
             };
             var user = AuthenticateUser(userModel);
-
+            Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Username=" + UserName /*+ "-Password=" + Password*/, TrackInterface: Logger.EnableLoggingInfo,PrintInterface:Logger.EnableLoggingInfo);
             if (user != null)
             {
                 var tokenString = GenerateJSONWebToken(user);
                 response = Ok(new { token = tokenString });
+            }
+            else
+            {
+                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Username="+UserName /*+ "-Password="+ Password*/, TrackInterface: true);
             }
             Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End", TrackInterface: true);
             return response;

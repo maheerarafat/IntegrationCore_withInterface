@@ -28,6 +28,8 @@ namespace IntegrationCore.Models
 
         [XmlElement("moic:Priority")]
         public int Priority { get; set; }
+        [XmlElement("moic:ForeignOutboxno")]
+        public string ForeignOutboxno { get; set; }
 
         [XmlElement("moic:SecrecyLevel")]
         public int SecrecyLevel { get; set; }

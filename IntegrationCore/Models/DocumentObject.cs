@@ -26,7 +26,7 @@ namespace IntegrationCore.Models
         public TarasolItem PostFromType { get; set; }
         public TarasolItem PostToType { get; set; }
         public List<TarasolItem> Variables { get; set; }
-        //public TarasolItem DocTypeID { get; set; }
+       public TarasolItem MessageTypeID { get; set; }
         //public List<Attachment> Files { get; set; }
     }
 }

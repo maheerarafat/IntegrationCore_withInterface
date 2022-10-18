@@ -418,6 +418,6 @@ public class Logger : IDisposable
         }
         // Do not change this code.  Put cleanup code in Dispose(disposing As Boolean) above.
         Dispose(true);
-        GC.SuppressFinalize(this);
+        //GC.SuppressFinalize(this);
     }
 }

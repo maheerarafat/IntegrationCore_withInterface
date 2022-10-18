@@ -1,4 +1,6 @@
 ﻿
+using System.Collections.Generic;
+
 namespace IntegrationCore.Models
 {
     public class SettingModel
@@ -50,6 +52,13 @@ namespace IntegrationCore.Models
         public string MOISMSChannel { get; set; }
         public string DMSUser { get; set; }
         public string DMSPass { get; set; }
+        public string TarasolGeneralSettings { get; set; }
+        public string OldEntities { get; set; }
+        public string SampleData { get; set; }
         //   
+    }
+    public class TarasolGeneralSetting
+    {
+        public List<string> AttachmentsExtensions { get; set; }
     }
 }

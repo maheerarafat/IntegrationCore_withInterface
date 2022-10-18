@@ -18,13 +18,13 @@ namespace IntegrationCore.IntegrationLibrary
             };
             return eSBResult;
         }
-        public static IntResult GetResult(int code)
+        public static IntResult GetResult(int code,string field ="")
         {
             IntResult eSBResult = new IntResult();
             if (code == 2)
             {
                 eSBResult.Code = 2;
-                eSBResult.EMessage = "Input data not valid";
+                eSBResult.EMessage = "Input data not valid: " + field;
                 eSBResult.LMessage = "البيانات المرسلة غير صحيحة";
             }
             else if (code == 200)
@@ -43,7 +43,7 @@ namespace IntegrationCore.IntegrationLibrary
             {
                 eSBResult.Code = 0;
                 eSBResult.EMessage = "Failed";
-                eSBResult.LMessage = "فشلت عملية الإرسال";
+                eSBResult.LMessage = "فشلت العملية";
             }
             else
             {

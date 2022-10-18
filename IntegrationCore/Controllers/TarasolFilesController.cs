@@ -31,7 +31,7 @@ namespace IntegrationCore.Controllers
         
         [HttpPost]
         [Authorize] //////////////////Used Currently
-        public FileContentResult GetCorrFileFromTarasol(string InterfaceID)
+        public FileStreamResult GetCorrFileFromTarasol(string InterfaceID)
         {
             //Expose file upload api from tarasol to upload files to ESB
             try
@@ -40,10 +40,16 @@ namespace IntegrationCore.Controllers
                 var userId = claimsIdentity.FindFirst("name")?.Value;
                 if(userId.ToString() == IntegrationSettings.GetSetting("DMSUser").ToString())
                 {
-                    Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start - Interface:" + InterfaceID, TrackInterface: true);
+                    Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start - Interface:" + InterfaceID, TrackInterface: true,PrintInterface:true);
                     MemoryStream jsonResult = TarasolFiles.GetStreamFileFromTarasol(InterfaceID, _cache);
                     Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End", TrackInterface: true);
-                    return File(jsonResult.GetBuffer(), "application/octet-stream");
+                    System.Net.Mime.ContentDisposition cd = new System.Net.Mime.ContentDisposition
+                    {
+                        FileName = InterfaceID,
+                        Inline = true  // false = prompt the user for downloading;  true = browser to try to show the file inline
+                    };
+                    Response.Headers.Add("Content-Disposition", cd.ToString());
+                    return File(jsonResult, "application/zip",InterfaceID +".zip");
                 }
                 else
                 {
@@ -58,7 +64,69 @@ namespace IntegrationCore.Controllers
             }
         }
 
-        
+        [HttpPost]
+        [Authorize] //////////////////Used Currently???
+        public FileStreamResult GetCorFileFromTarasol(string InterfaceID)
+        {
+            //Expose file upload api from tarasol to upload files to ESB
+            try
+            {
+                var claimsIdentity = this.User.Identity as ClaimsIdentity;
+                var userId = claimsIdentity.FindFirst("name")?.Value;
+                if (userId.ToString() == IntegrationSettings.GetSetting("DMSUser").ToString())
+                {
+                    Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start - Interface:" + InterfaceID, TrackInterface: true, PrintInterface: true);
+                    MemoryStream jsonResult = TarasolFiles.GetStreamFileFromTarasol(InterfaceID, _cache);
+                    Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End", TrackInterface: true);
+                    System.Net.Mime.ContentDisposition cd = new System.Net.Mime.ContentDisposition
+                    {
+                        FileName = InterfaceID,
+                        Inline = true  // false = prompt the user for downloading;  true = browser to try to show the file inline
+                    };
+                    Response.Headers.Add("Content-Disposition", cd.ToString());
+                    return File(jsonResult, "application/zip", InterfaceID + ".zip");
+                }
+                else
+                {
+                    throw new NullReferenceException("Invalid or Expired Session");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, ex.Message);
+                throw ex;
+            }
+        }
+
+        //[HttpPost]
+        //[Authorize] //////////////////To Maher - fix Correspondence Approve Issue
+        //public FileContentResult GetCorrFileFromTarasolByUID(string CorrUID)
+        //{
+        //    //Expose file upload api from tarasol to upload files to ESB
+        //    try
+        //    {
+        //        var claimsIdentity = this.User.Identity as ClaimsIdentity;
+        //        var userId = claimsIdentity.FindFirst("name")?.Value;
+        //        if (userId.ToString() == IntegrationSettings.GetSetting("DMSUser").ToString())
+        //        {
+        //            Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start - CorrUID:" + CorrUID, TrackInterface: true,PrintInterface:true);
+        //            MemoryStream jsonResult = TarasolFiles.GetStreamFileFromTarasolByUID(CorrUID, _cache);
+        //            Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End", TrackInterface: true);
+        //            return File(jsonResult.GetBuffer(), "application/octet-stream");
+        //        }
+        //        else
+        //        {
+        //            throw new NullReferenceException("Invalid or Expired Session");
+        //        }
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, ex.Message);
+        //        throw ex;
+        //    }
+        //}
 
         [HttpPost, DisableRequestSizeLimit]
         [Authorize]  //////////////////Used Currently
@@ -73,6 +141,7 @@ namespace IntegrationCore.Controllers
                 var userId = claimsIdentity.FindFirst("name")?.Value;
                 if (userId.ToString() == IntegrationSettings.GetSetting("DMSUser").ToString())
                 {
+                    Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "file count :" + Request.Form.Files.Count, TrackInterface: true,PrintInterface: true);
                     List<SendFileToTarasolReturnedData> jsonResult = await TarasolFiles.SendFilesStreamToTarasolAsync(Request.Form.Files, InterfaceID);
 
                     Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End", TrackInterface: true);
