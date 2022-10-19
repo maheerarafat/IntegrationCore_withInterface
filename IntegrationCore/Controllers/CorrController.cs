@@ -221,7 +221,7 @@ namespace IntegrationCore.Controllers
         }
 
 
-        //Tarasol will call this API to trigger pulling exported Correspondences status from ESB
+        ///Tarasol will call this API to trigger pulling exported Correspondences status from ESB
         [HttpPost]
         [Authorize]
         public JsonResult ScanForAck([FromBody]ExportCorr[] scanRequest)
