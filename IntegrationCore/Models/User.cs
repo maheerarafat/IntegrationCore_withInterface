@@ -23,6 +23,8 @@ namespace IntegrationCore.Models
         public string FldBlockChainKey { get; set; }
         public string FldBlockChainAddress { get; set; }
         public string FldDisplayName { get; set; }
+        public string FldTypeID { get; set; }
+
         //public int FldUserStatus { get; set; }
         //public string FldWebCPanelPermissions { get; set; }
         //public string FldNotes { get; set; }

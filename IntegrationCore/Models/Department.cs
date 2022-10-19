@@ -17,6 +17,7 @@ namespace IntegrationCore.Models
         public string FLDACTIVE { get; set; }
         public string FLDOLDDEPTID { get; set; }
         public string FLDOLDDEPTACTIVE { get; set; }
+       public string fldDepartmentClassCode { get; set; }
         //public string FLDNOTES { get; set; }
         //public string FLDCOUNTER { get; set; }
         //public string FLDFLAGS { get; set; }

@@ -40,7 +40,9 @@ namespace IntegrationCore.IntegrationLibrary
                         HRPOSCODE = "114477",// need to check in service
                         HRPOSNAME = "foo",// need to check in service
                         FldUserCode = "foo",
-                        ResponseCode = "200"
+                        ResponseCode = "200",
+                        FldTypeID = "1"
+                        
                     };
                 }
                 else if (searchObject.SearchKey == "0001")
@@ -61,11 +63,13 @@ namespace IntegrationCore.IntegrationLibrary
                         HRPOSCODE = "1123",// need to check in service
                         HRPOSNAME = "foo2",// need to check in service
                         FldUserCode = "foo2",
-                        ResponseCode = "200"
+                        ResponseCode = "200",
+                        FldTypeID = "2"
                     };
                     
                 }
                 string[] searchPar = { (searchObject.FieldName == "MNum") ?"MilitaryNumber":"EmiratesID" , searchObject.SearchKey.Trim() };
+                string[] searchTypeIDPar = { searchObject.FieldName = "TypeId", searchObject.SearchKey = searchObject.TypeId };
                 Parameters.Add(searchPar);
                 HREmployeeDetail ed=new HREmployeeDetail() ;
                 HREmployeeDetails hREmployeeDetails = new HREmployeeDetails();
@@ -122,7 +126,8 @@ namespace IntegrationCore.IntegrationLibrary
                     HRPOSNAME = ((string.IsNullOrEmpty(ed.OccupationGroupID)) ? ((ed.JobTileGroupID != "999")?ed.JobTileGroupName:ed.JobTitleName) : (ed.OccupationGroupName)),// need to check in service
                     FldUserCode = (string.IsNullOrEmpty(ed.EmiratesID))?"-":ed.EmiratesID ,
                     FldName  = "hr_" + ed.EmployeeID,
-                    ResponseCode = "200"
+                    ResponseCode = "200",
+                    FldTypeID = ed.TypeId
 
                 };
                 

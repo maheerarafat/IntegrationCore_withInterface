@@ -71,8 +71,9 @@ namespace IntegrationCore.IntegrationLibrary
                     department.FLDCODE = "0000"; // Dept_id
                     department.FLDACTIVE = "1";                              //status , entry_date
                     department.FLDOLDDEPTID = "150";
-                    department.FLDOLDDEPTACTIVE = "1";
+                    department.FLDOLDDEPTACTIVE = "0";
                     department.FLDTYPE = 3;
+                    department.fldDepartmentClassCode = "2";
                     departmentList.Add(department);
                     return departmentList;
                 }
@@ -86,6 +87,7 @@ namespace IntegrationCore.IntegrationLibrary
                     department.FLDOLDDEPTID = "150";
                     department.FLDOLDDEPTACTIVE = "1";
                     department.FLDTYPE = 3;
+                    department.fldDepartmentClassCode = "3";
                     departmentList.Add(department);
                     return departmentList;
                 }
@@ -97,6 +99,7 @@ namespace IntegrationCore.IntegrationLibrary
                     department.FLDCODE = "0002"; // Dept_id
                     department.FLDACTIVE = "1";                              //status , entry_date
                     department.FLDOLDDEPTID = "150";
+                    department.fldDepartmentClassCode = "6";
                     department.FLDOLDDEPTACTIVE = "0";
                     department.FLDTYPE = 3;
                     departmentList.Add(department);
@@ -112,6 +115,21 @@ namespace IntegrationCore.IntegrationLibrary
                     department.FLDOLDDEPTID = "150";
                     department.FLDOLDDEPTACTIVE = "0";
                     department.FLDTYPE = 3;
+                    department.fldDepartmentClassCode = "6";
+                    departmentList.Add(department);
+                    return departmentList;
+                }
+                else if (searchObject.SearchKey == "150")
+                {
+                    department.FLDLNAME = "150قسم تجريبي";//dept_name
+                    department.FLDENAME = "test department150";// Dept_Name_eng
+                    department.FLDPARENTID = "1231";// Dept_ID_PAR
+                    department.FLDCODE = "150"; // Dept_id
+                    department.FLDACTIVE = "0";                              //status , entry_date
+                    department.FLDOLDDEPTID = "";
+                    department.FLDOLDDEPTACTIVE = "1";
+                    department.fldDepartmentClassCode = "6";
+                                                department.FLDTYPE = 3;
                     departmentList.Add(department);
                     return departmentList;
                 }
@@ -173,7 +191,8 @@ namespace IntegrationCore.IntegrationLibrary
                             FLDPARENTID = hRDepartment.DepartmentParentID.Trim(),
                             FLDACTIVE = (hRDepartment.DepartmentStatus == "A") ? "1" : "0",
                             FLDOLDDEPTID = hRDepartment.OldDepartmentID.Trim(),
-                            FLDOLDDEPTACTIVE = (OldDeptStatus == "A") ? "1" : "0"
+                            FLDOLDDEPTACTIVE = (OldDeptStatus == "A") ? "1" : "0",
+                            fldDepartmentClassCode= hRDepartment.DepartmentClassCode.Trim()
                         };
 
                         switch (hRDepartment.DepartmentClassCode)

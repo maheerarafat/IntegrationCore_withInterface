@@ -1,3 +1,5 @@
+2022-11-06	  Support Search by user's TypeId
+2022-10-27	  Support syncing department classification
 2022-09-25	  Added new setting "SampleData" for testing; its value should be false on production enviroment.
 2022-07-18	  Send tarasol notification when the fax url is empty to fix retry issue 
 2022-06-28	  Remove special characters from attachments file name 

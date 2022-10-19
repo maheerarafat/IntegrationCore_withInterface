@@ -82,5 +82,7 @@ namespace IntegrationCore.Models
         public string PhonceNumber { get; set; }
         [XmlElement("ExternalEmail")]
         public string ExternalEmail { get; set; }
+        [XmlElement("TypeId")]
+        public string TypeId { get; set; }
     }
 }
