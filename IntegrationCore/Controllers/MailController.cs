@@ -19,7 +19,7 @@ namespace IntegrationCore.Controllers
         public MailController(IHostingEnvironment hostingEnvironment, IMemoryCache memoryCache)
         {
 
-            //Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start");
+            ///Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start");
             _hostingEnvironment = hostingEnvironment;
             _cache = memoryCache;
             if (_cache.Get("IsSettingsLoaded") == null || (bool)_cache.Get("IsSettingsLoaded") == false)
