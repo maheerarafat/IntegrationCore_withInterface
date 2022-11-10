@@ -41,7 +41,7 @@ namespace IntegrationCore.IntegrationLibrary
                         HRPOSNAME = "foo",// need to check in service
                         FldUserCode = "foo",
                         ResponseCode = "200",
-                        FldTypeID = "1"
+                        TypeID = "1"
                         
                     };
                 }
@@ -64,13 +64,18 @@ namespace IntegrationCore.IntegrationLibrary
                         HRPOSNAME = "foo2",// need to check in service
                         FldUserCode = "foo2",
                         ResponseCode = "200",
-                        FldTypeID = "2"
+                        TypeID = "2"
                     };
                     
                 }
                 string[] searchPar = { (searchObject.FieldName == "MNum") ?"MilitaryNumber":"EmiratesID" , searchObject.SearchKey.Trim() };
-                string[] searchTypeIDPar = { searchObject.FieldName = "TypeId", searchObject.SearchKey = searchObject.TypeId };
                 Parameters.Add(searchPar);
+                if (!string.IsNullOrEmpty(searchObject.TypeId))
+                {
+                string[] searchTypeIDPar = { searchObject.FieldName = "TypeId", searchObject.SearchKey = searchObject.TypeId };
+                Parameters.Add(searchTypeIDPar);
+
+                }
                 HREmployeeDetail ed=new HREmployeeDetail() ;
                 HREmployeeDetails hREmployeeDetails = new HREmployeeDetails();
                 string objStr;
@@ -127,7 +132,7 @@ namespace IntegrationCore.IntegrationLibrary
                     FldUserCode = (string.IsNullOrEmpty(ed.EmiratesID))?"-":ed.EmiratesID ,
                     FldName  = "hr_" + ed.EmployeeID,
                     ResponseCode = "200",
-                    FldTypeID = ed.TypeId
+                    TypeID = ed.TypeId
 
                 };
                 
@@ -135,10 +140,14 @@ namespace IntegrationCore.IntegrationLibrary
                 {
                     ed.EmployeeID = sampleUser.HREMPID;
                     user = sampleUser;
+                    var SampleUserStr  = Newtonsoft.Json.JsonConvert.SerializeObject(sampleUser);
+
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "SampleUser: " + SampleUserStr, TrackInterface: Logger.EnableLoggingInfo);
 
                 }
 
-             //   Check if user is already in Tarasol
+
+                //   Check if user is already in Tarasol
                 string DecPass = Encryption.DecryptString(IntegrationSettings.GetSetting("DBPassword").ToString());
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Connect to Database: " + IntegrationSettings.GetSetting("ConnectionString").ToString() /*+ "@#$11"+ DecPass*/, TrackInterface: Logger.EnableLoggingInfo);
                 ///OracleConnection conn = new OracleConnection(IntegrationSettings.GetSetting("ConnectionString").ToString() + DecPass);
@@ -152,15 +161,17 @@ namespace IntegrationCore.IntegrationLibrary
 
                     OracleCommand cmd = conn.CreateCommand();
                     cmd.CommandType = CommandType.Text;
-                    cmd.CommandText = "select u.flduid,u.fldname cnt from INTHRUSERSMAP m inner join tsusers u on u.flduid = m.flduseruid where fldhrempid = " + ed.EmployeeID;
+                    cmd.CommandText = "select u.flduid,u.fldname cnt , m.fldflags from INTHRUSERSMAP m inner join tsusers u on u.flduid = m.flduseruid where fldhrempid = " + ed.EmployeeID;
                     Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, cmd.CommandText, TrackInterface: Logger.EnableLoggingInfo);
                     var reader = cmd.ExecuteReader();
                     string UUID = "0";
                     string fldname = "0";
+                    int NickNameMerge = 0;
                     while (reader.Read())
                     {
                         UUID = reader.GetValue(0).ToString();
                         fldname = reader.GetValue(1).ToString();
+                        NickNameMerge = (int)reader.GetValue(2);
                     }
                     if (UUID == "0")
                     {
@@ -168,7 +179,7 @@ namespace IntegrationCore.IntegrationLibrary
                         Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, cmd.CommandText, TrackInterface: Logger.EnableLoggingInfo);
                         cmd.ExecuteNonQuery();
 
-                        cmd.CommandText = "insert into INTHRUSERSMAP(flduseruid,fldhrempid) values('" + GUID + "'," + ed.EmployeeID + ")";
+                        cmd.CommandText = "insert into INTHRUSERSMAP(flduseruid,fldhrempid,fldflags) values('" + GUID + "'," + ed.EmployeeID + " ,'1')";
                         Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, cmd.CommandText, TrackInterface: Logger.EnableLoggingInfo);
                         cmd.ExecuteNonQuery();
 
@@ -186,11 +197,21 @@ namespace IntegrationCore.IntegrationLibrary
                             user.HRPOSCODE = user.HRDEPTCODE + "_" + Ecode;
                         }
                         user.FldName = "hr_" + ed.EmployeeID;
+                        user.MergeNickNameTypeID = true;
+
                     }
                     else
                     {
                         user.FldUID = UUID;
                         user.FldName = fldname;
+                        if ( (NickNameMerge & 1) == 1)
+                        {
+                            user.MergeNickNameTypeID = true;
+
+                        }
+                        else {
+                            user.MergeNickNameTypeID = false;
+                        }
                         // return error message to tarasol
                         //user.ResponseCode = "201";
                         //user.LMessage = "المستخدم موجود مسبقاً في تراسل";
