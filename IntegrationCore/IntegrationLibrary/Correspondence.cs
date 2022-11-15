@@ -443,6 +443,8 @@ namespace IntegrationCore.IntegrationLibrary
                                                         Regex re = new System.Text.RegularExpressions.Regex("[;\\\\/:*@#!'$%^&\\[\\]()?\"<>+=~|&{};']");
                                                         string outputString = FileNameWithoutExt;
                                                           outputString = re.Replace(FileNameWithoutExt, "");
+                                                        outputString = outputString.Replace(" ", "_");
+
                                                         if (string.IsNullOrEmpty(outputString))
                                                         {
                                                             fileName =  Guid.NewGuid().ToString() +  Path.GetExtension(fileName);

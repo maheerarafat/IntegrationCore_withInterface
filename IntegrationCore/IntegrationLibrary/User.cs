@@ -220,6 +220,7 @@ namespace IntegrationCore.IntegrationLibrary
                     Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "UUID: " + UUID, TrackInterface: true);
 
                     Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "user.FldName " + user.FldName, TrackInterface: true);
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "user.TypeID " + user.TypeID, TrackInterface: true);
                     result = user;
                 }
 
