@@ -135,17 +135,15 @@ namespace IntegrationCore.IntegrationLibrary
                     TypeID = ed.TypeId
 
                 };
-                
+                var strLogtitle = "UserFromHr: ";
                 if (SampleData)
                 {
                     ed.EmployeeID = sampleUser.HREMPID;
                     user = sampleUser;
-                    var SampleUserStr  = Newtonsoft.Json.JsonConvert.SerializeObject(sampleUser);
-
-                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "SampleUser: " + SampleUserStr, TrackInterface: Logger.EnableLoggingInfo);
-
+                    strLogtitle = "UserFromSample: ";
                 }
 
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, strLogtitle + Newtonsoft.Json.JsonConvert.SerializeObject(user), TrackInterface: Logger.EnableLoggingInfo);
 
                 //   Check if user is already in Tarasol
                 string DecPass = Encryption.DecryptString(IntegrationSettings.GetSetting("DBPassword").ToString());
@@ -171,7 +169,7 @@ namespace IntegrationCore.IntegrationLibrary
                     {
                         UUID = reader.GetValue(0).ToString();
                         fldname = reader.GetValue(1).ToString();
-                        NickNameMerge = (int)reader.GetValue(2);
+                        NickNameMerge = Convert.ToInt32( reader.GetValue(2).ToString());
                     }
                     if (UUID == "0")
                     {
@@ -221,6 +219,7 @@ namespace IntegrationCore.IntegrationLibrary
 
                     Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "user.FldName " + user.FldName, TrackInterface: true);
                     Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "user.TypeID " + user.TypeID, TrackInterface: true);
+
                     result = user;
                 }
 
