@@ -169,7 +169,11 @@ namespace IntegrationCore.IntegrationLibrary
                     {
                         UUID = reader.GetValue(0).ToString();
                         fldname = reader.GetValue(1).ToString();
-                        NickNameMerge = Convert.ToInt32( reader.GetValue(2).ToString());
+                        if ( reader.GetValue(2) != DBNull.Value)
+                        {
+                            NickNameMerge = Convert.ToInt32(reader.GetValue(2));
+                        }
+                        
                     }
                     if (UUID == "0")
                     {
