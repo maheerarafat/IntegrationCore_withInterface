@@ -1,3 +1,4 @@
+2022-11-25	  Stop correspondence importing if counts was null
 2022-11-06	  Support Search by user's TypeId
 2022-10-27	  Support syncing department classification
 2022-09-25	  Added new setting "SampleData" for testing; its value should be false on production enviroment.
