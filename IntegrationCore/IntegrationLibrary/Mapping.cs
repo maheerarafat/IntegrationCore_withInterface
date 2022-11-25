@@ -92,7 +92,7 @@ namespace IntegrationCore.IntegrationLibrary
                 {
                     DepartmentPositionList jsonResponse = JsonConvert.DeserializeObject<DepartmentPositionList>(CallExternalAPI.CallPostAPI(ApiUrl, jsondata, Tarasol_Token).ToString());
                     Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "ApiUrl post data : " + JsonConvert.SerializeObject(jsonResponse), TrackInterface: true);
-                    return jsonResponse.CountofRecords != "0";
+                    return jsonResponse.CountofRecords == "1";
                 }
                 catch (Exception)
                 {
