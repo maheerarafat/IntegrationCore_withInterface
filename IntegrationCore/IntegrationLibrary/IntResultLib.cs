@@ -12,19 +12,19 @@ namespace IntegrationCore.IntegrationLibrary
         {
             IntResult eSBResult = new IntResult
             {
-                Code = ex.HResult,
+                Code = 2,
                 EMessage = ex.Message,
-                LMessage = ex.Message 
+                LMessage = "البيانات المرسلة غير صحيحة"
             };
             return eSBResult;
         }
-        public static IntResult GetResult(int code,string field ="")
+        public static IntResult GetResult(int code)
         {
             IntResult eSBResult = new IntResult();
             if (code == 2)
             {
                 eSBResult.Code = 2;
-                eSBResult.EMessage = "Input data not valid: " + field;
+                eSBResult.EMessage = "Input data not valid";
                 eSBResult.LMessage = "البيانات المرسلة غير صحيحة";
             }
             else if (code == 200)
@@ -43,7 +43,13 @@ namespace IntegrationCore.IntegrationLibrary
             {
                 eSBResult.Code = 0;
                 eSBResult.EMessage = "Failed";
-                eSBResult.LMessage = "فشلت العملية";
+                eSBResult.LMessage = "فشلت عملية الإرسال";
+            }
+            else if (code == 5)
+            {
+                eSBResult.Code = 5;
+                eSBResult.EMessage = "Payload JSON request is empty";
+                eSBResult.LMessage = "الطلب لايحوي معلومات";
             }
             else
             {
@@ -51,7 +57,7 @@ namespace IntegrationCore.IntegrationLibrary
                 eSBResult.EMessage = "Success";
                 eSBResult.LMessage = "تمت العملية بنجاح";
             }
-           
+
             return eSBResult;
         }
     }

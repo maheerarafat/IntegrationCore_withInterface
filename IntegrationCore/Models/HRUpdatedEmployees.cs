@@ -27,9 +27,4 @@ namespace IntegrationCore.Models
         [XmlElement("TransactionDate")]
         public string TransactionDate { get; set; }
     }
-    public class HREmployeeTrasInfo
-    {
-        public HRUpdatedEmployee HRUpdatedEmployee { get; set; }
-        public HREmployeeDetail HREmployeeDetail { get; set; }
-    }
 }

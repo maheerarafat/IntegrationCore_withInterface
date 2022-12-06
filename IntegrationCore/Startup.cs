@@ -14,7 +14,6 @@ using System.Text;
 using Microsoft.Extensions.Hosting;
 using IntegrationCore.BGServices;
 using IntegrationCore.IntegrationLibrary;
-using Microsoft.Extensions.FileProviders;
 using System.IO;
 
 namespace IntegrationCore
@@ -27,6 +26,7 @@ namespace IntegrationCore
         }
 
         public IConfiguration Configuration { get; }
+        private readonly Microsoft.AspNetCore.Hosting.IHostingEnvironment _currentEnvironment;
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -48,16 +48,21 @@ namespace IntegrationCore
         
             services.AddMvc();
             services.AddMemoryCache();
+
+            // services.AddSingleton<IHostedService, JoberSMSService>(); // TODO Enable when need register log in interface
+
             if (bool.Parse(Configuration["SharedConfig:Enable"]))
             {
                 IntegrationSettings settings = new IntegrationSettings(Configuration["SharedConfig:Path"]);
+
             }
-            //services.AddSingleton<IHostedService, DataRefreshService>();
-            //services.AddSingleton<IHostedService, FilesRefreshService>();
+            // services.AddSingleton<IHostedService, DataRefreshService>();
+            // services.AddSingleton<IHostedService, FilesRefreshService>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        
+
 
         public void Configure(IApplicationBuilder app, Microsoft.AspNetCore.Hosting.IHostingEnvironment env)
         {
@@ -81,6 +86,8 @@ namespace IntegrationCore
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+
         }
     }
 }

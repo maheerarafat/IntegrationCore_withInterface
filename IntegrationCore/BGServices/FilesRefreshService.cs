@@ -34,7 +34,7 @@ namespace IntegrationCore.BGServices
             while (!cancellationToken.IsCancellationRequested)
             {
                 //await _randomStringProvider.UpdateString(cancellationToken);
-                await Task.Delay(TimeSpan.FromMinutes(1), cancellationToken);
+                await Task.Delay(TimeSpan.FromSeconds(8), cancellationToken);
             }
         }
 

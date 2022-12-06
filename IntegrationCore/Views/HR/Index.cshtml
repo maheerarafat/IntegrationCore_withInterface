@@ -1,0 +1,256 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+}
+
+<style type="text/css">
+    .list-group-item {
+        cursor: pointer;
+    }
+</style>
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-2">
+
+            <!--Side panel-->
+            <div class="card">
+
+                <ul class="list-group list-group-flush">
+                    <li id="enqueued" class="list-group-item active" onclick="active_menu('1')">
+                        Sync Table
+                        @*<span class="badge badge-pill badge-info" style="float: right;">5</span>*@
+                    </li>
+                    <li id="scheduled" class="list-group-item " onclick="active_menu('2')">
+                        Activity log
+                        @*<span class="badge badge-pill badge-light" style="float: right;">0</span>*@
+                    </li>
+                    <li id="failed" class="list-group-item " onclick="active_menu('3')">
+                        Failed
+                        @*<span class="badge badge-pill badge-light" style="float: right;">0</span>*@
+                    </li>
+                </ul>
+            </div>
+            <!--End Side panel-->
+
+        </div>
+
+        <div class="col-sm-10">
+            
+            @*@{
+                Html.RenderPartial("_TopTableRender");
+            }*@
+
+            <div class="alert alert-danger" role="alert" style="display:none">
+                <p id="resMessage"></p>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div id="table_before_render" style="display:block;">
+                <div class="post">
+                    <div class="avatar"></div>
+                </div>
+                <div class="post">
+                    <div class="line"></div>
+                    <div class="line"></div>
+                    <div class="line"></div>
+                </div>
+            </div>
+
+
+            <div id="tables_render" style="display:none;">
+
+                <!-- Sync Table-->
+                <div class="tbl-detail" id="queue">
+                    <h1> Sync Tables</h1>
+                    <a class="btn btn-info" asp-controller="HR" asp-action="Add">Individual Sync</a>
+                    <table id="sync_tbl" class="table table-striped table-bordered dt-responsive nowrap" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>FLDID</th>
+                                <th>Table Name</th>
+                                <th>Last Update</th>
+                                <th>Sync Manual</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <!--End  Sync Table-->
+                <!--Activity log Jobs-->
+                <div class="tbl-detail" id="succeeded-job" style="display:none;">
+                    <h1>Activity log </h1>
+
+                    <a class="btn btn-info" onclick=refresh_log()>Refresh</a>
+                    <table id="activity_log" class="table table-striped table-bordered dt-responsive nowrap" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>FLDID</th>
+                                <th>Sync Type</th>
+                                <th>Description</th>
+                                <th>Date and Time</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <!--End Activity log Jobs-->
+                <!--Failed Jobs-->
+                <div class="tbl-detail" id="faild-job" style="display:none;">
+                    <h1>Sync Errors</h1>
+
+                    <table id="error_log" class="table table-striped table-bordered dt-responsive nowrap" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>FLDID</th>
+                                <th>Sync Type</th>
+                                <th>Message</th>
+                                <th>Failed</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <!--Failed log Jobs-->
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    var initial_activity_log = false;
+    var initial_error_log = false;
+
+    function active_menu(item) {
+
+
+        switch (item) {
+            case '1':
+                $('.tbl-detail').css({ 'display': 'none' });
+                $('#queue').css({ 'display': 'block' });
+                $('.list-group-item').removeClass('active');
+                $('#enqueued').addClass('active');
+                // code block
+                break;
+            case '2':
+                $('.tbl-detail').css({ 'display': 'none' });
+                $('#succeeded-job').css({ 'display': 'block' });
+                $('.list-group-item').removeClass('active');
+                $('#scheduled').addClass('active');
+                if (!initial_activity_log) {
+                    get_activity_log();
+                }
+                // code block
+                break;
+            case '3':
+                $('.tbl-detail').css({ 'display': 'none' });
+                $('#faild-job').css({ 'display': 'block' });
+                $('.list-group-item').removeClass('active');
+                $('#failed').addClass('active');
+                if (!initial_error_log) {
+                    get_error_log();
+                }
+                // code block
+                break;
+            default:
+                $('.tbl-detail').css({ 'display': 'none' });
+            // code block
+        }
+
+
+    }
+
+    $(document).ready(function () {
+
+        console.log("ready!");
+
+        let columns = [
+            { "data": "fldid", "name": "fldid", "autoWidth": true },
+            { "data": "fldnamettable", "name": "Table Name", "autoWidth": true },
+            {
+                "data": "fldlastupdatedate", "name": "Last Update", "autoWidth": true, render: function (data, type, row) {
+                    if (type == 'sort' || type == 'type') {
+
+                    }
+                    return convertString2Date(data);
+                }
+            },
+            {
+                data: null, render: function (data, type, row) {
+                    return "<a href='#' class='btn btn-info' onclick=run_procedure('" + row.fldid + "'); >Sync</a>";
+                }
+            }
+        ]
+        render_dataTable("/IntegrationCore/HR/GetHistoryUpdateHR", "sync_tbl", columns, 'cover-spin');
+    });
+
+
+    function run_procedure(id) {
+
+        $('#cover-spin').show(0);
+        $.post("/IntegrationCore/HR/RunProcedureSyncManual",
+            { id: id },
+            function (data, status) {
+                $('#cover-spin').css('display', 'none');
+                if (status = 'success') {
+
+                } else {
+                    $('.alert').css('display', 'block');
+                    $('#resMessage').text("Data: " + data + "\nStatus: " + status);
+                }
+            });
+    }
+
+    function get_activity_log() {
+        initial_activity_log = true;
+        let columns = [
+            { "data": "fldid", "name": "fldid", "autoWidth": true },
+            { "data": "fldsyncname", "name": "Sync Type", "autoWidth": true },
+            { "data": "flddescription", "name": "Description", "autoWidth": true },
+            {
+                "data": "flddate", "name": "Date and Time", "autoWidth": true, render: function (data, type, row) {
+                    if (type == 'sort' || type == 'type') {
+
+                    }
+                    return convertString2Date(data);
+                }
+            },
+        ]
+        render_dataTable("/IntegrationCore/HR/GetActivityLogHR", "activity_log", columns, 'cover-spin');
+    }
+
+
+    function get_error_log() {
+        initial_error_log = true;
+        let columns = [
+            { "data": "fldid", "name": "fldid", "autoWidth": true },
+            { "data": "fldsyncname", "name": "Sync Type", "autoWidth": true },
+            { "data": "flddescription", "name": "Description", "autoWidth": true },
+            {
+                "data": "flddate", "name": "Date and Time", "autoWidth": true, render: function (data, type, row) {
+                    if (type == 'sort' || type == 'type') {
+
+                    }
+                    return time_ago(data);
+                }
+            },
+        ]
+        render_dataTable("/IntegrationCore/HR/GetActivityLogErrorHR", "error_log", columns, 'cover-spin');
+    }
+
+    function refresh_log() {
+        $("#activity_log").DataTable().clear().destroy();
+        initial_activity_log = false;
+        get_activity_log();
+    }
+
+
+
+</script>
+
+
+
+

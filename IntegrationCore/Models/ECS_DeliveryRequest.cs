@@ -10,7 +10,7 @@ namespace IntegrationCore.Models
     public class ECS_DeliveryRequest
     {
         [XmlElement("moic:EntityCode")]
-        public string EntityCode { get; set; }
+        public int EntityCode { get; set; }
         [XmlElement("moic:TransactionId")]
         public string TransactionId { get; set; }
         [XmlElement("moic:ReadBy")]

@@ -44,10 +44,12 @@ namespace IntegrationCore.IntegrationLibrary
             var fullCipher = Convert.FromBase64String(cipherText);
 
             var iv = new byte[16];
-            var cipher = new byte[fullCipher.Length - 16];
+
+            var cipher = new byte[fullCipher.Length - 16];//Change this line
 
             Buffer.BlockCopy(fullCipher, 0, iv, 0, iv.Length);
-            Buffer.BlockCopy(fullCipher, iv.Length, cipher, 0, cipher.Length);
+
+            Buffer.BlockCopy(fullCipher, iv.Length, cipher, 0, cipher.Length);//Change this line
             var key = Encoding.UTF8.GetBytes(keyString);
 
             using (var aesAlg = Aes.Create())
@@ -71,19 +73,6 @@ namespace IntegrationCore.IntegrationLibrary
             }
         }
 
-       
 
-        public static string AMEncryptString(string text)
-        {
-            AM_EncryptCore.clsEncrypt clsEncrypt = new AM_EncryptCore.clsEncrypt();
-            string eMsg = "";
-            return clsEncrypt.EncryptString(text,"Tarasol",AM_EncryptCore.clsEncrypt.OperationKind.oEncrypt,ref eMsg);
-        }
-        public static string AMDecryptString(string text)
-        {
-            AM_EncryptCore.clsEncrypt clsEncrypt = new AM_EncryptCore.clsEncrypt();
-            string eMsg = "";
-            return clsEncrypt.EncryptString(text, "Tarasol", AM_EncryptCore.clsEncrypt.OperationKind.oDecrypt, ref eMsg);
-        }
     }
 }

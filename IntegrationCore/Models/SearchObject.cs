@@ -5,6 +5,5 @@ namespace IntegrationCore.Models
     {
         public string FieldName { get; set; }
         public string SearchKey { get; set; }
-        public string TypeId { get; set; }
     }
 }

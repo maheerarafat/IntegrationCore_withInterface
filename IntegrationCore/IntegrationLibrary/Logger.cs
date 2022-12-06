@@ -2,6 +2,8 @@
 using System.Text;
 using IntegrationCore.IntegrationLibrary;
 using Microsoft.VisualBasic;
+using Microsoft.AspNetCore.Hosting;
+using System.IO;
 
 [assembly: log4net.Config.XmlConfigurator(ConfigFile = @"log.config", Watch = true)]
 
@@ -17,7 +19,6 @@ public class Logger : IDisposable
     public bool WriteMsgAtTheEnd = false;
     public string Message = "";
     private static bool _EnableLogging = false;
-    private static bool _EnableLoggingInfo = false;
     private static bool _EnableDBLogging = false;
     private static log4net.ILog _Log;
 
@@ -51,34 +52,7 @@ public class Logger : IDisposable
             _EnableLogging = value;
         }
     }
-    public static bool EnableLoggingInfo
-    {
-        get
-        {
-            if (!_EnableLoggingInfo)
-            {
-                string EnableLoggingElement;
-                IntegrationSettings.LoadSettings();
-                EnableLoggingElement = (string)IntegrationSettings.GetSetting("EnableLoggingInfo");
 
-                if (EnableLoggingElement != null)
-                {
-                    bool Result;
-                    if (bool.TryParse(EnableLoggingElement, out Result))
-                        _EnableLoggingInfo = Result;
-                    else
-                        _EnableLoggingInfo = false;
-                }
-                else
-                    _EnableLoggingInfo = false;
-            }
-            return _EnableLoggingInfo;
-        }
-        set
-        {
-            _EnableLoggingInfo = value;
-        }
-    }
 
     public static bool EnableDBLogging
     {
@@ -132,9 +106,8 @@ public class Logger : IDisposable
         _PerfEnd = 1,
         _Error = 2,
         _Info = 3,
-        _Critical = 4,
-        _file = 5
-     }
+        _Critical = 4
+    }
 
     class Performance
     {
@@ -265,31 +238,39 @@ public class Logger : IDisposable
             return;
     }
 
-    public static void AddToLogFile(string Scope, Enum_LogType Type, string Message, string AdditionalInfo = "", bool TrackInterface = false, bool PrintInterface = false)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="Scope"></param>
+    /// <param name="Type"></param>
+    /// <param name="Message"></param>
+    /// <param name="AdditionalInfo"></param>
+    /// <param name="BodyRequest"> String.Empty</param>
+    /// <param name="ScheduleType">  (int)ICALibrary.Helper.Enum.scheduleType  </param>
+    public static void AddToLogFile(string Scope, Enum_LogType Type, string Message, string AdditionalInfo = "", string BodyRequest = "", int ScheduleType = 0, bool TrackInterface = false)
     {
-        // Loggrr typr info
         int CurrThread = System.Threading.Thread.CurrentThread.ManagedThreadId;
         string ScopeWithThread = Scope + ":" + CurrThread;
-
-        if (PrintInterface)
+        if (TrackInterface)
         {
             if (Type == Enum_LogType._Info)
             {
-                Jobs.AddLogJobESB(ScopeWithThread, Message, (int)IntegrationCore.Helper.Enum.responseCode.Success, DateTime.Now, DateTime.Now, 0, Message, (int)IntegrationCore.Helper.Enum.scheduleType.Done );
+                Jobs.AddLogJobESB(ScopeWithThread, Message, (int)ICALibrary.Helper.Enum.responseCode.Success, DateTime.Now, DateTime.Now, 0, BodyRequest, ScheduleType);
             }
             else if (Type == Enum_LogType._Error)
             {
-                Jobs.AddLogJobESB(ScopeWithThread, Message, (int)IntegrationCore.Helper.Enum.responseCode.Failed, DateTime.Now, DateTime.Now, 0, Message, (int)IntegrationCore.Helper.Enum.scheduleType.Done);
+                Jobs.AddLogJobESB(ScopeWithThread, Message, (int)ICALibrary.Helper.Enum.responseCode.Failed, DateTime.Now, DateTime.Now, 0, BodyRequest, ScheduleType);
             }
         }
 
-        if (EnableLogging || Type == Enum_LogType._Error /*|| Type == Enum_LogType._Info*/)
+
+        if (EnableLogging || Type == Enum_LogType._Error || Type == Enum_LogType._Info)
         {
             // Dim FilePath As String = ""
             string FolderPath;
             // Dim SR As System.IO.StreamWriter = Nothing
-            Performance currentfunctionPerformance = new Performance();
 
+            Performance currentfunctionPerformance = new Performance();
 
             try
             {
@@ -332,17 +313,14 @@ public class Logger : IDisposable
                         str.Append(";" + AdditionalInfo + ";");
 
                     // Beacuse we depend on new line as line separator, we must remove any new line in the message
-                    // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^                    
-                    if ((Type == Enum_LogType._Error) || (Type == Enum_LogType._Info && TrackInterface))
-                    {
-                        str.Append(Message.Replace(Constants.vbCrLf, @"\n"));
-                    }
-
+                    // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    str.Append(Message.Replace(Constants.vbCrLf, @"\n"));
                     str.Append(Constants.vbNewLine);
                     if (Log != null)
                     {
                         // If Type = Enum_LogType._InfoStart Or Type = Enum_LogType._InfoEnd Or Type = Enum_LogType._Info Then
-                        Log.Info(str);
+                        if (Log.IsInfoEnabled)
+                            Log.Info(str);
                     }
                     else
                         System.IO.File.AppendAllText(AppDomain.CurrentDomain.BaseDirectory + @"Logs\" + "loggingError.txt", "Log is nothing : Date:" + DateTime.Now.ToString() + " scope:" + Scope + Constants.vbCrLf);
@@ -357,12 +335,13 @@ public class Logger : IDisposable
             return;
     }
 
+
     private void AddToLogAsnc()
     {
     }
-    private static string getLogFileName()
+    public static string getLogFileName()
     {
-        return DateTime.Now.ToString("yyyyMMdd") + ".log";
+        return DateTime.Now.ToString("yyyyMMdd") + ICALibrary.Helper.Constant.FileLogExtenstion;
     }
 
     private bool disposedValue; // To detect redundant calls
@@ -418,6 +397,22 @@ public class Logger : IDisposable
         }
         // Do not change this code.  Put cleanup code in Dispose(disposing As Boolean) above.
         Dispose(true);
-        //GC.SuppressFinalize(this);
+        GC.SuppressFinalize(this);
+    }
+
+    public static Byte[] DownloadLatestLog(IHostingEnvironment _hostingEnvironment, string fileName)
+    {
+        string logPath = _hostingEnvironment.ContentRootPath + $"\\Logs\\{fileName}";
+
+        if (File.Exists(logPath))
+        {
+            using (FileStream fs = new FileStream(logPath, FileMode.Open, FileAccess.Read))
+            {
+                Byte[] byteConent = new byte[fs.Length];
+                fs.Read(byteConent, 0, System.Convert.ToInt32(fs.Length));
+                return byteConent;
+            }
+        }
+        return new byte[0];
     }
 }

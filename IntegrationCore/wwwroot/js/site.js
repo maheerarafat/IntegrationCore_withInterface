@@ -1,17 +1,4 @@
-﻿window.onmessage = function (e) {
-    if (document.getElementById("DMS_URL") != null) {
-        this.console.log(document.getElementById("DMS_URL").innerHTML);
-
-        if (e.origin != document.getElementById("DMS_URL").innerHTML) return null;
-        var myCustomData = { IntData: e.data };
-        window.parent.postMessage(myCustomData, '*')
-        this.console.log(document.getElementById("DMS_URL").innerHTML);
-    }
-    
-    //var event = new CustomEvent('IntEvent', { detail: myCustomData });
-    //window.parent.document.dispatchEvent(event);
-
-};
+﻿// Write your JavaScript code.
 
 
 function convertString2Date(date_str) {
@@ -36,7 +23,7 @@ function render_dataTable(url, id, columns, id_spinner, isFilter, isOrder) {
     $("#" + id).DataTable({
         "processing": true, // for show progress bar
         "serverSide": true, // for process server side
-        "filter": isFilter, // this is for disable filter (search box)
+        "filter": true, // this is for disable filter (search box)
         "orderMulti": false, // for disable multiple column at once
         "bDestroy": true, // destory table when refresh
         "ordering": isOrder, // disable order
@@ -56,7 +43,7 @@ function render_dataTable(url, id, columns, id_spinner, isFilter, isOrder) {
                     $('#resMessage').text(xhr.responseJSON.value.eMessage);
                 } else if (xhr.statusText == "Unauthorized") {
                     $('#resMessage').text(xhr.statusText);
-                    window.location.href = getBaseURL();
+                    CallBackUnauthorized();
                 }
                 else {
                     $('#resMessage').text(xhr.statusText);
@@ -76,4 +63,19 @@ function render_dataTable(url, id, columns, id_spinner, isFilter, isOrder) {
             }],
         "columns": columns
     });
+}
+
+// logout button
+$("#logout").click(function () {
+
+    sessionStorage['token'] = '';
+    window.location.href = getBaseURL();
+});
+
+
+
+// Shared function to call when Unauthorized happen
+function CallBackUnauthorized() {
+    sessionStorage['token'] = '';
+    window.location.href = getBaseURL();
 }

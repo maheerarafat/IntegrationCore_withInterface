@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="NotificationService"
+		targetNamespace="http://id.gov.ae/ws/notification"
+		xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+		xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+		xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
+		xmlns:tns="http://id.gov.ae/ws/notification"
+		xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+	<wsdl:documentation>
+		<wsdl:appinfo source="WMQI_APPINFO">
+			<MRWSDLAppInfo imported="true">
+				<generatedXSD location="NotificationService.xsd"/>
+				<binding hasEncoding="false" imported="true" name="NotificationServiceHttpBinding" originalBindingStyle="document"/>
+			</MRWSDLAppInfo>
+		</wsdl:appinfo>
+	</wsdl:documentation>
+
+	<wsdl:types>
+		<xsd:schema targetNamespace="http://id.gov.ae/ws/notification">
+			<xsd:include schemaLocation="NotificationService.xsd"/>
+		</xsd:schema>
+	</wsdl:types>
+
+	<wsdl:message name="sendNotificationRequestMsg">
+		<wsdl:part element="tns:sendNotification" name="sendNotification"/>
+	</wsdl:message>
+
+	<wsdl:message name="sendNotificationResponseMsg">
+		<wsdl:part element="tns:sendNotificationResponse" name="sendNotificationResponse"/>
+	</wsdl:message>
+
+	<wsdl:portType name="NotificationService">
+		<wsdl:operation name="sendNotification">
+			<wsdl:input message="tns:sendNotificationRequestMsg" name="sendNotificationRequest"/>
+			<wsdl:output message="tns:sendNotificationResponseMsg" name="sendNotificationResponse"/>
+		</wsdl:operation>
+	</wsdl:portType>
+
+	<wsdl:binding name="NotificationServiceHttpBinding" type="tns:NotificationService">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="sendNotification">
+			<soap:operation soapAction="http://id.gov.ae/ws/notification/sendNotification"/>
+			<wsdl:input name="sendNotificationRequest">
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output name="sendNotificationResponse">
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+
+	<wsdl:service name="NotificationServiceHttpService">
+		<wsdl:port binding="tns:NotificationServiceHttpBinding" name="NotificationServiceHttpPort">
+			<soap:address location="http://id.gov.ae/ws/notification/NotificationService"/>
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

@@ -7,31 +7,29 @@ namespace IntegrationCore.Helper
 {
     public class Enum
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        public enum lang
+        public enum enumExchangStatus
         {
-            English,
-            Arabic
+            Folder = 1,
+            Email,
+            Fax
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public enum responseCode
+        public enum enumExchangAddressToType
         {
-            SuccessNotify,
-            Success,
-            Failed
+            Internal,
+            External,
         }
 
-
-        public enum scheduleType
+        public enum enumEmailDistributor
         {
-            Done,
-            Progress,
-            NotStarted
+            Department,
+            Individual,
+        }
+
+        public enum enumConnType
+        {
+            Oracle=1,
+            Sql,
         }
     }
 }

@@ -14,7 +14,7 @@ namespace IntegrationCore.Models
         [XmlElement("StatusMessage")] 
         public string StatusMessage { get; set; }
 
-        [XmlElement("RequestId")]  
+        [XmlElement("RequestId")]
         public string RequestId { get; set; }
     }
 }

@@ -11,8 +11,7 @@ namespace IntegrationCore.Models
         public TarasolItem ExternalRefNumber { get; set; }
         public TarasolItem Notes { get; set; }
         public TarasolItem CreationDate { get; set; }
-        public TarasolItem DBCreationDate { get; set; }
-
+        
         public TarasolItem Body { get; set; }
         
         public TarasolItem PriorityID { get; set; }
@@ -25,8 +24,8 @@ namespace IntegrationCore.Models
         public TarasolTargetItem PostFromID { get; set; }
         public TarasolItem PostFromType { get; set; }
         public TarasolItem PostToType { get; set; }
-        public List<TarasolItem> Variables { get; set; }
-       public TarasolItem MessageTypeID { get; set; }
+        
+        //public TarasolItem DocTypeID { get; set; }
         //public List<Attachment> Files { get; set; }
     }
 }

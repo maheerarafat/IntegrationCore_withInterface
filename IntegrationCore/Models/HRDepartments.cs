@@ -3,7 +3,7 @@ using System.Xml.Serialization;
 
 namespace IntegrationCore.Models
 {
-    [XmlRoot("GetListOfAllDepartmentsResponse")]
+    [XmlRoot("")]
     public class HRDepartments
     {
         [XmlElement("Content")]
@@ -25,7 +25,5 @@ namespace IntegrationCore.Models
         public string DepartmentClassCode { get; set; }
         [XmlElement("OccupationGroupID")]
         public string OccupationGroupID { get; set; }
-        [XmlElement("OldDepartmentID")]
-        public string OldDepartmentID { get; set; }
     }
 }

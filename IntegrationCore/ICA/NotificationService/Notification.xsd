@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema elementFormDefault="qualified"
+		targetNamespace="http://id.gov.ae/schema/notification"
+		xmlns:tns="http://id.gov.ae/schema/notification"
+		xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+		xmlns:cmn="http://id.gov.ae/schema/commontypes">
+
+	<xsd:import namespace="http://id.gov.ae/schema/commontypes" schemaLocation="CommonTypes.xsd" />
+
+	<xsd:complexType name="SendNotificationRequestType">
+		<xsd:sequence>
+			<xsd:element maxOccurs="1" minOccurs="1" ref="cmn:Header"/>
+			<xsd:element maxOccurs="1" minOccurs="1" name="Body" type="tns:NotificationBodyRequestType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="SendNotificationResponseType">
+		<xsd:sequence>
+			<xsd:element maxOccurs="1" minOccurs="1" ref="cmn:Header"/>
+			<xsd:element maxOccurs="1" minOccurs="1" name="Body" type="tns:NotificationBodyResponseType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="NotificationBodyRequestType">
+		<xsd:sequence>
+			<xsd:element maxOccurs="1" minOccurs="1" name="transactionRefNo" type="xsd:string"/>
+			<xsd:element maxOccurs="1" minOccurs="1" name="notification" type="tns:NotificationType"/>
+			<xsd:element maxOccurs="1" minOccurs="1" name="timestamp" type="xsd:dateTime"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="NotificationBodyResponseType">
+		<xsd:sequence>
+			<xsd:element maxOccurs="1" minOccurs="1" name="transactionRefNo" type="xsd:string"/>
+			<xsd:element maxOccurs="1" minOccurs="1" name="responseCode" type="cmn:ResponseCodeType"/>
+			<xsd:element maxOccurs="1" minOccurs="0" name="responseDescription" type="xsd:string"/>
+			<xsd:element maxOccurs="1" minOccurs="1" name="timestamp" type="xsd:dateTime"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="NotificationType">
+		<xsd:sequence>
+			<xsd:element maxOccurs="1" minOccurs="1" name="notificationType" type="tns:NotificationCodeType"/>
+			<xsd:element maxOccurs="1" minOccurs="1" name="toAddress" type="xsd:string"/>
+			<xsd:element maxOccurs="1" minOccurs="0" name="fromAddress" type="xsd:string"/>
+			<xsd:element maxOccurs="1" minOccurs="0" name="subject" type="xsd:string"/>
+			<xsd:choice maxOccurs="1" minOccurs="1">
+				<xsd:element maxOccurs="1" minOccurs="0" name="templateName" type="xsd:string"/>
+				<xsd:element maxOccurs="1" minOccurs="0" name="messageBody" type="xsd:string"/>
+			</xsd:choice>
+			<xsd:element maxOccurs="1" minOccurs="0" name="ccAddress" type="xsd:string"/>
+			<xsd:element maxOccurs="1" minOccurs="0" name="bccAddress" type="xsd:string"/>
+			<xsd:element maxOccurs="1" minOccurs="0" name="importance" type="xsd:string"/>
+			<xsd:element maxOccurs="1" minOccurs="0" name="parameters" type="cmn:ParameterListType"/>
+			<xsd:element maxOccurs="1" minOccurs="0" name="attachments" type="tns:AttachmentListType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:simpleType name="NotificationCodeType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="SMS"/>
+			<xsd:enumeration value="EMAIL"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:complexType name="AttachmentListType">
+		<xsd:sequence>
+			<xsd:element maxOccurs="unbounded" minOccurs="1" name="attachment" type="tns:AttachmentType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="AttachmentType">
+		<xsd:sequence>
+			<xsd:element maxOccurs="1" minOccurs="1" name="name" type="xsd:string"/>
+			<xsd:element maxOccurs="1" minOccurs="1" name="contentType" type="xsd:string"/>
+			<xsd:choice>
+				<xsd:element maxOccurs="1" minOccurs="1" name="data" type="xsd:base64Binary"/>
+				<xsd:element maxOccurs="1" minOccurs="1" name="dataLocation" type="xsd:string"/>
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:complexType>
+
+</xsd:schema>

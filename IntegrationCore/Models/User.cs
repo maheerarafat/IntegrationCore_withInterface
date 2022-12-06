@@ -11,7 +11,6 @@ namespace IntegrationCore.Models
         public string FldFamilyName { get; set; }
         public string FldFirstName { get; set; }
         public string FldName { get; set; }
-        public string FldNickName { get; set; }
         public string FldPassword { get; set; }
         public string FldUID { get; set; }
         public string FldLocalFirstName { get; set; }
@@ -23,8 +22,6 @@ namespace IntegrationCore.Models
         public string FldBlockChainKey { get; set; }
         public string FldBlockChainAddress { get; set; }
         public string FldDisplayName { get; set; }
-        public string TypeID { get; set; }
-
         //public int FldUserStatus { get; set; }
         //public string FldWebCPanelPermissions { get; set; }
         //public string FldNotes { get; set; }
@@ -34,25 +31,6 @@ namespace IntegrationCore.Models
         //public string FldModifiedFields { get; set; }
         //public string FldFlags { get; set; }
         //public string FldLASTLOGIN { get; set; }
-        public string HREMPID { get; set; }
-        public string HRDEPTCODE { get; set; }
-        public string HRPOSCODE { get; set; }
-        public string HRPOSNAME { get; set; }
-        public string ResponseCode { get; set; }
-        public string EMessage { get; set; }
-        public string LMessage { get; set; }
-        public bool MergeNickNameTypeID { get; set; }
-        
-
-    }
-    public class IntUserRequest
-    {
-        public string code { get; set; }
-        public string ecs { get; set; }
-        public string empno { get; set; }
-        public string mobile { get; set; }
-        public string email { get; set; }
-        
     }
 
     public class IntUser

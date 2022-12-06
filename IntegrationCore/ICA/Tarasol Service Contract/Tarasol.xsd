@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="http://id.gov.ae/schema/tarasolservice" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://id.gov.ae/schema/tarasolservice" xmlns:pref="http://id.gov.ae/schema/commontypes">
+    <xsd:import schemaLocation="../../CommonLibrary/id/gov/ae/common/schema/CommonTypes.xsd" namespace="http://id.gov.ae/schema/commontypes"></xsd:import>
+	<xsd:element name="Code" type="xsd:string"></xsd:element>
+
+	<xsd:element name="EName" type="xsd:string"></xsd:element>
+
+	<xsd:element name="LName" type="xsd:string"></xsd:element>
+
+	<xsd:element name="CorrespondenceNo" type="xsd:string"></xsd:element>
+
+	<xsd:element name="Date" type="xsd:dateTime"></xsd:element>
+
+	<xsd:element name="DocumentSubject" type="xsd:string"></xsd:element>
+
+	<xsd:element name="Priority" type="xsd:string"></xsd:element>
+
+
+	<xsd:element name="ForeignOutboxNo" type="xsd:string"></xsd:element>
+
+	<xsd:element name="MailSequence" type="xsd:string"></xsd:element>
+
+	<xsd:element name="Language" type="xsd:string"></xsd:element>
+
+
+	<xsd:element name="DocumentType" type="xsd:string"></xsd:element>
+
+	<xsd:element name="DocumentBody" type="xsd:string"></xsd:element>
+
+	<xsd:element name="Secrecy" type="xsd:string"></xsd:element>
+
+	<xsd:element name="TransactionId" type="xsd:string"></xsd:element>
+
+	<xsd:element name="DocumentContent" type="xsd:string"></xsd:element>
+
+	<xsd:element name="AttachmentPath" type="xsd:string"></xsd:element>
+
+	<xsd:element name="DocumentName" type="xsd:string"></xsd:element>
+
+	<xsd:element name="Description" type="xsd:string"></xsd:element>
+
+	<xsd:element name="documentNumber" type="xsd:string"></xsd:element>
+
+	<xsd:element name="MimeType" type="xsd:string"></xsd:element>
+
+	<xsd:element name="SiteId" type="xsd:string"></xsd:element>
+
+
+
+
+
+
+
+
+	<xsd:complexType name="AddNewDocumentRequestBodyType">
+		<xsd:sequence>
+			<xsd:element ref="tns:transactionRefNo" minOccurs="1" maxOccurs="1"></xsd:element>
+			<xsd:element ref="tns:Sender" minOccurs="1" maxOccurs="1"></xsd:element>
+			<xsd:element ref="tns:Receivers" minOccurs="1" maxOccurs="1"></xsd:element>
+			<xsd:element ref="tns:CorrespondenceNo" minOccurs="1"
+				maxOccurs="1">
+			</xsd:element>
+			<xsd:element ref="tns:Date" minOccurs="1" maxOccurs="1"></xsd:element>
+			<xsd:element ref="tns:DocumentSubject" minOccurs="1"
+				maxOccurs="1">
+			</xsd:element>
+			<xsd:element ref="tns:Priority" minOccurs="0"
+				maxOccurs="1">
+			</xsd:element>
+			<xsd:element ref="tns:ForeignOutboxNo" minOccurs="0"
+				maxOccurs="1">
+			</xsd:element>
+			<xsd:element ref="tns:MailSequence" minOccurs="0"
+				maxOccurs="1">
+			</xsd:element>
+			<xsd:element ref="tns:Language" minOccurs="0"
+				maxOccurs="1">
+			</xsd:element>
+			<xsd:element ref="tns:DocumentType" minOccurs="0"
+				maxOccurs="1">
+			</xsd:element>
+			<xsd:element ref="tns:DocumentBody" minOccurs="0"
+				maxOccurs="1">
+			</xsd:element>
+			<xsd:element ref="tns:Secrecy" minOccurs="0"
+				maxOccurs="1">
+			</xsd:element>
+			<xsd:element ref="tns:TransactionIds" minOccurs="0"
+				maxOccurs="1">
+			</xsd:element>
+			<xsd:element ref="tns:Attachments" minOccurs="0"
+				maxOccurs="1">
+			</xsd:element>
+			<xsd:element ref="tns:timestamp" minOccurs="1" maxOccurs="1"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="AddNewDocumentRequestType">
+		<xsd:sequence>
+			<xsd:element ref="pref:Header"></xsd:element>
+			<xsd:element name="Body" type="tns:AddNewDocumentRequestBodyType"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="Sender">
+		<xsd:sequence>
+			<xsd:element ref="tns:Code" minOccurs="1" maxOccurs="1"></xsd:element>
+			<xsd:element ref="tns:EName" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element ref="tns:LName" minOccurs="0" maxOccurs="1"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:element name="Sender" type="tns:Sender"></xsd:element>
+
+
+	<xsd:element name="Receivers" type="tns:RecevierDetail"></xsd:element>
+
+
+	<xsd:complexType name="TransactionIds">
+		<xsd:sequence>
+			<xsd:element ref="tns:TransactionId" minOccurs="0" maxOccurs="1"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:element name="TransactionIds" type="tns:TransactionIds"></xsd:element>
+
+	<xsd:complexType name="AttachmentType">
+		<xsd:sequence>
+			<xsd:element ref="tns:DocumentContent" minOccurs="1" maxOccurs="1"></xsd:element>
+			<xsd:element ref="tns:AttachmentPath" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element ref="tns:DocumentName" minOccurs="1" maxOccurs="1"></xsd:element>
+			<xsd:element ref="tns:Description" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element ref="tns:documentNumber" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element ref="tns:MimeType" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element ref="tns:SiteId" minOccurs="0" maxOccurs="1"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:element name="Attachments" type="tns:Attachment"></xsd:element>
+
+    <xsd:element name="RequestId" type="xsd:string"></xsd:element>
+
+    <xsd:element name="Message" type="xsd:string"></xsd:element>
+
+    <xsd:complexType name="AddNewDocumentResponseBodyType">
+    	<xsd:sequence>
+    		<xsd:element name="transactionRefNo"
+    			type="pref:TransactionRefNoType" minOccurs="1" maxOccurs="1">
+    		</xsd:element>
+            <xsd:element ref="tns:responseCode" minOccurs="1" maxOccurs="1"></xsd:element>
+            <xsd:element ref="tns:responseDescription" minOccurs="0" maxOccurs="1"></xsd:element>
+            <xsd:element ref="tns:RequestId" minOccurs="0"
+    			maxOccurs="1">
+    		</xsd:element>
+    		<xsd:element ref="tns:Code" minOccurs="0" maxOccurs="1"></xsd:element>
+    		<xsd:element ref="tns:Message" minOccurs="0"
+    			maxOccurs="1">
+    		</xsd:element>
+    		<xsd:element name="timestamp" type="xsd:dateTime"
+    			minOccurs="1" maxOccurs="1">
+    		</xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="AddNewDocumentResponseType">
+    	<xsd:sequence>
+    		<xsd:element ref="pref:Header"></xsd:element>
+    		<xsd:element name="Body" type="tns:AddNewDocumentResponseBodyType"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:element name="transactionRefNo" type="pref:TransactionRefNoType"></xsd:element>
+
+    <xsd:element name="timestamp" type="xsd:dateTime"></xsd:element>
+
+
+    <xsd:element name="ReadBy" type="xsd:string"></xsd:element>
+
+    <xsd:element name="DateOfUpdate" type="xsd:dateTime"></xsd:element>
+
+    <xsd:complexType name="DeliveryReportRequestBodyType">
+    	<xsd:sequence>
+    		<xsd:element ref="tns:transactionRefNo" minOccurs="1" maxOccurs="1"></xsd:element>
+    		<xsd:element ref="tns:GlobalID" minOccurs="1" maxOccurs="1"></xsd:element>
+    		<xsd:element ref="tns:CorrespondenceNo" minOccurs="1" maxOccurs="1"></xsd:element>
+    		<xsd:element ref="tns:ReadBy" minOccurs="0" maxOccurs="1"></xsd:element>
+    		<xsd:element ref="tns:DateOfUpdate" minOccurs="1" maxOccurs="1"></xsd:element>
+    		<xsd:element ref="tns:timestamp" minOccurs="1" maxOccurs="1"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="DeliveryReportRequestType">
+    	<xsd:sequence>
+    		<xsd:element ref="pref:Header"></xsd:element>
+    		<xsd:element name="Body" type="tns:DeliveryReportRequestBodyType"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="GlobalID">
+    	<xsd:sequence>
+    		<xsd:element ref="tns:Code" minOccurs="0" maxOccurs="1"></xsd:element>
+    		<xsd:element ref="tns:EName" minOccurs="0" maxOccurs="1"></xsd:element>
+    		<xsd:element ref="tns:LName" minOccurs="0" maxOccurs="1"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:element name="GlobalID" type="tns:GlobalID"></xsd:element>
+
+    <xsd:element name="StatusCode" type="xsd:string"></xsd:element>
+
+    <xsd:element name="StatusDescription" type="xsd:string"></xsd:element>
+
+    <xsd:complexType name="DeliveryReportResponseBodyType">
+    	<xsd:sequence>
+    		<xsd:element ref="tns:transactionRefNo" minOccurs="1"
+    			maxOccurs="1">
+    		</xsd:element>
+            <xsd:element ref="tns:responseCode" minOccurs="1" maxOccurs="1"></xsd:element>
+            <xsd:element ref="tns:responseDescription" minOccurs="0" maxOccurs="1"></xsd:element>
+            <xsd:element ref="tns:StatusCode" minOccurs="0"
+    			maxOccurs="1">
+    		</xsd:element>
+    		<xsd:element ref="tns:StatusDescription" minOccurs="0"
+    			maxOccurs="1">
+    		</xsd:element>
+    		<xsd:element ref="tns:timestamp" minOccurs="1"
+    			maxOccurs="1">
+    		</xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="DeliveryReportResponseType">
+    	<xsd:sequence>
+    		<xsd:element ref="pref:Header"></xsd:element>
+    		<xsd:element name="Body" type="tns:DeliveryReportResponseBodyType"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:element name="ReceiverDetail" type="tns:ReceiverDetailType"></xsd:element>
+
+
+    <xsd:complexType name="ReceiverDetailType">
+    	<xsd:sequence>
+    		<xsd:element ref="tns:Code" minOccurs="1" maxOccurs="1"></xsd:element>
+    		<xsd:element ref="tns:EName" minOccurs="0" maxOccurs="1"></xsd:element>
+    		<xsd:element ref="tns:LName" minOccurs="0" maxOccurs="1"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="RecevierDetail">
+    	<xsd:sequence>
+    		<xsd:element ref="tns:ReceiverDetail" minOccurs="1" maxOccurs="1"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:element name="Attachment" type="tns:AttachmentType"></xsd:element>
+
+    <xsd:complexType name="Attachment">
+    	<xsd:sequence>
+    		<xsd:element ref="tns:Attachment"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:element name="responseCode" type="pref:ResponseCodeType"></xsd:element>
+
+    <xsd:element name="responseDescription" type="xsd:string"></xsd:element>
+</xsd:schema>

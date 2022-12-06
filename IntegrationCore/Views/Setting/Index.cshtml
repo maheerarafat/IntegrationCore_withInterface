@@ -2,6 +2,7 @@
     ViewData["Title"] = "Settings";
 }
 
+
 <div class="container">
     <div class="alert alert-danger" role="alert" style="display:none">
         <p id="resMessage"></p>
@@ -16,263 +17,188 @@
     <div class="form-horizontal">
         <hr />
 
-        <label>DB Type</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <div class="">
-                    <label for="Oracle">Oracle</label>
-                    <input type="radio" name="DBype" id="Oracle" />
-                    <label for="SQL">SQL</label>
-                    <input type="radio" name="DBype" id="SQL" />
-                </div>
-                <div class="">
+        <div class="panel panel-default">
+            <div class="panel-heading">Settings</div>
+
+            <div class="panel-body">
+
+                <div class="row">
+
+                    <div class="col-md-6">
+                        <label>DB Type</label>
+                        <div class="form-group">
+                            <div class="col-md-10">
+                                <div class="">
+                                    <label for="Oracle">Oracle</label>
+                                    <input type="radio" name="DBype" id="Oracle" />
+                                    <label for="SQL">SQL</label>
+                                    <input type="radio" name="DBype" id="SQL" />
+                                </div>
+                                <div class="">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+
+                    </div>
 
                 </div>
-            </div>
-        </div>
 
-        <label>Connection String</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <input type="text" class="form-control" id="ConnectionString" name="ConnectionString" />
-            </div>
-        </div>
+                <div class="row">
 
-        <label>DB Password</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <input type="password" autocomplete="off" class="form-control" id="DBPassword" name="DBPassword" />
-            </div>
-        </div>
-        <div class="form-group">
-            <button style="        width: 20%;
-        font-weight: bolder;
-        font-size: large;
-        margin-left: 1.2%;
-        background-color: darkgray;" class="btn btn-default" onclick="test_Connection()">
-                Test Connection
-            </button>
-        </div>
-        <label style="margin-top:50px;">Tarasol Username</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <input type="text" class="form-control" id="TarasolINTUser" name="TarasolINTUser" />
-            </div>
-        </div>
+                    <div class="col-md-6">
+                        <label>Connection String</label>
+                        <div class="form-group">
+                            <div class="col-md-10">
+                                <input type="text" class="form-control" id="ConnectionString" name="ConnectionString" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label>DB Password</label>
+                        <div class="form-group">
+                            <div class="col-md-10">
+                                <input type="password" class="form-control" id="DBPassword" name="DBPassword" />
+                            </div>
+                        </div>
+                    </div>
 
-        <label>Tarasol Password</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <input type="password" class="form-control" autocomplete="off" id="TarasolINTPassword" name="TarasolINTPassword" />
-            </div>
-        </div>
-        <label>Default Reference</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <input type="text" class="form-control" autocomplete="off" id="DefaultReference" name="DefaultReference" />
-            </div>
-        </div>
-        <label>API URL</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <input type="text" class="form-control" id="APIURL" name="APIURL" />
-            </div>
-        </div>
-        <label>Integration Data Folder</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <input type="text" class="form-control" id="IntegrationDataFolder" name="IntegrationDataFolder" />
-            </div>
-        </div>
-        <label style="margin-top:50px;">ECS Username</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <input type="text" class="form-control" id="UserName" name="UserName" />
-            </div>
-        </div>
+                </div>
 
-        <label>ECS Password</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <input type="password" class="form-control" autocomplete="off" id="Password" name="Password" />
-            </div>
-        </div>
+                <div class="row">
+
+                    <div class="col-md-6">
+                        <label>Username</label>
+                        <div class="form-group">
+                            <div class="col-md-10">
+                                <input type="text" class="form-control" id="UserName" name="UserName" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Password</label>
+                        <div class="form-group">
+                            <div class="col-md-10">
+                                <input type="password" class="form-control" id="Password" name="Password" />
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row">
+
+                    <div class="col-md-6">
+                        <label>Data Folder</label>
+                        <div class="form-group">
+                            <div class="col-md-10">
+                                <input type="text" class="form-control" id="DataFolder" name="DataFolder" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label>API URL</label>
+                        <div class="form-group">
+                            <div class="col-md-10">
+                                <input type="text" class="form-control" id="APIURL" name="APIURL" />
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row">
+
+                    <div class="col-md-6">
+                        <label>Integration Data Folder</label>
+                        <div class="form-group">
+                            <div class="col-md-10">
+                                <input type="text" class="form-control" id="IntegrationDataFolder" name="IntegrationDataFolder" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Enable Send Email Time in 24 Format</label>
+                        <div class="form-group">
+                            <div class="col-md-10">
+                                <input type="text" class="form-control" id="TimeStartSendEmail" name="TimeStartSendEmail" />
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Classification</label>
+                        <div class="form-group">
+                            <div class="col-md-10">
+                                <input type="text" class="form-control" id="ClassificationId" name="ClassificationId" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Entity Prefix</label>
+                        <div class="form-group">
+                            <div class="col-md-10">
+                                <input type="text" class="form-control" id="EntityPrefix" name="EntityPrefix" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+
+                    <div class="col-md-6">
+                        <label>Enable Logging</label>
+                        <div class="form-group">
+                            <div class="col-md-10">
+                                <input type="checkbox" id="EnableLogging" name="EnableLogging" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div>
+                            <a style="cursor:pointer;" href="@Url.Action("DownloadLatestLog", "Home")"> Download latest Log</a>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Manual Sync</label>
+                        <div class="form-group">
+                            <div class="col-md-10">
+                                <span onclick="manual_sync_incoming()" class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>
+                            </div>
+                        </div>
+                    </div>
+                   
+                </div>
+
+
+                <div class="row">
+
+                    <div class="col-md-6">
+                        <div class="">
+                            <button class="btn btn-default" onclick="save_setting()">Save</button>
+                        </div>
+                    </div>
+                    <div class="col-md-6"></div>
+
+                </div>
 
 
 
-        @*<label>Data Folder</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <input type="text" class="form-control" id="DataFolder" name="DataFolder" />
             </div>
-        </div>
 
-        <label>Enable Logging</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <input type="checkbox" id="EnableLogging" name="EnableLogging" />
-            </div>
-        </div>*@
-
-
-        <label style="margin-top:50px;">ESB SMS User</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <input type="text" class="form-control" id="ESBSMSUser" name="ESBSMSUser" />
-            </div>
-        </div>
-        <label>ESB SMS Pass</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <input type="password" class="form-control" autocomplete="off" id="ESBSMSPass" name="ESBSMSPass" />
-            </div>
-        </div>
-        <label>MOI SMS User</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <input type="text" class="form-control" id="MOISMSUser" name="MOISMSUser" />
-            </div>
-        </div>
-        <label>MOI SMS Pass</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <input type="password" class="form-control" id="MOISMSPass" name="MOISMSPass" />
-            </div>
-        </div>
-        <label>MOI SMS Channel</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <input type="text" class="form-control" autocomplete="off" id="MOISMSChannel" name="MOISMSChannel" />
-            </div>
-        </div>
-        <label style="margin-top:50px;">ESB URL</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <input type="text" class="form-control" id="ESBURL" name="ESBURL" />
-            </div>
-        </div>
-        <label>ESB ECS User</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <input type="text" class="form-control" id="ESBECSUser" name="ESBECSUser" />
-            </div>
-        </div>
-        <label>ESB ECS Pass</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <input type="password" class="form-control" autocomplete="off" id="ESBECSPass" name="ESBECSPass" />
-            </div>
-        </div>
-        <label style="margin-top:50px;">ESB HR User</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <input type="text" class="form-control" id="ESBHRUser" name="ESBHRUser" />
-            </div>
-        </div>
-        <label>ESB HR Pass</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <input type="password" class="form-control" autocomplete="off" id="ESBHRPass" name="ESBHRPass" />
-            </div>
-        </div>
-
-        <label style="margin-top:50px;">DMS Interface URL</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <input type="text" class="form-control" id="DMSInterfaceURL" name="DMSInterfaceURL" />
-            </div>
-        </div>
-
-        <label>DMS Service User</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <input type="text" class="form-control" id="DMSUser" name="DMSUser" />
-            </div>
-        </div>
-        <label>DMS Service Password</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <input type="password" class="form-control" id="DMSPass" name="DMSPass" />
-            </div>
         </div>
 
 
-        <label style="margin-top:50px;">Fax URL</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <input type="text" class="form-control" id="FaxServer" name="FaxServer" />
-            </div>
-        </div>
-        <label>Fax Username</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <input type="text" class="form-control" id="FaxUser" name="FaxUser" />
-            </div>
-        </div>
-        <label>Fax Password</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <input type="password" class="form-control" id="FaxPassword" name="FaxPassword" />
-            </div>
-        </div>
-        <label>Fax "From" Field name in Tarasol</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <input type="text" class="form-control" id="FromFaxField" name="FromFaxField" />
-            </div>
-        </div>
-        <label style="margin-top:50px;">ESB Email URL</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <input type="text" class="form-control" id="ESBEmail" name="ESBEmail" />
-            </div>
-        </div>
-        <label>ESB Email User</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <input type="text" class="form-control" id="ESBEmailUser" name="ESBEmailUser" />
-            </div>
-        </div>
-        <label>ESB Email Password</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <input type="password" class="form-control" id="ESBEmailPassword" name="ESBEmailPassword" />
-            </div>
-        </div>
-        <label style="margin-top:50px;">Site End Point</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <input type="text" class="form-control" id="SiteEndPoint" name="SiteEndPoint" />
-            </div>
-        </div>
-        <label>Entity Prefix</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <input type="text" class="form-control" id="EntityPrefix" name="EntityPrefix" />
-            </div>
-        </div>
-        <label>Token Period     "If it's empty, token will be unexpired"</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <input type="text" class="form-control" id="TokenPeriod" name="TokenPeriod" />
-            </div>
-        </div>
 
-        <label>Enable Logging Info</label>
-        <div class="form-group">
-            <div class="col-md-10">
-                <input type="checkbox" id="EnableLoggingInfo" name="EnableLoggingInfo" />
-            </div>
-        </div>
-        <div class="form-group">
-            <button style="        width: 33%;
-        font-weight: bolder;
-        font-size: x-large;
-        margin-left: 1.2%;
-        background-color: darkgray;" class="btn btn-default" onclick="save_setting()">
-                Save
-            </button>
-        </div>
     </div>
 
 </div>
@@ -282,21 +208,10 @@
 
     var DBPassword = '';
     var Password = '';
-    var ESBECSPass = '';
-    var ESBHRPass = '';
-    var ESBSMSPass = '';
-    var MOISMSPass = '';
-    var ESBEmailPassword = '';
-    var FaxPass = '';
-    var DMSPass = '';
-    var TarasolINTPassword = '';
+
     $(document).ready(function () {
 
-        get_Settings();
-
-
-    });
-    function get_Settings() {
+         $('#cover-spin').show(0);
         let data = sessionStorage['token'];
         $.ajax({
             method: 'GET',
@@ -306,67 +221,43 @@
                     "Authorization", "Bearer " + data);
             }
         }).done(function (data) {
-            debugger;
+            debugger
+            $('#cover-spin').css('display', 'none');
             $('#ConnectionString').val(data.connectionString);
-            //DBPassword = data.dbPassword;
+            DBPassword = data.dbPassword;
             $('#UserName').val(data.userName);
-            //Password = data.password;
+            Password = data.password;
             $('#APIURL').val(data.apiurl);
             $('#IntegrationDataFolder').val(data.integrationDataFolder);
             $('#DataFolder').val(data.dataFolder);
-            //$('#EnableLogging').prop('checked', data.enableLogging);
-
-            $('#ESBECSUser').val(data.esbecsUser);
-            //$('#ESBECSPass').val(data.ESBECSPass);
-            $('#ESBHRUser').val(data.esbhrUser);
-            //$('#ESBHRPass').val(data.ESBHRPass);
-            //$('#ESBSMSPass').val(data.ESBSMSPass);
-            $('#ESBSMSUser').val(data.esbsmsUser);
-            $('#MOISMSChannel').val(data.moismsChannel);
-            $('#MOISMSUser').val(data.moismsUser);
-            //$('#MOISMSPass').val(data.MOISMSPass);
-            $('#ESBURL').val(data.esburl);
-
-            $('#ESBEmail').val(data.esbEmail);
-            $('#ESBEmailUser').val(data.esbEmailUser);
-            //$('#ESBEmailPassword').val(data.esbEmailPassword);
-            $('#SiteEndPoint').val(data.siteEndPoint);
-            $('#DefaultReference').val(data.defaultReference);
-
+            $('#EnableLogging').prop('checked', data.enableLogging);
+            $('#TimeStartSendEmail').val(data.timeStartSendEmail);
+            $('#ClassificationId').val(data.classificationId);
             $('#EntityPrefix').val(data.entityPrefix);
-            $('#DMSInterfaceURL').val(data.dmsInterfaceURL);
-            $('#DMSUser').val(data.dmsUser);
-            //$('#DMSPass').val(data.dmsPass);
-
-            $('#FaxServer').val(data.faxServer);
-            $('#FaxUser').val(data.faxUser);
-            $('#FromFaxField').val(data.fromFaxField);
-
-            $('#TarasolINTUser').val(data.tarasolINTUser);
-            //$('#FaxPassword').val(data.faxPass);
-
-            $('#TokenPeriod').val(data.tokenPeriod);
-            
-            $('#EnableLoggingInfo').prop('checked', data.enableLoggingInfo);
             if (data.dbType == 1)
-                $('#Oracle').prop('checked', data.dbType);
+                $('#Oracle').prop('checked', data.dbType)
             else
-                $('#SQL').prop('checked', data.dbType);
-            $('#DBPassword').val('');
+                 $('#SQL').prop('checked', data.dbType)
+
         }).error(function (xhdr, statusText, errorText) {
             $('.alert').css('display', 'block');
+            $('#cover-spin').css('display', 'none');
             if (xhdr.responseText != "") {
-                $('#resMessage').text(errorText);
                 $('#resMessage').text(xhdr.responseJSON.value.eMessage);
-            } else
+            } else if (xhdr.statusText == "Unauthorized") {
+                $('#resMessage').text(xhdr.statusText);
+                CallBackUnauthorized();
+            }
+            else
                 $('#resMessage').text(xhdr.statusText);
         });
-    }
+
+    });
+
     function save_setting() {
-        debugger;
+
         let dbType = 1;
-        let EnableLoggingInfo = false;
-        //let enableLogging = false;
+        let enableLogging = false;
         if ($('#Oracle').prop('checked')) {
             dbType = 1;
         } else {
@@ -379,143 +270,100 @@
         if ($('#Password').val() != '') {
             Password = $('#Password').val();
         }
-        if ($('#ESBECSPass').val() != '') {
-            ESBECSPass = $('#ESBECSPass').val();
+
+        if ($('#EnableLogging').prop('checked')) {
+            enableLogging = true;
         }
-        if ($('#ESBHRPass').val() != '') {
-            ESBHRPass = $('#ESBHRPass').val();
-        }
-        if ($('#ESBSMSPass').val() != '') {
-            ESBSMSPass = $('#ESBSMSPass').val();
-        }
-        if ($('#MOISMSPass').val() != '') {
-            MOISMSPass = $('#MOISMSPass').val();
-        }
-        if ($('#FaxPassword').val() != '') {
-            FaxPass = $('#FaxPassword').val();
-        }
-        if ($('#DMSPass').val() != '') {
-            DMSPass = $('#DMSPass').val();
-        }
-        if ($('#TarasolINTPassword').val() != '') {
-            TarasolINTPassword = $('#TarasolINTPassword').val();
-        }
-        if ($('#ESBEmailPassword').val() != '') {
-            ESBEmailPassword = $('#ESBEmailPassword').val();
-        }
-        if ($('#EnableLoggingInfo').prop('checked')) {
-            EnableLoggingInfo = true;
-        }
-        //'timeStartSendEmail': $('#TimeStartSendEmail').val()
+
+        $('#cover-spin').show(0);
+
         let request = JSON.stringify({
             'ConnectionString': $('#ConnectionString').val(),
             'UserName': $('#UserName').val(),
             'APIURL': $('#APIURL').val(),
             'IntegrationDataFolder': $('#IntegrationDataFolder').val(),
             'DataFolder': $('#DataFolder').val(),
-            //'EnableLogging': enableLogging,
+            'EnableLogging': enableLogging,
             'DBType': dbType,
             'DBPassword': DBPassword,
             'Password': Password,
-
-            'ESBECSPass': ESBECSPass,
-            'ESBHRPass':  ESBHRPass,
-            'ESBSMSPass': ESBSMSPass,
-            'MOISMSPass': MOISMSPass,
-            'ESBECSUser': $('#ESBECSUser').val(),
-            'MOISMSChannel': $('#MOISMSChannel').val() ,
-            'ESBHRUser': $('#ESBHRUser').val(),
-            'ESBSMSUser': $('#ESBSMSUser').val(),
-            'MOISMSUser': $('#MOISMSUser').val(),
-
-            'ESBURL': $('#ESBURL').val(),
-            'MOISMSUser': $('#MOISMSUser').val(),
-            'SiteEndPoint': $('#SiteEndPoint').val(),
-            'DefaultReference': $('#DefaultReference').val(),
-            'EntityPrefix': $('#EntityPrefix').val(),
-            'TokenPeriod': $('#TokenPeriod').val(),
-            'DMSInterfaceURL': $('#DMSInterfaceURL').val(),
-            'DMSUser': $('#DMSUser').val(),
-            'DMSPass': DMSPass,
-
-            'FaxUser': $('#FaxUser').val(),
-            'FaxServer': $('#FaxServer').val(),
-            'FromFaxField': $('#FromFaxField').val(),
-            'FaxPass': FaxPass,
-
-            'TarasolINTUser': $('#TarasolINTUser').val(),
-            'TarasolINTPassword': TarasolINTPassword,
-            'ESBEmail': $('#ESBEmail').val(),
-            'ESBEmailUser': $('#ESBEmailUser').val(),
-            'ESBEmailPassword': ESBEmailPassword,
-            'EnableLoggingInfo': EnableLoggingInfo,
+            "TimeStartSendEmail": $('#TimeStartSendEmail').val(),
+            "ClassificationId": $('#ClassificationId').val(),
+            "EntityPrefix": $('#EntityPrefix').val()
         });
         $.ajax({
                 type: 'POST',
                 url: '@Url.Action("EditSettings", "Setting")',
                 data: request,
-            contentType: "application/json",
-            beforeSend: function (xhdr) {
-                let token = sessionStorage['token'];
-                xhdr.setRequestHeader(
+                contentType: "application/json",
+                beforeSend: function (xhdr) {
+                    let token = sessionStorage['token'];
+                    xhdr.setRequestHeader(
                     "Authorization", "Bearer " + token);
-            }
+                }
             }).done(function (data) {
 
-                alert('Saved');
-                get_Settings();
+                 $('#cover-spin').css('display', 'none');
             }).error(function (xhdr, statusText, errorText) {
 
                 $('.alert').css('display', 'block');
-
+                $('#cover-spin').css('display', 'none');
                 if (xhdr.responseText != "") {
                     $('#resMessage').text(xhdr.responseJSON.value.eMessage);
                 } else
                     $('#resMessage').text(xhdr.statusText);
-                //get_Settings();
             });
     }
 
-    function test_Connection() {
-        debugger;
+    function downloadLog() {
 
-
-        if ($('#DBPassword').val() != '' ) {
-            DBPassword = $('#DBPassword').val();
-        }
-
-        //'timeStartSendEmail': $('#TimeStartSendEmail').val()
-        let request = JSON.stringify({
-            'ConnectionString': $('#ConnectionString').val(),
-
-            'DBPassword': DBPassword
-
-        });
+        let data = sessionStorage['token'];
         $.ajax({
-                type: 'POST',
-                url: '@Url.Action("test_Connection", "Setting")',
-                data: request,
-            contentType: "application/json",
+            method: 'GET',
+            url: '@Url.Action("DownloadLatestLog", "Home")',
             beforeSend: function (xhdr) {
-                let token = sessionStorage['token'];
                 xhdr.setRequestHeader(
-                    "Authorization", "Bearer " + token);
+                    "Authorization", "Bearer " + data);
             }
-            }).done(function (data) {
+        }).done(function (data) {
 
-                alert('Connected Successfully');
+            window.Location = data
+        }).error(function (xhdr, statusText, errorText) {
+            $('.alert').css('display', 'block');
+            $('#cover-spin').css('display', 'none');
+            if (xhdr.responseText != "") {
+                $('#resMessage').text(xhdr.responseJSON.value.eMessage);
+            } else
+                $('#resMessage').text(xhdr.statusText);
+        });
+    }
 
-            }).error(function (xhdr, statusText, errorText) {
 
-                //$('.alert').css('display', 'block');
+    function manual_sync_incoming() {
 
-                //if (xhdr.responseText != "") {
-                //    $('#resMessage').text(xhdr.statusText);
-                //} else
-                //    $('#resMessage').text(xhdr.statusText);
-                alert('Connection Error');
-                //get_Settings();
-            });
+        debugger;
+        $('#cover-spin').show(0);
+        let data = sessionStorage['token'];
+        $.ajax({
+            method: 'GET',
+            url: '@Url.Action("ManualSyncImporting", "Setting")',
+            beforeSend: function (xhdr) {
+                xhdr.setRequestHeader(
+                    "Authorization", "Bearer " + data);
+            }
+        }).done(function (data) {
+
+            $('#cover-spin').css('display', 'none');
+            debugger;
+
+        }).error(function (xhdr, statusText, errorText) {
+            $('.alert').css('display', 'block');
+            $('#cover-spin').css('display', 'none');
+            if (xhdr.responseText != "") {
+                $('#resMessage').text(xhdr.responseJSON.value.eMessage);
+            } else
+                $('#resMessage').text(xhdr.statusText);
+        });
     }
 
 </script>

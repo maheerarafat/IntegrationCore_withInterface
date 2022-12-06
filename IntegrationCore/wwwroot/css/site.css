@@ -1,9 +1,10 @@
 ﻿@font-face {
-    font-family: -webkit-pictograph;
+    font-family: DroidKufi;
+    src: url('font/DroidKufi-Regular.woff')
 }
 
 * {
-    font-family: -webkit-pictograph;
+    font-family: DroidKufi;
 }
 
 body {
@@ -208,3 +209,11 @@ td {
         font-size: 3em;
         top: 50%;
     }
+
+
+/*Report style*/
+.border-report {
+    border: 4px gray;
+    border-style: double;
+    margin-top: 1em;
+}

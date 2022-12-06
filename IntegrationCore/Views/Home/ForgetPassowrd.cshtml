@@ -1,4 +1,4 @@
-﻿@model IntegrationCore.Models.SettingModel
+﻿@model IntegrationCore.Models.Setting
 @{
     ViewData["Title"] = "Reset Password";
     Layout = null;
@@ -402,7 +402,6 @@
     <script>
 
         var mb_number = '';
-        var var_otp = '';
         var user_id = '';
         var cuurent_window_page = this;
         var user_number = '';
@@ -413,10 +412,11 @@
             user_number = num;
             $('.alert').css('display', 'none');
             $('#cover-spin').show(0);
+            let urlRequest = '@Url.Action("GetUserMobileLookup", "HR")';
             $.ajax(
                 {
                     type: 'POST',
-                    url: '/IntegrationCore/HR/GetUserMobileLookup',
+                    url: urlRequest,
                     data: JSON.stringify({ 'Username': num }),
                     contentType: "application/json",
                     success: function (data) {
@@ -430,7 +430,7 @@
                             if (mb_number == "") {
                                 $('#cover-spin').css('display', 'none');
 
-                                $('#message_error').text('لا يوجد رقم موبايل لهذا المستخدم');
+                                $('#message_error').html('<p>يرجى ملئ <a target="_blank" href="https://tarasol.ica.ae">الاستبيان الداخلي</a> والتواصل مع مشرفي النظام </p>');
 
                                 $('#btnChangeMobile').css('display', 'block');
                                 $('#btnAction').css('display', 'none');
@@ -463,17 +463,18 @@
             $('.alert').css('display', 'none');
             $('#btnChangeMobile').css('display', 'none');
             $('#cover-spin').show(0);
+            let urlRequest = '@Url.Action("SendOTP", "SMS")';
+            
             $.ajax(
                 {
                     type: 'POST',
-                    url: '/IntegrationCore/SMS/SendOTP',
+                    url: urlRequest,
                     data: JSON.stringify({ 'ecs': user_number, 'mobile': mb_number }),
                     contentType: "application/json",
                     success: function (data) {
                         $('#cover-spin').css('display', 'none');
                         $('#loginformcontent').css('display', 'none');
                         $('#otppanel').css('display', 'block');
-                        var_otp = data.value;
                         $('#btnAction').attr('onclick', 'check_otp()');
                         $('#btnResource').text('تأكيد');
                     },
@@ -495,10 +496,11 @@
             $('#message_error').text('');
             $('.alert').css('display', 'none');
             $('#cover-spin').show(0);
+            let urlRequest = '@Url.Action("CheckOTP", "Home")';
             $.ajax(
                 {
                     type: 'POST',
-                    url: '/IntegrationCore/Home/CheckOTP',
+                    url: urlRequest,
                     data: JSON.stringify({ 'ecs': user_number, 'code': $('#txtUserOTP').val() }),
                     contentType: "application/json",
                     success: function (data) {
@@ -534,10 +536,11 @@
             }
             $('.alert').css('display', 'none');
             $('#cover-spin').show(0);
+            let urlRequest = '@Url.Action("ChangePassword", "Home")';
             $.ajax(
                 {
                     type: 'POST',
-                    url: '/IntegrationCore/Home/ChangePassword',
+                    url: urlRequest,
                     data: JSON.stringify({ 'Username': user_number, 'Password': $('#txtNewPassword').val(), 'OTP': $('#txtUserOTP').val() }),
                     contentType: "application/json",
                     success: function (data) {

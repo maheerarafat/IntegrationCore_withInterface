@@ -13,6 +13,7 @@ using IntegrationCore.Models;
 
 namespace IntegrationCore.Controllers
 {
+   
     public class JobController : Controller
     {
 
@@ -70,7 +71,7 @@ namespace IntegrationCore.Controllers
                 int recordsTotal = 0;
 
                 //Paging 
-                var data = Jobs.GetLogJobESBSuccuss(pageNumber, pageSize, ref recordsTotal);
+                var data = Jobs.GetLogJobESBSuccuss(pageNumber, pageSize, searchValue, ref recordsTotal);
 
                 //Returning Json Data
                 return Json(new { draw = draw, recordsFiltered = recordsTotal, recordsTotal = recordsTotal, data = data });
@@ -112,7 +113,7 @@ namespace IntegrationCore.Controllers
                 int recordsTotal = 0;
 
                 //Paging 
-                var data = Jobs.GetLogJobESBFaild(pageNumber, pageSize, ref recordsTotal);
+                var data = Jobs.GetLogJobESBFaild(pageNumber, pageSize, searchValue, ref recordsTotal);
 
                 //Returning Json Data
                 return Json(new { draw = draw, recordsFiltered = recordsTotal, recordsTotal = recordsTotal, data = data });
@@ -208,6 +209,74 @@ namespace IntegrationCore.Controllers
             }
         }
 
+        [HttpPost]
+        [Authorize]
+        public ActionResult ExcuteManualRequest(ICALibrary.Models.ManualRequest manualRequest)
+        {
+            try
+            {
+                object jsonResult;
+                if (manualRequest.MethodName.StartsWith(ICALibrary.Helper.Constant.MethodSendAckICA))
+                {
+                    ExportCorr[] SendAckICA = Newtonsoft.Json.JsonConvert.DeserializeObject<ExportCorr[]>(manualRequest.BodyRequest);
+                    if (this._hostingEnvironment.IsEnvironment("ICA"))
+                    {
+                        ConfigAttribute configAttribute = new ConfigAttribute
+                        {
+                            consumerID = _config["ICA:tarasol_service_contract:consumer_id"],
+                            urlServiceESB = _config["ICA:tarasol_service_contract:url"]
+                        };
+                        Correspondence.SendAckICA(_hostingEnvironment, SendAckICA, configAttribute);
+                    }
+                }
+                else if (manualRequest.MethodName.StartsWith(ICALibrary.Helper.Constant.MethodExportFromFolderICA))
+                {
+                    ExportCorr[] ExportFromFolderICA = Newtonsoft.Json.JsonConvert.DeserializeObject<ExportCorr[]>(manualRequest.BodyRequest);
+                    ConfigAttribute configAttribute = new ConfigAttribute
+                    {
+                        consumerID = _config["ICA:tarasol_service_contract:consumer_id"],
+                        urlServiceNotify = _config["ICA:tarasol_service_contract:url"],
+                        urlServiceESB = _config["ICA:notification_service:url"],
+                        senderMail = _config["ICA:SenderMail"]
+                    };
+                    if (this._hostingEnvironment.IsEnvironment("ICA"))
+                    {
+                        Correspondence.ExportFromFolderICA(_hostingEnvironment, ExportFromFolderICA, configAttribute);
+                    }
+                }
+                else if (manualRequest.MethodName.StartsWith(ICALibrary.Helper.Constant.MethodWriteAck))
+                {
+                    Correspondence correspondence = new Correspondence();
+                    DeliveryRequest acknowledegment = Newtonsoft.Json.JsonConvert.DeserializeObject<DeliveryRequest>(manualRequest.BodyRequest);
+                    jsonResult = correspondence.WriteAck(acknowledegment);
+                }
+                else if (manualRequest.MethodName.StartsWith(ICALibrary.Helper.Constant.MethodSendSMSICA))
+                {
+                    String strDecode = String.Empty;
+                    strDecode = System.Net.WebUtility.HtmlDecode(manualRequest.BodyRequest);
+                    strDecode = strDecode.Replace("%20", " ");
+                    List<SMSObject> sMSObject = Newtonsoft.Json.JsonConvert.DeserializeObject<List<SMSObject>>(strDecode);
+                    string transactionRefNo = string.Empty;
+                    ConfigAttribute configAttribute = new ConfigAttribute
+                    {
+                        consumerID = _config["ICA:notification_service:consumer_id"],
+                        urlServiceNotify = _config["ICA:notification_service:url"]
+                    };
+                    IntResult jsonObj = SMS.SendSMSICA(sMSObject, configAttribute, out transactionRefNo);
+                    if (jsonObj.Code == (int)ICALibrary.Helper.Enum.responseCode.Success)
+                    {
+                        Jobs.UpdateProccessScheduleStatus(manualRequest.Id, (int)ICALibrary.Helper.Enum.scheduleType.Done);
+                    }
+                }
 
+                //Returning Json Data
+                return Json(IntResultLib.GetResult(200));
+            }
+            catch (Exception ex)
+            {
+                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, ex.Message);
+                return NotFound(ex.Message);
+            }
+        }
     }
 }

@@ -1,0 +1,235 @@
+﻿@{
+    ViewData["Title"] = "Add";
+}
+
+
+<link rel='stylesheet' href='~/css/box_add/owl.theme.css'>
+<link rel='stylesheet' href='~/css/box_add/bootstrap-editable.css'>
+<link rel="stylesheet" href="~/css/box_add/style.css">
+
+<style type="text/less">
+    .float_left {
+        float: right !important;
+    }
+</style>
+
+<div id="" class="owl-carousel" dir="rtl">
+
+    <div class="single-view container">
+        <!-- Client Name Row -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="name"><h1></h1></div>
+            </div>
+        </div>
+        <!-- End Client Name Row -->
+        <!-- Client Entry Created Row -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="client-created-details">
+
+                </div>
+            </div>
+        </div><br>
+        <!-- End Client Entry Created Row -->
+        <!-- Prospect Details Row -->
+        <div class="row">
+            <div class="col-md-12">
+                <h3 class="float_left"> معلومات المستخدمين </h3>
+                <div class="alert alert-danger" role="alert" style="display:none">
+                    <p id="resMessage"></p>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+
+            <div class="col-md-6">
+                <div class="table-responsive">
+                    <table class="prospect-information table table-hover">
+                        <tbody>
+
+                            <tr>
+                                <td class="float_left">الاسم</td>
+                                <td id="EMP_NAME_A"></td>
+                            </tr>
+                            <tr>
+                                <td class="float_left"> المرتب العام</td>
+                                <td id="DEPT_NAME_A"></td>
+                            </tr>
+                            <tr>
+                                <td class="float_left">رقم الهاتف</td>
+                                <td id="MOBILE_NO">&nbsp;<span class="glyphicon glyphicon-phone"></span></td>
+                            </tr>
+                            <tr>
+                                <td class="float_left">البريد الالكتروني</td>
+                                <td id="MAIL">&nbsp;<span class="glyphicon glyphicon-envelope"></span></td>
+                            </tr>
+                            <tr>
+                                <td class="float_left">الرتبة</td>
+                                <td id="RANK_ID"></td>
+                            </tr>
+                            <tr>
+                                <td class="float_left">الهوية الإمارتية</td>
+                                <td id="Emirate_id"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <button class="btn" onclick="update_info()">حفظ</button>
+            </div>
+
+            <div class="col-md-6">
+                <div class="table-responsive">
+                    <table class="prospect-information table table-hover">
+                        <tbody>
+                            <tr>
+                                <td class="float_left">نوع الإجراء</td>
+                                <td>
+                                    @*<a class="callresult"></a>*@
+                                    <select name="drop_callresult" id="id_callresult" class="form-control">
+                                        <option value="1">إضافة</option>
+                                        <option value="2">تحديث بيانات</option>
+                                        <option value="3">ربط بيانات موظف قديم</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="float_left">ملاك</td>
+                                <td>
+                                    @*<a class="owner"></a>*@
+                                    <select name="drop_owner" id="id_owner" class="form-control">
+                                        <option value="0">ملاك القيادة العامة للشرطة</option>
+                                        <option value="3">الملاك الاتحادى</option>
+                                        <option value="29">ملاك محلي حكومة الشارقة</option>
+                                        <option value="33">تحالف الإمارات للحلول التقنية</option>
+                                        <option value="26">ملاك شركة الرواد لأنظمة تقنية المعلومات</option>
+                                        <option value="30">ملاك محلي حكومة الفجيرة</option>
+                                        <option value="23">ملاك شؤون الجنسية والاقامة والمنافذ / المحلي</option>
+                                        <option value="24">ملاك شؤون الجنسية والاقامة والمنافذ / الخدمة المدنية لإمارة أبوظبي</option>
+                                        <option value="32">ملاك الهوية</option>
+                                        <option value="25">ملاك شركة خدماتي</option>
+                                        <option value="31">ملاك القيادة العامة لشرطة الشارقة</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr id="tr_ecs_odl">
+                                <td class="float_left"> حساب نظام المراسلات القديم (الرواد)</td>
+                                <td><a href="#" class="old-ecs"></a></td>
+                            </tr>
+                            <tr>
+                                <td class="float_left">الرقم العسكري</td>
+                                <td><a href="#" class="prospect-owner"></a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+<br>
+<br>
+<br>
+<br>
+<div id='console'></div>
+
+<!-- partial -->
+<script src='~/js/box_add/owl.carousel.min.js'></script>
+<script src='~/js/box_add/holder.js'></script>
+<script src='~/js/box_add/bootstrap.min.js'></script>
+<script src='~/js/box_add/bootstrap-editable.min.js'></script>
+<script src='~/js/box_add/bootbox.js'></script>
+<script src="~/js/box_add/script.js"></script>
+
+<script>
+
+    var emp_no = '';
+    var dept_id = '';
+
+    $(".prospect-owner").each(function () {
+
+        let type_owner = $('id_owner').text();
+        $(this).editable({
+            type: 'text',
+            title: 'الرقم العسكري',
+            mode: 'popup',
+            success: function (res, nv) {
+                $('.alert').css('display', 'none');
+                $(this).text(nv);
+                emp_no = nv;
+                $('#cover-spin').show(0);
+                $.ajax(
+                    {
+                        type: 'GET',
+                        url: '/IntegrationCore/HR/GetUserDetails',
+                        data: "num=" + nv + "&type=" + type_owner,
+                        success: function (data) {
+                            for (var i = 0; i < data.value.length; i++) {
+                                $('#cover-spin').css('display', 'none');
+                                $('#EMP_NAME_A').text(data.value[i].emP_NAME_A);
+                                $('#DEPT_NAME_A').text(data.value[i].depT_NAME_A);
+                                $('#MOBILE_NO').text(data.value[i].mobilE_NO);
+                                $('#MAIL').text(data.value[i].mail);
+                                $('#RANK_ID').text(data.value[i].ranK_NAME_A);
+                                $('#Emirate_id').text(data.value[i].uaE_ID);
+                                dept_id = data.value[i].lasT_DEPT_ID;
+                            }
+                            //alert('successful');
+                        },
+                        error: function (xhr, error, code) {
+                            $('#cover-spin').css('display', 'none');
+
+                            $('#EMP_NAME_A').text('');
+                            $('#DEPT_NAME_A').text('');
+                            $('#MOBILE_NO').text('');
+                            $('#MAIL').text('');
+                            $('#RANK_ID').text('');
+                            $('#Emirate_id').text('');
+                            $('.alert').css('display', 'block');
+                            $('#resMessage').text('معلومات الإدخال خاطئة')
+                            if (xhr.responseText != "") {
+                                console.log(xhr.responseJSON.value.eMessage);
+                            } else {
+                                console.log(xhr.statusText);
+                            }
+                        }
+                    }
+                );
+            }
+        });
+    });
+
+    function update_info() {
+
+        $('.alert').css('display', 'none');
+        $('#cover-spin').show(0);
+        $.ajax(
+            {
+                type: 'POST',
+                url: '/IntegrationCore/HR/UpdateOldECS',
+                datatype: "json",
+                contentType: "application/json",
+                data: '{"ecs": "' + $('.old-ecs').text() + '" , "empno":"' + emp_no + '" , "code": "' + dept_id + '" }',
+                success: function (data) {
+                    $('#cover-spin').css('display', 'none');
+                    alert('successful');
+                },
+                error: function (xhr, error, code) {
+                    $('#cover-spin').css('display', 'none');
+                    alert('faild');
+                }
+            }
+        );
+
+    }
+
+</script>
+
+
+

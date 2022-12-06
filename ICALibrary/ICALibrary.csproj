@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="MessageIntegrity">
+      <HintPath>DLLs\MessageIntegrity.dll</HintPath>
+    </Reference>
+    <Reference Include="Otp.NET">
+      <HintPath>DLLs\Otp.NET.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

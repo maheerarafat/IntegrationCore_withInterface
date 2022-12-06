@@ -28,13 +28,9 @@ namespace IntegrationCore.Models
 
         [XmlElement("moic:Priority")]
         public int Priority { get; set; }
-        [XmlElement("moic:ForeignOutboxno")]
-        public string ForeignOutboxno { get; set; }
 
         [XmlElement("moic:SecrecyLevel")]
         public int SecrecyLevel { get; set; }
-        [XmlElement("moic:Alignment")]
-        public int Alignment { get; set; }
         [XmlElement("moic:DocumentType")]
         public int DocumentType { get; set; }
 
@@ -44,7 +40,7 @@ namespace IntegrationCore.Models
         [XmlArray("moic:Attachments")]
         public List<ECSAttachment> ECSAttachmentList { get; set; }
 
-        [XmlArray("moic:TransactionIds")]  // Global ID
+        [XmlElement("moic:TransactionIds")]  // Global ID
         public List<TransactionId> TransactionIdList { get; set; }
     }
     [XmlRoot("moic:Attachment")]
@@ -73,7 +69,7 @@ namespace IntegrationCore.Models
         [XmlElement("moic:Destination")]
         public string DestinationValue { get; set; }
     }
-    [XmlRoot("moic:TransactionId")]
+
     public class TransactionId
     {
 

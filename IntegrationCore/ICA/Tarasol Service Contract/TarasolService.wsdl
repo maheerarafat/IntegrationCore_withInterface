@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?><wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+name="TarasolService" targetNamespace="http://id.gov.ae/ws/tarasolservices"
+ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://id.gov.ae/ws/tarasolservices" 
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsd1="http://id.gov.ae/ws/tarasolservice">
+  <wsdl:documentation>
+    <wsdl:appinfo source="WMQI_APPINFO">
+      <MRWSDLAppInfo imported="true">
+        <generatedXSD location="TarasolService.xsd"/>
+        <binding hasEncoding="false" imported="true" name="TarasolServiceSOAP" originalBindingStyle="document"/>
+      </MRWSDLAppInfo>
+    </wsdl:appinfo>
+  </wsdl:documentation>
+  <wsdl:types>
+          <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+          	<xsd:import namespace="http://id.gov.ae/ws/tarasolservice"
+          		schemaLocation="Schema Definitions/TarasolService.xsd">
+          	</xsd:import></xsd:schema>  
+    </wsdl:types>      	
+  <wsdl:message name="addNewDocumentRequestMsg">
+    <wsdl:part element="xsd1:addNewDocument" name="addNewDocumentParameters"/>
+  </wsdl:message>
+  <wsdl:message name="addNewDocumentResponseMsg">
+    <wsdl:part element="xsd1:addNewDocumentResponse" name="addNewDocumentResult"/>
+  </wsdl:message>
+  <wsdl:message name="deliveryReportRequestMsg">
+  	<wsdl:part element="xsd1:deliveryReport" name="deliveryReportParameters" ></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="deliveryReportResponseMsg">
+  	<wsdl:part element="xsd1:deliveryReportResponse" name="deliveryReportResult" ></wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="TarasolService">
+    <wsdl:operation name="addNewDocument">
+      <wsdl:input message="tns:addNewDocumentRequestMsg" name ="addNewDcoumentRequest"/>
+      <wsdl:output message="tns:addNewDocumentResponseMsg" name ="addNewDocumentResponse"/>
+    </wsdl:operation>
+    <wsdl:operation name="deliveryReport">
+    	<wsdl:input name ="deliveryReportRequest" message="tns:deliveryReportRequestMsg"></wsdl:input>
+    	<wsdl:output name ="deliveryReportResponse" message="tns:deliveryReportResponseMsg"></wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="TarasolServiceSOAP" type="tns:TarasolService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="addNewDocument">
+      <soap:operation soapAction="http://id.gov.ae/ws/tarasolservices/addNewDocument"/>
+      <wsdl:input name ="addNewDcoumentRequest">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name ="addNewDocumentResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="deliveryReport">
+      <soap:operation soapAction="http://id.gov.ae/ws/tarasolservices/addNewDocument"/>
+      <wsdl:input name ="deliveryReportRequest">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name ="deliveryReportResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="TarasolService">
+    <wsdl:port binding="tns:TarasolServiceSOAP" name="TarasolServiceSOAP">
+      <soap:address location="http://localhost:7800/ws/tarasolservice/TarasolService"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

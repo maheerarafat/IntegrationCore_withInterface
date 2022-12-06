@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://id.gov.ae/ws/tarasolservice"
+	xmlns:tns="http://id.gov.ae/ws/tarasolservice" xmlns:pref="http://id.gov.ae/schema/tarasolservice">
+	
+	<xsd:import schemaLocation="Tarasol.xsd" namespace="http://id.gov.ae/schema/tarasolservice"></xsd:import>
+
+    <xsd:element name="addNewDocument" type="pref:AddNewDocumentRequestType"></xsd:element>
+
+    <xsd:element name="addNewDocumentResponse" type="pref:AddNewDocumentResponseType"></xsd:element>
+
+    <xsd:element name="deliveryReport" type="pref:DeliveryReportRequestType"></xsd:element>
+
+    <xsd:element name="deliveryReportResponse" type="pref:DeliveryReportResponseType"></xsd:element>
+</xsd:schema>
+

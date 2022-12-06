@@ -16,7 +16,7 @@ namespace IntegrationCore.BGServices
         private IConfiguration _config;
         private readonly IHostingEnvironment _hostingEnvironment;
         private static IMemoryCache _cache;
-        public DataRefreshService(IConfiguration config, IHostingEnvironment hostingEnvironment, IMemoryCache memoryCache)
+        public DataRefreshService(/*RandomStringProvider randomStringProvider,*/IConfiguration config, IHostingEnvironment hostingEnvironment, IMemoryCache memoryCache)
         {
             // _randomStringProvider = randomStringProvider;
             _config = config;
@@ -35,9 +35,8 @@ namespace IntegrationCore.BGServices
             while (!cancellationToken.IsCancellationRequested)
             {
                 //await _randomStringProvider.UpdateString(cancellationToken);
-                Cache.GetSession(true);
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "cancellationToken : " + cancellationToken, TrackInterface: true);
-                await Task.Delay(TimeSpan.FromMinutes(2), cancellationToken);
+                User.UpdateDelegationList();
+                await Task.Delay(TimeSpan.FromMinutes(30), cancellationToken);
             }
         }
     }

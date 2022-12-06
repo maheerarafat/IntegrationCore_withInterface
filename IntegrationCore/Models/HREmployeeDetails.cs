@@ -78,11 +78,5 @@ namespace IntegrationCore.Models
         public string BranchName { get; set; }
         [XmlElement("EmployeeStatus")]
         public string EmployeeStatus { get; set; }
-        [XmlElement("PhonceNumber")]
-        public string PhonceNumber { get; set; }
-        [XmlElement("ExternalEmail")]
-        public string ExternalEmail { get; set; }
-        [XmlElement("TypeId")]
-        public string TypeId { get; set; }
     }
 }

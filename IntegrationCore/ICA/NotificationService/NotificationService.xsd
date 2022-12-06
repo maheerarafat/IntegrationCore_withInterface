@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+		targetNamespace="http://id.gov.ae/ws/notification"
+		xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+		xmlns:noti="http://id.gov.ae/schema/notification">
+
+	<xsd:import namespace="http://id.gov.ae/schema/notification" schemaLocation="Notification.xsd" />
+
+	<xsd:element name="sendNotification" type="noti:SendNotificationRequestType" />
+
+	<xsd:element name="sendNotificationResponse" type="noti:SendNotificationResponseType"/>
+
+</xsd:schema>

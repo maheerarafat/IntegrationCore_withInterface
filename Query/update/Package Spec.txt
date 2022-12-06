@@ -1,0 +1,8 @@
+create or replace package OTP is
+
+
+  function GetMobileNumber(username varchar2) return varchar2;
+  Function SetSecurityCode(username varchar2,Key varchar2) return boolean;
+  function GetSecurityCode(username varchar2) return varchar2;
+  Function ChangePassword(username varchar2,password varchar2) return boolean;
+end OTP;

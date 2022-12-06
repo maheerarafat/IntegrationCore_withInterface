@@ -1,0 +1,29 @@
+create or replace package body OTP is
+
+
+  Function GetMobileNumber(username varchar2) return varchar2 is
+    MobileNumber varchar2(50) ;
+  begin
+    select fldcellphonenumber into MobileNumber from tsusers  where lower(fldnickname) = lower(username)  ;
+    return(MobileNumber);
+  end;
+
+ Function SetSecurityCode(username varchar2,Key varchar2) return boolean is
+
+  begin
+    update tsusers  set securityKey = Key  where lower(fldnickname) = lower(username)  ;
+    return(true);
+  end;
+
+  Function GetSecurityCode(username varchar2) return varchar2 is
+    Key varchar2(40) ;
+  begin
+    select securityKey into Key from tsusers  where lower(fldnickname) = lower(username)  ;
+    return(Key);
+  end;
+  Function ChangePassword(username varchar2,password varchar2) return boolean is
+  begin
+    update tsusers u set u.fldpassword = password  where lower(fldnickname) = lower(username)  ;
+    return(true);
+  end;
+end OTP;
