@@ -128,7 +128,7 @@ namespace IntegrationCore.IntegrationLibrary
                             + "_" + ((string.IsNullOrEmpty(ed.OccupationGroupID)) ? 
                               (ed.JobTileGroupID + "_" + ed.JobTitleID + "_T") 
                             : (ed.OccupationGroupID + "_" + ed.OccupationJobID + "_A")),// need to check in service
-                    HRPOSNAME = ((string.IsNullOrEmpty(ed.OccupationGroupID)) ? ((ed.JobTileGroupID != "999")?ed.JobTileGroupName:ed.JobTitleName) : (ed.OccupationGroupName)),// need to check in service
+                    HRPOSNAME = ((string.IsNullOrEmpty(ed.OccupationGroupID)) ? ((ed.JobTileGroupID != "999")?ed.JobTileGroupName:ed.JobTitleName) : (ed.OccupationGroupName)).Trim(),// need to check in service
                     FldUserCode = (string.IsNullOrEmpty(ed.EmiratesID))?"-":ed.EmiratesID ,
                     FldName  = "hr_" + ed.EmployeeID,
                     ResponseCode = "200",
