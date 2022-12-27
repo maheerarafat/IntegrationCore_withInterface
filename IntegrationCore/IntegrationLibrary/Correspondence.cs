@@ -662,6 +662,22 @@ namespace IntegrationCore.IntegrationLibrary
                                                     {
                                                         int secrecyLevel = Convert.ToInt16(document.SecrecyID.Value);
                                                         int priorityLeve = Convert.ToInt16(document.PriorityID.Value);
+
+
+                                                        var htmlContent = "empty";
+
+                                                        if (document.Body != null && !string.IsNullOrWhiteSpace(document.Body.Value))
+                                                        {
+                                                            htmlContent = Regex.Replace(document.Body.Value, "<.*?>", String.Empty)
+                                                                .Replace(@"\r\n", " ").Replace("&nbsp;", " ").Replace("PrintingDateTime", "").Trim();
+
+                                                            htmlContent = System.Net.WebUtility.HtmlDecode(htmlContent);
+
+                                                            htmlContent = Regex.Replace(htmlContent, @"[\~\!\@\#\$\%\^\&\*\(\)\+\{\}\|\:\""\<\>\?\`\=\[\]\\\;\'\,\.\/]", " ");
+
+                                                            htmlContent = Regex.Replace(htmlContent, @"[\s]{2,}", " ");
+                                                        }
+
                                                         ECS_Document eCS_Document = new ECS_Document()
                                                         {
                                                             EntityCode = entity.Replace(IntegrationSettings.GetSetting("EntityPrefix").ToString(), "").Trim(), // last parent
@@ -677,7 +693,7 @@ namespace IntegrationCore.IntegrationLibrary
                                                             SecrecyLevel = (secrecyLevel - 1),
                                                             Alignment = 1,
                                                             TransactionIdList = transactionIdList,
-                                                            HtmlContent = ((document.Body == null)?"empty":Regex.Replace((string.IsNullOrEmpty(document.Body.Value))? "empty" : document.Body.Value, "<.*?>", String.Empty).Replace("\n"," ").Replace("&nbsp"," ").Replace(";","").Replace("PrintingDateTime","")).Trim(),
+                                                            HtmlContent = htmlContent,
                                                             DocumentType = 4
                                                         };
                                                         if (document.MessageTypeID.Value == "11") // telegram
