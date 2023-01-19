@@ -16,13 +16,13 @@ namespace IntegrationCore.IntegrationLibrary
             ////bool EnableLoggingInfo = (bool)IntegrationSettings.GetSetting("EnableLoggingInfo");
             try
             {
-                var SampleData = Convert.ToBoolean( IntegrationSettings.GetSetting("SampleData"));
+                var SampleData = Convert.ToBoolean(IntegrationSettings.GetSetting("SampleData"));
                 Models.User sampleUser = new Models.User();
                 string GUID = Guid.NewGuid().ToString();
                 List<string[]> Parameters = new List<string[]>();
                 if (searchObject.SearchKey == "0000")
                 {
-                    
+
                     sampleUser = new Models.User
 
                     {
@@ -42,7 +42,7 @@ namespace IntegrationCore.IntegrationLibrary
                         FldUserCode = "foo",
                         ResponseCode = "200",
                         TypeID = "1"
-                        
+
                     };
                 }
                 else if (searchObject.SearchKey == "0001")
@@ -66,20 +66,20 @@ namespace IntegrationCore.IntegrationLibrary
                         ResponseCode = "200",
                         TypeID = "2"
                     };
-                    
+
                 }
-                string[] searchPar = { (searchObject.FieldName == "MNum") ?"MilitaryNumber":"EmiratesID" , searchObject.SearchKey.Trim() };
+                string[] searchPar = { (searchObject.FieldName == "MNum") ? "MilitaryNumber" : "EmiratesID", searchObject.SearchKey.Trim() };
                 Parameters.Add(searchPar);
                 if (!string.IsNullOrEmpty(searchObject.TypeId))
                 {
-                string[] searchTypeIDPar = { searchObject.FieldName = "TypeId", searchObject.SearchKey = searchObject.TypeId };
-                Parameters.Add(searchTypeIDPar);
+                    string[] searchTypeIDPar = { searchObject.FieldName = "TypeId", searchObject.SearchKey = searchObject.TypeId };
+                    Parameters.Add(searchTypeIDPar);
 
                 }
-                HREmployeeDetail ed=new HREmployeeDetail() ;
+                HREmployeeDetail ed = new HREmployeeDetail();
                 HREmployeeDetails hREmployeeDetails = new HREmployeeDetails();
                 string objStr;
-                if (! SampleData)
+                if (!SampleData)
                 {
                     try
                     {
@@ -96,21 +96,21 @@ namespace IntegrationCore.IntegrationLibrary
                         };
                         return user1;
                     }
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "hREmployeeDetails: " + objStr,TrackInterface: Logger.EnableLoggingInfo);
-                ed = hREmployeeDetails.HREmployeeDetailsList[0];
-                if (ed.EmployeeID == "")
-                {
-                    Models.User user1 = new Models.User()
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "hREmployeeDetails: " + objStr, TrackInterface: Logger.EnableLoggingInfo);
+                    ed = hREmployeeDetails.HREmployeeDetailsList[0];
+                    if (ed.EmployeeID == "")
                     {
-                        ResponseCode = "0",
-                        LMessage = "لايوجد نتائج",
-                        EMessage = "No results"
-                    };
-                    return user1;
+                        Models.User user1 = new Models.User()
+                        {
+                            ResponseCode = "0",
+                            LMessage = "لايوجد نتائج",
+                            EMessage = "No results"
+                        };
+                        return user1;
+                    }
                 }
-                }
-           
-                
+
+
                 Models.User user = new Models.User
                 {
                     FldNickName = ed.MilitaryNumber,//Emp_no Militery Number
@@ -125,27 +125,25 @@ namespace IntegrationCore.IntegrationLibrary
                     HREMPID = ed.EmployeeID,
                     HRDEPTCODE = ed.LastDepartmentID,
                     HRPOSCODE = ed.LastDepartmentID
-                            + "_" + ((string.IsNullOrEmpty(ed.OccupationGroupID)) ? 
-                              (ed.JobTileGroupID + "_" + ed.JobTitleID + "_T") 
+                            + "_" + ((string.IsNullOrEmpty(ed.OccupationGroupID)) ?
+                              (ed.JobTileGroupID + "_" + ed.JobTitleID + "_T")
                             : (ed.OccupationGroupID + "_" + ed.OccupationJobID + "_A")),// need to check in service
-                    HRPOSNAME = ((string.IsNullOrEmpty(ed.OccupationGroupID)) ? ((ed.JobTileGroupID != "999")?ed.JobTileGroupName:ed.JobTitleName) : (ed.OccupationGroupName)),// need to check in service
-                    FldUserCode = (string.IsNullOrEmpty(ed.EmiratesID))?"-":ed.EmiratesID ,
-                    FldName  = "hr_" + ed.EmployeeID,
-                    ResponseCode = "200",
-                    TypeID = ed.TypeId
+                    HRPOSNAME = ((string.IsNullOrEmpty(ed.OccupationGroupID)) ? ((ed.JobTileGroupID != "999") ? ed.JobTileGroupName : ed.JobTitleName) : (ed.OccupationGroupName)).Trim(),// need to check in service
+                    FldUserCode = (string.IsNullOrEmpty(ed.EmiratesID)) ? "-" : ed.EmiratesID,
+                    FldName = "hr_" + ed.EmployeeID,
+                    ResponseCode = "200"
+                    //TypeID = ed.TypeId
 
                 };
-                
+                var strLogtitle = "UserFromHr: ";
                 if (SampleData)
                 {
                     ed.EmployeeID = sampleUser.HREMPID;
                     user = sampleUser;
-                    var SampleUserStr  = Newtonsoft.Json.JsonConvert.SerializeObject(sampleUser);
-
-                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "SampleUser: " + SampleUserStr, TrackInterface: Logger.EnableLoggingInfo);
-
+                    strLogtitle = "UserFromSample: ";
                 }
 
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, strLogtitle + Newtonsoft.Json.JsonConvert.SerializeObject(user), TrackInterface: Logger.EnableLoggingInfo);
 
                 //   Check if user is already in Tarasol
                 string DecPass = Encryption.DecryptString(IntegrationSettings.GetSetting("DBPassword").ToString());
@@ -171,7 +169,11 @@ namespace IntegrationCore.IntegrationLibrary
                     {
                         UUID = reader.GetValue(0).ToString();
                         fldname = reader.GetValue(1).ToString();
-                        NickNameMerge = (int)reader.GetValue(2);
+                        if (reader.GetValue(2) != DBNull.Value)
+                        {
+                            NickNameMerge = Convert.ToInt32(reader.GetValue(2));
+                        }
+
                     }
                     if (UUID == "0")
                     {
@@ -204,12 +206,13 @@ namespace IntegrationCore.IntegrationLibrary
                     {
                         user.FldUID = UUID;
                         user.FldName = fldname;
-                        if ( (NickNameMerge & 1) == 1)
+                        if ((NickNameMerge & 1) == 1)
                         {
                             user.MergeNickNameTypeID = true;
 
                         }
-                        else {
+                        else
+                        {
                             user.MergeNickNameTypeID = false;
                         }
                         // return error message to tarasol
@@ -221,6 +224,7 @@ namespace IntegrationCore.IntegrationLibrary
 
                     Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "user.FldName " + user.FldName, TrackInterface: true);
                     Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "user.TypeID " + user.TypeID, TrackInterface: true);
+
                     result = user;
                 }
 
@@ -294,7 +298,7 @@ namespace IntegrationCore.IntegrationLibrary
         //            }
         //            conn.Close();
         //        }
-                
+
         //    }
         //    catch (Exception ex)
         //    {
@@ -487,8 +491,8 @@ namespace IntegrationCore.IntegrationLibrary
         //            EMessage = ""
 
         //        };
-                
-                
+
+
         //        //
         //        //Check if user is already in Tarasol
         //        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Connect to Database: " + IntegrationSettings.GetSetting("ConnectionString").ToString());
