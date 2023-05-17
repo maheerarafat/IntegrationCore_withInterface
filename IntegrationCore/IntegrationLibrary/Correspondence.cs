@@ -594,13 +594,14 @@ namespace IntegrationCore.IntegrationLibrary
                                                                 IntResult mailResult = (IntResult)Mail.SendEmail(mail);
                                                                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Result: " + JsonConvert.SerializeObject(mailResult), TrackInterface: true);
                                                                 //Send Notification to Tarasol
-                                                                if (mailResult.EMessage == "Unable to send Email")
+                                                                if (mailResult.EMessage == "success" || mailResult.Code == 1)
                                                                 {
-                                                                    SendNotificationToTarasol(addressTo.Exchange_no_email, CorrItem.CorrUID, 2, 0, "Unable to send Email", "");
+                                                                    SendNotificationToTarasol(addressTo.Exchange_no_email, CorrItem.CorrUID, 1, 0, "", "");
+
                                                                 }
                                                                 else
                                                                 {
-                                                                    SendNotificationToTarasol(addressTo.Exchange_no_email, CorrItem.CorrUID, 1, 0, "", "");
+                                                                    SendNotificationToTarasol(addressTo.Exchange_no_email, CorrItem.CorrUID, 2, 0, "Unable to send Email", "");
                                                                 }
                                                             }
 
