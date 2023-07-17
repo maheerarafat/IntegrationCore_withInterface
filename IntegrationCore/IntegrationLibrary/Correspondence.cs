@@ -105,18 +105,25 @@ namespace IntegrationCore.IntegrationLibrary
                 {
                     DirectoryInfo di = Directory.CreateDirectory(path);
                     List<Attachment> attachments = tarasolDocument.Files;
+                    // To check if there are duplicate in names file
+                    Dictionary<string, int> filesImportedCount = new Dictionary<string, int>();
+                    //
 
                     TarasolGeneralSetting tarasolGeneralSetting = JsonConvert.DeserializeObject<TarasolGeneralSetting>(IntegrationSettings.GetTarasolGeneralSetting());
                     if (tarasolDocument.Files != null)
                     {
                         foreach (var data in attachments)
                         {
+                            string fullFileNameExtenstion = (data.FileName + data.FileExtension).ToLower();
                             if (!string.IsNullOrEmpty(data.FileContent))
                             {
                                 var base64string = data.FileContent;
                                 var base64array = Convert.FromBase64String(base64string);
-                                string filePath = path + "/" + (data.FileName.Contains("___Main___PDF___T04File") ? GUID + ".pdf" : (data.FileName
-                                     + (string.IsNullOrEmpty(data.FileExtension) ? "" : ("." + data.FileExtension))));
+                                string filePath = path + "/" + (data.FileName.Contains("___Main___PDF___T04File") ? 
+                                    GUID + ".pdf" : (
+                                    (filesImportedCount.ContainsKey(fullFileNameExtenstion) ? ($"{data.FileName}({filesImportedCount[fullFileNameExtenstion]})") : data.FileName )  + // Check file exist in Dictionary
+                                    (string.IsNullOrEmpty(data.FileExtension) ? "" : ("." + data.FileExtension))
+                                    ));
                                 System.IO.File.WriteAllBytes(filePath, base64array);
                                 if (string.IsNullOrEmpty(Path.GetExtension(filePath)))
                                 {
@@ -131,6 +138,17 @@ namespace IntegrationCore.IntegrationLibrary
                                 //    //Directory.Delete(mainPath, true);
                                 //    //return IntResultLib.GetResult(2);
                                 //};
+
+                                // Add file to Dictionary by name
+                                if (filesImportedCount.ContainsKey(fullFileNameExtenstion))
+                                {
+                                    filesImportedCount[fullFileNameExtenstion] = filesImportedCount[fullFileNameExtenstion] + 1;
+                                }
+                                else
+                                {
+                                    filesImportedCount[fullFileNameExtenstion] = 1;
+                                }
+                                //
                             }                               
                         }
                     }
@@ -745,7 +763,7 @@ namespace IntegrationCore.IntegrationLibrary
                                                 {
                                                     if(NotiAdd.GlobalIDs != null && NotiAdd.GlobalIDs?.MainParentGlobalID == null && NotiAdd.ExchangeStatus == "1")
                                                     {
-                                                        SendNotificationToTarasol(NotiAdd.ExchangeNo, CorrItem.CorrUID, 0, 0, "ÇáÑãÒ ÇáÚÇã ÛíÑ ãæÌæÏ Öãä ÌåÉ ãÑÊÈØÉ", "Global ID is not under Integrated Entity");
+                                                        SendNotificationToTarasol(NotiAdd.ExchangeNo, CorrItem.CorrUID, 0, 0, "Ø§Ù„Ø±Ù…Ø² Ø§Ù„Ø¹Ø§Ù… ØºÙŠØ± Ù…ÙˆØ¬ÙˆØ¯ Ø¶Ù…Ù† Ø¬Ù‡Ø© Ù…Ø±ØªØ¨Ø·Ø©", "Global ID is not under Integrated Entity");
                                                     }
                                                     else
                                                     {
@@ -954,18 +972,18 @@ namespace IntegrationCore.IntegrationLibrary
                 if (status == 0)
                 {
                     t = Logger.Enum_LogType._Error;
-                    lMessage = "İÔá ÊÕÏíÑ ÇáãÑÇÓáÉ ÈÓÈÈ ãÔßáÉ İí ÈíÇäÇÊåÇ";
+                    lMessage = "ÙØ´Ù„ ØªØµØ¯ÙŠØ± Ø§Ù„Ù…Ø±Ø§Ø³Ù„Ø© Ø¨Ø³Ø¨Ø¨ Ù…Ø´ÙƒÙ„Ø© ÙÙŠ Ø¨ÙŠØ§Ù†Ø§ØªÙ‡Ø§";
                     eMessage = "correspondence export failed due to metadata error";
                 }
                 else if (status == 2)
                 {
                     t = Logger.Enum_LogType._Error;
-                    lMessage = "İÔá ÊÕÏíÑ ÇáãÑÇÓáÉ ÈÓÈÈ ãÔßáÉ ÈÇáÇÊÕÇá ÚÈÑ ESB";
+                    lMessage = "ÙØ´Ù„ ØªØµØ¯ÙŠØ± Ø§Ù„Ù…Ø±Ø§Ø³Ù„Ø© Ø¨Ø³Ø¨Ø¨ Ù…Ø´ÙƒÙ„Ø© Ø¨Ø§Ù„Ø§ØªØµØ§Ù„ Ø¹Ø¨Ø± ESB";
                     eMessage = "correspondence export failed due to ESB connection error";
                 }
                 else if (status == 1)
                 {
-                    lMessage = "Êã ÊÕÏíÑÇáãÑÇÓáÉ ÈäÌÇÍ";
+                    lMessage = "ØªÙ… ØªØµØ¯ÙŠØ±Ø§Ù„Ù…Ø±Ø§Ø³Ù„Ø© Ø¨Ù†Ø¬Ø§Ø­";
                     eMessage = "correspondence export exported successfully";
                 }
                 string NotificationURL = IntegrationSettings.GetSetting("APIURL").ToString() + "/Corr/corrExportStatus";
