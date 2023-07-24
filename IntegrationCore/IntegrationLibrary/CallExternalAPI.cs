@@ -1,4 +1,5 @@
-﻿using IntegrationCore.Models;
+using hMailServer;
+using IntegrationCore.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
@@ -43,18 +44,20 @@ namespace IntegrationCore.IntegrationLibrary
                 HttpWebResponse httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
                 if (httpResponse.StatusCode == HttpStatusCode.Unauthorized)
                 {
-                    CallPostAPI(APIURL, PostData, Cache.GetSession(isNew: true).Token);
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Unauthorized (Post Request) Rec01   : ");
+                    return CallPostAPI(APIURL, PostData, Cache.GetSession(isNew: true).Token);
                 }
                 using (StreamReader streamReader = new StreamReader(httpResponse.GetResponseStream()))
                 {
                     string result = streamReader.ReadToEnd();
-                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Tarasol Result  : " + result);
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Tarasol Result: " + result);
                     streamReader.Dispose();
                     streamReader.Close();
                     //object jsonResponse = JsonConvert.DeserializeObject<object>(result);
                     if(result.ToLower().Contains("session expired"))
                     {
-                        CallPostAPI(APIURL, PostData, Cache.GetSession(isNew: true).Token);
+                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Session Expired Tarasol Result (Post Request) Rec02  : ");
+                        return CallPostAPI(APIURL, PostData, Cache.GetSession(isNew: true).Token);
                     }
                     return result;
                 }
@@ -94,7 +97,8 @@ namespace IntegrationCore.IntegrationLibrary
                 HttpWebResponse httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
                 if (httpResponse.StatusCode == HttpStatusCode.Unauthorized)
                 {
-                    CallGetAPI(APIURL, Cache.GetSession(isNew: true).Token);
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Unauthorized (Get Request) Rec01  : ");
+                    return CallGetAPI(APIURL, Cache.GetSession(isNew: true).Token);
                 }
                 using (StreamReader streamReader = new StreamReader(httpResponse.GetResponseStream()))
                 {
@@ -103,7 +107,8 @@ namespace IntegrationCore.IntegrationLibrary
                     streamReader.Close();
                     if (result.ToLower().Contains("session expired"))
                     {
-                        CallGetAPI(APIURL, Cache.GetSession(isNew: true).Token);
+                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Session Expired Tarasol Result (Get Request) Rec02  : ");
+                        return CallGetAPI(APIURL, Cache.GetSession(isNew: true).Token);
                     }
                     return result;
                 }
@@ -290,7 +295,7 @@ namespace IntegrationCore.IntegrationLibrary
             }
         }
 
-        public static List<Attachment> GetMultiFilesFromTarasol(string APIURL, string Tarasol_Token, string DocUID, string SessionID)
+        public static List<Models.Attachment> GetMultiFilesFromTarasol(string APIURL, string Tarasol_Token, string DocUID, string SessionID)
         {
             try
             {
@@ -319,14 +324,14 @@ namespace IntegrationCore.IntegrationLibrary
                 FilePath = FilePath.Replace(".tarasol", "");
                 ZipFile.ExtractToDirectory(FilePath + ".zip", directory);
                 string[] Files = Directory.GetFiles(directory, "*.*");
-                List<Attachment> list = new List<Attachment>();
+                List<Models.Attachment> list = new List<Models.Attachment>();
                 foreach (string item in Files)
                 {
                     if (!item.EndsWith(DocUID + ".tarasol") && !item.EndsWith(DocUID + ".zip") && !item.EndsWith(DocUID + ".json"))
                     {
                         Byte[] bytes = File.ReadAllBytes(item);
                         string stream = Convert.ToBase64String(bytes);
-                        Attachment attachment = new Attachment()
+                        Models.Attachment attachment = new Models.Attachment()
                         {
                             FileContent = stream,
                             FileName = Path.GetFileName(item),
