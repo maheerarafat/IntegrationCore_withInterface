@@ -771,7 +771,7 @@ namespace IntegrationCore.IntegrationLibrary
                                                         {
                                                             if (Response.EMessage == (string.IsNullOrEmpty(NotiAdd.GlobalIDs?.MainParentGlobalID) ? NotiAdd.GlobalIDs?.GlobalID : NotiAdd.GlobalIDs?.MainParentGlobalID))
                                                             {
-                                                                SendNotificationToTarasol(NotiAdd.ExchangeNo, CorrItem.CorrUID, Response.Code, 0, "", "");
+                                                                SendNotificationToTarasol(NotiAdd.ExchangeNo, CorrItem.CorrUID, Response.Code, 0, Response.EMessage, "");
                                                             }
                                                         }
                                                     }
@@ -797,7 +797,7 @@ namespace IntegrationCore.IntegrationLibrary
                                         catch (Exception ex)
                                         {
 
-                                            SendNotificationToTarasol("", CorrItem.CorrUID, 0, 0, "", "");
+                                            SendNotificationToTarasol("", CorrItem.CorrUID, 0, 0, ex.Message, "");
                                             throw ex;
                                         }
 
@@ -964,9 +964,15 @@ namespace IntegrationCore.IntegrationLibrary
             
         }
         public static object SendNotificationToTarasol(String exchangeNo, String corrUID, int status, int RequestNo, string lMessage, string eMessage)
+
         {
             try
             {
+                string errMsg = lMessage;
+                if (string.IsNullOrEmpty(errMsg))
+                {
+                    errMsg = eMessage;
+                }
                 Logger.Enum_LogType t = Logger.Enum_LogType._Info;
                 ////bool EnableLoggingInfo = (bool)IntegrationSettings.GetSetting("EnableLoggingInfo");
                 if (status == 0)
@@ -998,6 +1004,12 @@ namespace IntegrationCore.IntegrationLibrary
 
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, t, "NotificationURL : " + NotificationURL, TrackInterface: true);
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, t, "Notification data : " + json,TrackInterface: Logger.EnableLoggingInfo, PrintInterface: true);
+                if (! string.IsNullOrEmpty(errMsg))
+                {
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, t, "Error Msg: " + errMsg, TrackInterface: Logger.EnableLoggingInfo, PrintInterface: true);
+
+                }
+
                 string Tarasol_Token = Cache.GetSession().Token;
                 if (string.IsNullOrEmpty(Tarasol_Token))
                 {
