@@ -1,3 +1,4 @@
+2023-08-18	  Tickets: 707 ,686, Log enhancement.	
 2022-11-25	  Stop correspondence importing if counts was null
 2022-11-06	  Support Search by user's TypeId
 2022-10-27	  Support syncing department classification
@@ -5,4 +6,5 @@
 2022-07-18	  Send tarasol notification when the fax url is empty to fix retry issue 
 2022-06-28	  Remove special characters from attachments file name 
 2022-06-05	  Support telegram document type
-			  Stop the export proccess if the destination dose not have globalID	
+			  Stop the export proccess if the destination dose not have globalID
+			  
