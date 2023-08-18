@@ -705,7 +705,7 @@ namespace IntegrationCore.IntegrationLibrary
                                                             DestinationList = destinationList,
                                                             OutboxNumber = document.ExternalRefNumber.Value.Trim(),
                                                             DocumentSubject = document.Subject.Value.Trim(),
-                                                            OutboxDate = Mapping.ConvertToDateTime(document.CreationDate.Value).ToString("yyyy-MM-ddTHH:mm:ssZ").Trim(),
+                                                            OutboxDate = Mapping.ConvertToDateTime(document.CreationDate.Value).ToString("yyyy-MM-ddTHH:mm:ss").Trim(),
                                                             Priority = Convert.ToInt16(document.PriorityID.Value.Trim()) /*-1*/,
                                                             ForeignOutboxno = serialNum.Trim(),
                                                             ECSAttachmentList = ECSAttachmentList,
