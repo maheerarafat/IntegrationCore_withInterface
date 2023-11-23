@@ -458,7 +458,7 @@ namespace IntegrationCore.IntegrationLibrary
                                                         string FileNameWithoutExt = Path.GetFileNameWithoutExtension(item);
                                                         string fileName = Path.GetFileName(item);
                                                         
-                                                        Regex re = new System.Text.RegularExpressions.Regex("[;\\\\/:*@#!'$%^&\\[\\]()?\"<>+=~|&{};']");
+                                                        Regex re = new System.Text.RegularExpressions.Regex("[;\\\\/:*@#!'$%^&\\[\\]()?\"<>+=~|&{};`,']");
                                                         string outputString = FileNameWithoutExt;
                                                           outputString = re.Replace(FileNameWithoutExt, "");
                                                         outputString = outputString.Replace(" ", "_");

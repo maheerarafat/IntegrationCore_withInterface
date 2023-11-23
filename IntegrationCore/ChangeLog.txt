@@ -1,3 +1,4 @@
+2023-11-23	  Ticket: 1264
 2023-08-18	  Tickets: 707 ,686, Log enhancement.	
 2022-11-25	  Stop correspondence importing if counts was null
 2022-11-06	  Support Search by user's TypeId
