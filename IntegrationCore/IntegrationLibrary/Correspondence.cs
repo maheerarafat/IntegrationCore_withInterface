@@ -450,15 +450,17 @@ namespace IntegrationCore.IntegrationLibrary
                                                 List<MultipartFormDataContent> contentAttachmentFax = new List<MultipartFormDataContent>();
                                                 List<Models.EmailAttachment> emailAttachmentList = new List<EmailAttachment>();
                                                 foreach (string item in Files)
-                                                { ;
+                                                { 
                                                     if (!item.EndsWith(CorrNameUID + ".tarasol") && !item.EndsWith(CorrNameUID + ".zip") && !item.EndsWith(CorrNameUID + ".json"))
                                                     {
                                                         byte[] bytes = File.ReadAllBytes(item);
                                                         string stream = Convert.ToBase64String(bytes);
                                                         string FileNameWithoutExt = Path.GetFileNameWithoutExtension(item);
                                                         string fileName = Path.GetFileName(item);
-                                                        
-                                                        Regex re = new System.Text.RegularExpressions.Regex("[;\\\\/:*@#!'$%^&\\[\\]()?\"<>+=~|&{};`,']");
+
+                                                        //Regex re = new System.Text.RegularExpressions.Regex("[;\\\\/:*@#!'$%^&\\[\\]()?\"<>+=~|&{};`,']"); -- old regex 
+                                                        Regex re = new Regex("[^\\.\\p{IsArabic}A-Za-z0-9_ -]+"); // same regex used in dubai police
+
                                                         string outputString = FileNameWithoutExt;
                                                           outputString = re.Replace(FileNameWithoutExt, "");
                                                         outputString = outputString.Replace(" ", "_");
@@ -696,6 +698,15 @@ namespace IntegrationCore.IntegrationLibrary
 
                                                             htmlContent = Regex.Replace(htmlContent, @"[\s]{2,}", " ");
                                                         }
+                                                        int MaxSubjectLength = int.Parse(IntegrationSettings.GetSetting("MaxSubjectLength").ToString());
+                                                        string subject = "";
+                                                        if (MaxSubjectLength == 0)
+                                                        {
+                                                            subject = document.Subject.Value.Trim();
+                                                        } else
+                                                        {
+                                                           subject = document.Subject.Value.Trim().Substring(0, MaxSubjectLength);
+                                                        }
 
                                                         ECS_Document eCS_Document = new ECS_Document()
                                                         {
@@ -704,7 +715,8 @@ namespace IntegrationCore.IntegrationLibrary
                                                             SourceUnitId =document.PostFromID.GlobalIDs.GlobalID.Trim(),//Tarasol Global ID 
                                                             DestinationList = destinationList,
                                                             OutboxNumber = document.ExternalRefNumber.Value.Trim(),
-                                                            DocumentSubject = document.Subject.Value.Trim(),
+                                                            
+                                                            DocumentSubject = subject,
                                                             OutboxDate = Mapping.ConvertToDateTime(document.CreationDate.Value).ToString("yyyy-MM-ddTHH:mm:ss").Trim(),
                                                             Priority = Convert.ToInt16(document.PriorityID.Value.Trim()) /*-1*/,
                                                             ForeignOutboxno = serialNum.Trim(),

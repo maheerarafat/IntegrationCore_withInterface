@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Http;
+using hMailServer;
 
 
 namespace IntegrationCore.Controllers
@@ -26,7 +27,7 @@ namespace IntegrationCore.Controllers
             
             if (_cache.Get("IsSettingsLoaded") == null || (bool)_cache.Get("IsSettingsLoaded") == false)
             {
-                Cache cache = new Cache(_cache);
+                IntegrationLibrary.Cache cache = new IntegrationLibrary.Cache(_cache);
                 IntegrationSettings.LoadSettings(_hostingEnvironment);
             }
         }
@@ -82,6 +83,11 @@ namespace IntegrationCore.Controllers
 
                 settingModel.TarasolINTUser = _cache.Get("TarasolINTUser").ToString();
                 settingModel.TarasolINTPassword = Encryption.DecryptString(_cache.Get("TarasolINTPassword").ToString());
+                if (_cache.Get("MaxSubjectLength") != null)
+                {
+                    settingModel.MaxSubjectLength = int.Parse(_cache.Get("MaxSubjectLength").ToString());
+
+                }
                 //settingModel.LoginPassword = Encryption.DecryptString(_cache.Get("LoginPassword").ToString()) ;
                 //settingModel.Password = Encryption.DecryptString(_cache.Get("Password").ToString());
                 //settingModel.ConfigPath = _cache.Get("ConfigPath").ToString();
@@ -153,12 +159,13 @@ namespace IntegrationCore.Controllers
                     UpdateModel.FromFaxField = setting.FromFaxField;
                     
                     UpdateModel.TarasolINTUser = setting.TarasolINTUser;
+                    UpdateModel.MaxSubjectLength = setting.MaxSubjectLength;
                     
                     if (setting.TarasolINTPassword != "") UpdateModel.TarasolINTPassword = Encryption.EncryptString(setting.TarasolINTPassword);
                     //UpdateModel.TimeStartSendEmail = setting.TimeStartSendEmail;
                     //UpdateModel.ConfigPath = settingModel.ConfigPath;
                     IntegrationSettings.SetSetting(UpdateModel);
-                    Cache cache = new Cache(_cache);
+                    IntegrationLibrary.Cache cache = new IntegrationLibrary.Cache(_cache);
                     IntegrationSettings.LoadSettings(_hostingEnvironment);
                     Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End", TrackInterface: true);
                 }

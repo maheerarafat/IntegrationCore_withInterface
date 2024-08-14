@@ -55,6 +55,7 @@ namespace IntegrationCore.Models
         public string TarasolGeneralSettings { get; set; }
         public string OldEntities { get; set; }
         public string SampleData { get; set; }
+        public int MaxSubjectLength { get; set; }
         //   
     }
     public class TarasolGeneralSetting

@@ -80,6 +80,7 @@ namespace IntegrationCore.IntegrationLibrary
                     Cache.SetCache("DMSPass", xdoc.SelectSingleNode("Configuration_Properties/DMSPass").InnerText);
                     Cache.SetCache("OldEntities", xdoc.SelectSingleNode("Configuration_Properties/OldEntities").InnerText);
                     Cache.SetCache("SampleData", xdoc.SelectSingleNode("Configuration_Properties/SampleData").InnerText);
+                    Cache.SetCache("MaxSubjectLength", xdoc.SelectSingleNode("Configuration_Properties/MaxSubjectLength")?.InnerText);
                     //Cache.SetCache("ImportDate", xdoc.SelectSingleNode("Configuration_Properties/ImportDate").InnerText);
 
 
@@ -204,7 +205,8 @@ namespace IntegrationCore.IntegrationLibrary
                     //xdoc.SelectSingleNode("Configuration_Properties/TarasolGeneralSettings").InnerText = settingModel.TarasolGeneralSettings;
                     if (settingModel.TarasolINTPassword != null) xdoc.SelectSingleNode("Configuration_Properties/TarasolINTPassword").InnerText = settingModel.TarasolINTPassword;
                     if (settingModel.OldEntities != null) xdoc.SelectSingleNode("Configuration_Properties/OldEntities").InnerText = settingModel.OldEntities;
-                    
+                   
+                    xdoc.SelectSingleNode("Configuration_Properties/MaxSubjectLength").InnerText = settingModel.MaxSubjectLength.ToString();
                     //if(settingModel.DataFolder == null)xdoc.SelectSingleNode("Configuration_Properties/DataFolder").InnerText= settingModel.DataFolder;
                     //xdoc.SelectSingleNode("Configuration_Properties/ConfigPath").InnerText= settingModel.ConfigPath;
                     xdoc.Save(ConfigPath);
