@@ -119,7 +119,8 @@ namespace IntegrationCore.IntegrationLibrary
                             {
                                 var base64string = data.FileContent;
                                 var base64array = Convert.FromBase64String(base64string);
-                                string filePath = path + "/" + (data.FileName.Contains("___Main___PDF___T04File") ? 
+                              
+                                string filePath = path + "/" + (Path.GetFileNameWithoutExtension(data.FileName) == "___Main___PDF___T04File" ? 
                                     GUID + ".pdf" : (
                                     (filesImportedCount.ContainsKey(fullFileNameExtenstion) ? ($"{data.FileName}({filesImportedCount[fullFileNameExtenstion]})") : data.FileName )  + // Check file exist in Dictionary
                                     (string.IsNullOrEmpty(data.FileExtension) ? "" : ("." + data.FileExtension))
@@ -653,11 +654,11 @@ namespace IntegrationCore.IntegrationLibrary
                                                     List<string> OldEntities = IntegrationSettings.GetSetting("OldEntities").ToString().Split(',').ToList();
                                                     foreach (var addressTo in document.AddressTo)
                                                     {
-                                                        
+
                                                         if (entity == addressTo.GlobalIDs?.MainParentGlobalID && (Convert.ToInt32(addressTo.ExchangeStatus) & 1) == 1) //Folder type
                                                         {
-                                                            String MainParentGlobalID = addressTo.GlobalIDs.MainParentGlobalID.Replace(IntegrationSettings.GetSetting("EntityPrefix").ToString().Trim(), ""); 
-                                                            if (OldEntities.Contains( entity.Replace(IntegrationSettings.GetSetting("EntityPrefix").ToString().Trim(), ""))) MainParentGlobalID = "6";
+                                                            String MainParentGlobalID = addressTo.GlobalIDs.MainParentGlobalID.Replace(IntegrationSettings.GetSetting("EntityPrefix").ToString().Trim(), "");
+                                                            if (OldEntities.Contains(entity.Replace(IntegrationSettings.GetSetting("EntityPrefix").ToString().Trim(), ""))) MainParentGlobalID = "6";
                                                             Destination destination = new Destination();
                                                             destination.DestinationValue = addressTo.GlobalIDs.GlobalID.Trim();
                                                             destinationList.Add(destination);
@@ -675,7 +676,7 @@ namespace IntegrationCore.IntegrationLibrary
 
                                                     string serialNum = document.ExternalRefNumber.Value.Split('/')[document.ExternalRefNumber.Value.Split('/').Length - 1];
                                                     if (document.PostFromID.GlobalIDs.GlobalID.Trim() == "")
-                                                    {Logger.AddToLogFile("Correspondence." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, $"The export for Corr : {CorrItem.CorrUID}  has been rejected because the source unit dose not have GlobalID");
+                                                    { Logger.AddToLogFile("Correspondence." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, $"The export for Corr : {CorrItem.CorrUID}  has been rejected because the source unit dose not have GlobalID");
                                                         return IntResultLib.GetResult(2);
                                                     }
                                                     //Expose ESB service
@@ -700,7 +701,7 @@ namespace IntegrationCore.IntegrationLibrary
                                                         }
                                                         int MaxSubjectLength = int.Parse(IntegrationSettings.GetSetting("MaxSubjectLength").ToString());
                                                         string subject = "";
-                                                        if (MaxSubjectLength == 0)
+                                                        if (MaxSubjectLength == 0  || MaxSubjectLength > document.Subject.Value.Length)
                                                         {
                                                             subject = document.Subject.Value.Trim();
                                                         } else

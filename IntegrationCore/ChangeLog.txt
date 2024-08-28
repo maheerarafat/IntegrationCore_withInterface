@@ -1,4 +1,5 @@
-2024-08-14	  Ticket: 1196, Added new setting "MaxSubjectLength" to the interface
+2024-08-28    Ticket: 2127 
+2024-08-16	  Ticket: 1196, Added new setting "MaxSubjectLength" to the interface
 2024-08-07	  Ticket: 1196, Added new setting "MaxSubjectLength" , subject will be trimmed depends on this setting value.
 2024-07-31	  Ticket: 2051
 2023-11-23	  Ticket: 1264
