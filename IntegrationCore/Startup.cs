@@ -1,21 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
-//using IntegrationCore.BackGroundServices;
-//using IntegrationCore.BackGroundServices.Scheduling;
 using Microsoft.Extensions.Hosting;
 using IntegrationCore.BGServices;
 using IntegrationCore.IntegrationLibrary;
-using Microsoft.Extensions.FileProviders;
-using System.IO;
+using Fax.WebApi;
 
 namespace IntegrationCore
 {
@@ -28,9 +21,9 @@ namespace IntegrationCore
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // JWT Auth
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -45,21 +38,23 @@ namespace IntegrationCore
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
                     };
                 });
-        
-            services.AddMvc();
+
+            services.AddControllersWithViews(); // replaces AddMvc()
+            services.AddRazorPages().AddRazorRuntimeCompilation();
+
             services.AddMemoryCache();
+
             if (bool.Parse(Configuration["SharedConfig:Enable"]))
             {
                 IntegrationSettings settings = new IntegrationSettings(Configuration["SharedConfig:Path"]);
             }
-            //services.AddSingleton<IHostedService, DataRefreshService>();
-            //services.AddSingleton<IHostedService, FilesRefreshService>();
+
+            // Background services (optional)
+            // services.AddHostedService<DataRefreshService>();
+            // services.AddHostedService<FilesRefreshService>();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        
-
-        public void Configure(IApplicationBuilder app, Microsoft.AspNetCore.Hosting.IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -73,13 +68,16 @@ namespace IntegrationCore
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseCookiePolicy();
+            app.UseRouting();
+
             app.UseAuthentication();
-            app.UseMvc(routes =>
+            app.UseAuthorization();
+
+            app.UseEndpoints(endpoints =>
             {
-                routes.MapRoute(
+                endpoints.MapControllerRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
             });
         }
     }

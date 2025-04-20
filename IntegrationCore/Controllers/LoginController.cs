@@ -22,9 +22,9 @@ namespace IntegrationCore.Controllers
     {
         private IConfiguration _config;
         private static IMemoryCache _cache;
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IWebHostEnvironment _hostingEnvironment;
 
-        public LoginController(IConfiguration config, IMemoryCache memoryCache, IHostingEnvironment _hostingE)
+        public LoginController(IConfiguration config, IMemoryCache memoryCache, IWebHostEnvironment _hostingE)
         {
             _config = config;
             _cache = memoryCache;

@@ -14,9 +14,9 @@ namespace IntegrationCore.BGServices
     public class FilesRefreshService: HostedService
     {
         private readonly IConfiguration _config;
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IWebHostEnvironment _hostingEnvironment;
         private static IMemoryCache _cache;
-        public FilesRefreshService(/*RandomStringProvider randomStringProvider,*/IConfiguration config, IHostingEnvironment hostingEnvironment, IMemoryCache memoryCache)
+        public FilesRefreshService(/*RandomStringProvider randomStringProvider,*/IConfiguration config, IWebHostEnvironment hostingEnvironment, IMemoryCache memoryCache)
         {
             // _randomStringProvider = randomStringProvider;
             _config = config;

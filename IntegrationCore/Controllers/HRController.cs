@@ -11,9 +11,9 @@ namespace IntegrationCore.Controllers
 
     public class HRController : Controller
     {
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IWebHostEnvironment _hostingEnvironment;
         private static IMemoryCache _cache;
-        public HRController(IHostingEnvironment hostingEnvironment, IMemoryCache memoryCache)
+        public HRController(IWebHostEnvironment hostingEnvironment, IMemoryCache memoryCache)
         {
             _hostingEnvironment = hostingEnvironment;
             _cache = memoryCache;

@@ -397,7 +397,7 @@ namespace IntegrationCore.IntegrationLibrary
             }
         }
         
-        public static object ExportFromFolder(IHostingEnvironment _hostingEnvironment,ExportCorr[] scanRequest)
+        public static object ExportFromFolder(IWebHostEnvironment _hostingEnvironment,ExportCorr[] scanRequest)
         {
             try
             {
@@ -866,7 +866,7 @@ namespace IntegrationCore.IntegrationLibrary
 
         }
         
-        public static object SendAck(IHostingEnvironment _hostingEnvironment, ExportCorr[] scanRequest)
+        public static object SendAck(IWebHostEnvironment _hostingEnvironment, ExportCorr[] scanRequest)
         {
             try
             {

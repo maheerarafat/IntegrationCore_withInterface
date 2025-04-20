@@ -14,9 +14,9 @@ namespace IntegrationCore.Controllers
 {
     public class MailController : Controller
     {
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IWebHostEnvironment _hostingEnvironment;
         private static IMemoryCache _cache;
-        public MailController(IHostingEnvironment hostingEnvironment, IMemoryCache memoryCache)
+        public MailController(IWebHostEnvironment hostingEnvironment, IMemoryCache memoryCache)
         {
 
             ///Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start");

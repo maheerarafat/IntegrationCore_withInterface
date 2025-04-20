@@ -17,10 +17,10 @@ namespace IntegrationCore.Controllers
     {
 
         private IConfiguration _config;
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IWebHostEnvironment _hostingEnvironment;
         private static IMemoryCache _cache;
 
-        public JobController(IHostingEnvironment hostingEnvironment, IMemoryCache memoryCache, IConfiguration config)
+        public JobController(IWebHostEnvironment hostingEnvironment, IMemoryCache memoryCache, IConfiguration config)
         {
             this._config = config;
             //Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start");

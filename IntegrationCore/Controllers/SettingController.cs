@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Http;
 using hMailServer;
+using Microsoft.AspNetCore.Hosting;
 
 
 namespace IntegrationCore.Controllers
@@ -16,10 +17,10 @@ namespace IntegrationCore.Controllers
     public class SettingController : Controller
     {
         private IConfiguration _config;
-        private readonly Microsoft.AspNetCore.Hosting.IHostingEnvironment _hostingEnvironment;
+        private readonly IWebHostEnvironment _hostingEnvironment;
         private static IMemoryCache _cache;
         
-        public SettingController(IConfiguration config, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment, IMemoryCache memoryCache)
+        public SettingController(IConfiguration config, IWebHostEnvironment hostingEnvironment, IMemoryCache memoryCache)
         {
             _config = config;
             _hostingEnvironment = hostingEnvironment;

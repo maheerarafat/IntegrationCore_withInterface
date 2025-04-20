@@ -8,23 +8,25 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.Extensions.Configuration;
-using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.IO;
 using System.Net;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Hosting;
 
 namespace IntegrationCore.Controllers
 {
     public class HomeController : Controller
     {
         private IConfiguration _config;
-        private readonly Microsoft.AspNetCore.Hosting.IHostingEnvironment _hostingEnvironment;
+        private readonly IWebHostEnvironment _hostingEnvironment;
         private static IMemoryCache _cache;
         
-        public HomeController(IConfiguration config, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment, IMemoryCache memoryCache)
+        public HomeController(IConfiguration config, IWebHostEnvironment hostingEnvironment, IMemoryCache memoryCache)
         {
             _config = config;
             _hostingEnvironment = hostingEnvironment;
@@ -92,8 +94,8 @@ namespace IntegrationCore.Controllers
             Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start", TrackInterface: true);
             string UserName = IntegrationSettings.GetSetting("LoginUser").ToString();
             string Password = IntegrationSettings.GetSetting("LoginPassword").ToString();
-            
-            
+
+
             if (UserName == LoginUser && Encryption.DecryptString(Password) == LoginPassword)
             {
                 Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End", TrackInterface: true);
@@ -102,7 +104,7 @@ namespace IntegrationCore.Controllers
                     Username = UserName,
                     Password = Password
                 };
-               string Token =  GenerateJSONWebToken(userModel);
+               string Token = GenerateJSONWebToken(userModel);
                return Json(Token);
             }
             Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Invalid user name or password");

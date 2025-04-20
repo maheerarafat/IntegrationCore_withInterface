@@ -2944,23 +2944,19 @@ namespace IntegrationCore.Models
         {
         }
 
-        public HRMurasalat_pttClient(string endpointConfigurationName) :
-                base(endpointConfigurationName)
+        public HRMurasalat_pttClient(string endpointConfigurationName) 
         {
         }
 
-        public HRMurasalat_pttClient(string endpointConfigurationName, string remoteAddress) :
-                base(endpointConfigurationName, remoteAddress)
+        public HRMurasalat_pttClient(string endpointConfigurationName, string remoteAddress) 
         {
         }
 
-        public HRMurasalat_pttClient(string endpointConfigurationName, System.ServiceModel.EndpointAddress remoteAddress) :
-                base(endpointConfigurationName, remoteAddress)
+        public HRMurasalat_pttClient(string endpointConfigurationName, System.ServiceModel.EndpointAddress remoteAddress) 
         {
         }
 
-        public HRMurasalat_pttClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) :
-                base(binding, remoteAddress)
+        public HRMurasalat_pttClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) 
         {
         }
 

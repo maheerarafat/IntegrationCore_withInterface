@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <UserSecretsId>a96d8bcf-426a-42e3-a492-c6d8f818f917</UserSecretsId>
   </PropertyGroup>
 
@@ -29,16 +29,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dapper" Version="2.0.30" />
-    <PackageReference Include="log4net" Version="2.0.8" />
-    <PackageReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
-    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.19.60" />
-    <PackageReference Include="System.ServiceModel.Duplex" Version="4.4.*" />
-    <PackageReference Include="System.ServiceModel.Http" Version="4.4.*" />
-    <PackageReference Include="System.ServiceModel.NetTcp" Version="4.4.*" />
-    <PackageReference Include="System.ServiceModel.Security" Version="4.4.*" />
+    <PackageReference Include="Dapper" Version="2.1.66" />
+    <PackageReference Include="log4net" Version="3.0.4" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="6.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.15" />
+    <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.3.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
+    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.8.0" />
+    <PackageReference Include="System.ServiceModel.Duplex" Version="6.0.0" />
+    <PackageReference Include="System.ServiceModel.Http" Version="8.1.2" />
+    <PackageReference Include="System.ServiceModel.NetTcp" Version="8.1.2" />
+    <PackageReference Include="System.ServiceModel.Security" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -47,9 +49,6 @@
     </Reference>
     <Reference Include="Dapper">
       <HintPath>E:\NVSSOFT\Work\Integration\IntegrationCore21-10-2019\IntegrationCore\IntegrationCore\obj\Debug\netcoreapp2.2\Dapper.dll</HintPath>
-    </Reference>
-    <Reference Include="FastMember">
-      <HintPath>obj\fastmember\1.5.0\lib\netcoreapp2.0\FastMember.dll</HintPath>
     </Reference>
     <Reference Include="Interop.hMailServer">
       <HintPath>C:\Program Files (x86)\hMailServer\Bin\Interop.hMailServer.dll</HintPath>
@@ -81,6 +80,9 @@
     <None Update="ChangeLog.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.0" />
   </ItemGroup>
 
 </Project>

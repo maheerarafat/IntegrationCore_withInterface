@@ -16,9 +16,9 @@ namespace IntegrationCore.Controllers
     public class CorrController : Controller
     {
 
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IWebHostEnvironment _hostingEnvironment;
         private static IMemoryCache _cache;
-        public CorrController(IHostingEnvironment hostingEnvironment, IMemoryCache memoryCache)
+        public CorrController(IWebHostEnvironment hostingEnvironment, IMemoryCache memoryCache)
         {
            
                 //Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start");

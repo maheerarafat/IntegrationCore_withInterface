@@ -14,9 +14,9 @@ namespace IntegrationCore.BGServices
     {
         //private readonly RandomStringProvider _randomStringProvider;
         private IConfiguration _config;
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IWebHostEnvironment _hostingEnvironment;
         private static IMemoryCache _cache;
-        public DataRefreshService(IConfiguration config, IHostingEnvironment hostingEnvironment, IMemoryCache memoryCache)
+        public DataRefreshService(IConfiguration config, IWebHostEnvironment hostingEnvironment, IMemoryCache memoryCache)
         {
             // _randomStringProvider = randomStringProvider;
             _config = config;

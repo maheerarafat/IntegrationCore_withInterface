@@ -1,13 +1,8 @@
-using hMailServer;
 using IntegrationCore.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Caching.Memory;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Formatting;
@@ -22,191 +17,126 @@ namespace IntegrationCore.IntegrationLibrary
 
         public static object CallPostAPI(string APIURL, string PostData, string Tarasol_Token = "")
         {
+
             try
             {
-                //
-                var httpWebRequest = (HttpWebRequest)WebRequest.Create(APIURL);
-                httpWebRequest.Timeout = 600000;
-                if (Tarasol_Token != "")
+                using (var client = new HttpClient())
                 {
-                    httpWebRequest.Headers["Authorization"] = "Bearer " + Tarasol_Token;
-                }
-                httpWebRequest.ContentType = "application/json";
-                httpWebRequest.Method = "POST";
+                    client.Timeout = TimeSpan.FromMilliseconds(600000); // Adjusting the timeout
 
-                using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
-                {
-                    string json = PostData;
+                    if (!string.IsNullOrEmpty(Tarasol_Token))
+                    {
+                        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", Tarasol_Token);
+                    }
 
-                    streamWriter.Write(json);
-                }
+                    var content = new StringContent(PostData, Encoding.UTF8, "application/json");
 
-                HttpWebResponse httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-                if (httpResponse.StatusCode == HttpStatusCode.Unauthorized)
-                {
-                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Unauthorized (Post Request) Rec01   : ");
-                    return CallPostAPI(APIURL, PostData, Cache.GetSession(isNew: true).Token);
-                }
-                using (StreamReader streamReader = new StreamReader(httpResponse.GetResponseStream()))
-                {
-                    string result = streamReader.ReadToEnd();
+                    // Sending POST request
+                    var response = client.PostAsync(APIURL, content).GetAwaiter().GetResult();
+
+                    if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    {
+                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Unauthorized (Post Request) Rec01   : ");
+                        return CallPostAPI(APIURL, PostData, Cache.GetSession(isNew: true).Token);
+                    }
+
+                    var result = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+
                     Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Tarasol Result: " + result);
-                    streamReader.Dispose();
-                    streamReader.Close();
-                    //object jsonResponse = JsonConvert.DeserializeObject<object>(result);
-                    if(result.ToLower().Contains("session expired"))
+
+                    if (result.ToLower().Contains("session expired"))
                     {
                         Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Session Expired Tarasol Result (Post Request) Rec02  : ");
                         return CallPostAPI(APIURL, PostData, Cache.GetSession(isNew: true).Token);
                     }
+
                     return result;
                 }
-
-
-                //HttpWebRequest Request = WebRequest.Create("http://tarasolsql/TarasolAPI4/Corr/login?username="+ username +"&password="+ password) as HttpWebRequest;
-                //HttpWebResponse Response = Request.GetResponse() as HttpWebResponse;
-                //Stream stream = Response.GetResponseStream();
-                //StreamReader sr = new StreamReader(stream);
-                //string jsonResult = sr.ReadToEnd();
-
             }
             catch (Exception ex)
             {
                 string errorJson = @"{
-                    ""result"":""error"",
-	                ""message"":""\" + ex.Message;
+            ""result"":""error"",
+            ""message"":""\" + ex.Message;
                 errorJson += @"""}";
-                //object error = JsonConvert.DeserializeObject<object>(errorJson);
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occurred in  : " + ex.Message);
                 return errorJson;
             }
         }
 
-        public static object CallGetAPI(string APIURL, string Tarasol_Token="")
+        public static object CallGetAPI(string APIURL, string Tarasol_Token = "")
         {
             try
             {
+                using (var client = new HttpClient())
+                {
+                    client.Timeout = TimeSpan.FromMilliseconds(600000); // Adjusting the timeout
 
-                HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(APIURL);
-                httpWebRequest.Timeout = 600000;
-                if (Tarasol_Token != "")
-                {
-                    httpWebRequest.Headers["Authorization"] = "Bearer " + Tarasol_Token;
-                }
+                    if (!string.IsNullOrEmpty(Tarasol_Token))
+                    {
+                        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", Tarasol_Token);
+                    }
 
-                HttpWebResponse httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-                if (httpResponse.StatusCode == HttpStatusCode.Unauthorized)
-                {
-                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Unauthorized (Get Request) Rec01  : ");
-                    return CallGetAPI(APIURL, Cache.GetSession(isNew: true).Token);
-                }
-                using (StreamReader streamReader = new StreamReader(httpResponse.GetResponseStream()))
-                {
-                    string result = streamReader.ReadToEnd();
-                    streamReader.Dispose();
-                    streamReader.Close();
+                    // Sending GET request
+                    var response = client.GetAsync(APIURL).GetAwaiter().GetResult();
+
+                    if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    {
+                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Unauthorized (Get Request) Rec01  : ");
+                        return CallGetAPI(APIURL, Cache.GetSession(isNew: true).Token); // Recursion for unauthorized
+                    }
+
+                    var result = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+
                     if (result.ToLower().Contains("session expired"))
                     {
                         Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Session Expired Tarasol Result (Get Request) Rec02  : ");
-                        return CallGetAPI(APIURL, Cache.GetSession(isNew: true).Token);
+                        return CallGetAPI(APIURL, Cache.GetSession(isNew: true).Token); // Recursion for session expired
                     }
+
                     return result;
                 }
-
             }
             catch (Exception ex)
             {
                 string errorJson = @"{
-                    ""result"":""error"",
-	                ""message"":""\" + ex.Message;
+            ""result"":""error"",
+            ""message"":""\" + ex.Message;
                 errorJson += @"""}";
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occurred in  : " + ex.Message);
                 return errorJson;
             }
         }
 
-        //public static async Task<object> CallGetAPIAsync(string APIURL, string Tarasol_Token = "")
-        //{
-        //    try
-        //    {
 
-        //        HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(APIURL);
-        //        if (Tarasol_Token != "")
-        //        {
-        //            httpWebRequest.Headers["Authorization"] = "Bearer " + Tarasol_Token;
-        //        }
-
-        //        WebResponse httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-        //        using (StreamReader streamReader = new StreamReader(httpResponse.GetResponseStream()))
-        //        {
-        //            string result = streamReader.ReadToEnd();
-        //            Task.Delay(0).Wait();
-        //            streamReader.Dispose();
-        //            streamReader.Close();
-
-        //            return result;
-        //        }
-
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        string errorJson = @"{
-        //            ""result"":""error"",
-	       //         ""message"":""\" + ex.Message;
-        //        errorJson += @"""}";
-        //        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message);
-        //        return errorJson;
-        //    }
-        //}
 
         public static MemoryStream CallGetFileAPI(string APIURL, string Tarasol_Token)
         {
             try
             {
+                using (var client = new HttpClient())
+                {
+                    client.Timeout = TimeSpan.FromMilliseconds(600000); // Adjusting the timeout
 
-                HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(APIURL);
-                httpWebRequest.Timeout = 600000;
-                if (Tarasol_Token != "")
-                {
-                    httpWebRequest.Headers["Authorization"] = "Bearer " + Tarasol_Token;
-                }
-                using (HttpWebResponse httpResponse = (HttpWebResponse)httpWebRequest.GetResponse())
-                {
-                    if (httpResponse.StatusCode == HttpStatusCode.Unauthorized)
+                    if (!string.IsNullOrEmpty(Tarasol_Token))
                     {
-                        CallGetFileAPI(APIURL, Cache.GetSession(isNew: true).Token);
+                        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", Tarasol_Token);
                     }
-                    //try
-                    //{
-                    //    using (StreamReader streamReader = new StreamReader(httpResponse.GetResponseStream()))
-                    //    {
-                    //        string result = streamReader.ReadToEnd();
-                    //        streamReader.Dispose();
-                    //        streamReader.Close();
-                    //        if (result.Contains("Session Expired"))
-                    //        {
-                    //            CallGetFileAPI(APIURL, Cache.GetSession(isNew: true).Token);
-                    //        }
-                    //        byte[] byteArray = Encoding.ASCII.GetBytes(result);
-                    //        MemoryStream stream = new MemoryStream(byteArray);
-                    //        return stream;
-                    //    }
-                    //}
-                    //catch (Exception)
-                    //{                        
-                    //}
-                    //return null;
 
-                    using (Stream responseStream = httpResponse.GetResponseStream())
+                    // Sending GET request
+                    var response = client.GetAsync(APIURL).GetAwaiter().GetResult();
+
+                    if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    {
+                        return CallGetFileAPI(APIURL, Cache.GetSession(isNew: true).Token); // Recursion for unauthorized
+                    }
+
+                    // Read the response stream and store it in a MemoryStream
+                    using (Stream responseStream = response.Content.ReadAsStream())
                     {
                         MemoryStream memoryStream = new MemoryStream();
-                        byte[] buffer = new byte[1024];
-                        int byteCount;
-                        do
-                        {
-                            byteCount = responseStream.Read(buffer, 0, buffer.Length);
-                            memoryStream.Write(buffer, 0, byteCount);
-                        } while (byteCount > 0);
+                        responseStream.CopyTo(memoryStream);
                         memoryStream.Seek(0, SeekOrigin.Begin);
                         return memoryStream;
                     }
@@ -214,9 +144,8 @@ namespace IntegrationCore.IntegrationLibrary
             }
             catch (Exception ex)
             {
-                
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message);
-                throw ex;
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occurred in  : " + ex.Message);
+                throw;
             }
         }
 
@@ -236,11 +165,11 @@ namespace IntegrationCore.IntegrationLibrary
                 ByteArrayContent byteArrayContent = new ByteArrayContent(FileBytes);
                 multiForm.Add(byteArrayContent, "file", fileName);
                 HttpClient httpClient = new HttpClient();
-                httpClient.Timeout = TimeSpan.FromMinutes(10) ;
+                httpClient.Timeout = TimeSpan.FromMinutes(10);
                 var response = await httpClient.PostAsync(APIURL, multiForm);
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
-                    ScanFileResponse scanFileResponse =  await response.Content.ReadAsAsync<ScanFileResponse>(new[] { new JsonMediaTypeFormatter() });
+                    ScanFileResponse scanFileResponse = await response.Content.ReadAsAsync<ScanFileResponse>(new[] { new JsonMediaTypeFormatter() });
                     Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Scan File Response : " + scanFileResponse.Value, TrackInterface: true);
                     SendFileToTarasolReturnedData sendFileToTarasolReurnedData = new SendFileToTarasolReturnedData()
                     {
@@ -260,9 +189,9 @@ namespace IntegrationCore.IntegrationLibrary
                     };
                     return senFileToTarasolReurnedData;
                 }
-                
-                
-                
+
+
+
 
             }
             catch (Exception ex)
@@ -299,81 +228,110 @@ namespace IntegrationCore.IntegrationLibrary
         {
             try
             {
+                using (var client = new HttpClient())
+                {
+                    client.Timeout = TimeSpan.FromMilliseconds(600000); // Adjusting the timeout
 
-                HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(APIURL);
-                httpWebRequest.Timeout = 600000;
-                if (Tarasol_Token != "")
-                {
-                    httpWebRequest.Headers["Authorization"] = "Bearer " + Tarasol_Token;
-                }
-                string directory = IntegrationSettings.GetSetting("IntegrationDataFolder").ToString() + "\\IntegrationTemp\\" + SessionID + "\\" + DocUID;
-                using (HttpWebResponse httpResponse = (HttpWebResponse)httpWebRequest.GetResponse())
-                {
-                    Directory.CreateDirectory(directory);
-                    using (Stream output = File.OpenWrite(directory + "\\" + DocUID + ".tarasol"))
+                    if (!string.IsNullOrEmpty(Tarasol_Token))
                     {
-                        using (Stream responseStream = httpResponse.GetResponseStream())
+                        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", Tarasol_Token);
+                    }
+
+                    // Define the directory where the files will be saved
+                    string directory = IntegrationSettings.GetSetting("IntegrationDataFolder").ToString() + "\\IntegrationTemp\\" + SessionID + "\\" + DocUID;
+
+                    // Send GET request to fetch the file
+                    var response = client.GetAsync(APIURL).GetAwaiter().GetResult();
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        throw new Exception("Failed to fetch file from Tarasol API");
+                    }
+
+                    // Create the directory if it doesn't exist
+                    Directory.CreateDirectory(directory);
+
+                    // Save the response stream to a file
+                    string filePath = directory + "\\" + DocUID + ".tarasol";
+
+                    using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+                    {
+                        response.Content.CopyToAsync(fileStream).GetAwaiter().GetResult();
+                    }
+
+                    // Rename and extract the downloaded tarasol file
+                    string zipFilePath = Path.ChangeExtension(filePath, ".zip");
+                    File.Move(filePath, zipFilePath);
+                    ZipFile.ExtractToDirectory(zipFilePath, directory);
+
+                    // Get all files in the directory
+                    string[] files = Directory.GetFiles(directory, "*.*");
+                    List<Models.Attachment> attachments = new List<Models.Attachment>();
+
+                    // Process each file in the directory
+                    foreach (string item in files)
+                    {
+                        if (!item.EndsWith(DocUID + ".tarasol") && !item.EndsWith(DocUID + ".zip") && !item.EndsWith(DocUID + ".json"))
                         {
-                            responseStream.CopyTo(output);
+                            byte[] bytes = File.ReadAllBytes(item);
+                            string stream = Convert.ToBase64String(bytes);
+
+                            Models.Attachment attachment = new Models.Attachment()
+                            {
+                                FileContent = stream,
+                                FileName = Path.GetFileName(item),
+                                FileExtension = Path.GetExtension(item)
+                            };
+
+                            attachments.Add(attachment);
+
+                            // Delete the file after processing
+                            File.Delete(item);
                         }
                     }
 
+                    // Cleanup the directory
+                    Directory.Delete(directory, true);
+
+                    return attachments;
                 }
-                string FilePath = directory + "\\" + DocUID + ".tarasol";
-                File.Move(FilePath, Path.ChangeExtension(FilePath, ".zip"));
-                FilePath = FilePath.Replace(".tarasol", "");
-                ZipFile.ExtractToDirectory(FilePath + ".zip", directory);
-                string[] Files = Directory.GetFiles(directory, "*.*");
-                List<Models.Attachment> list = new List<Models.Attachment>();
-                foreach (string item in Files)
-                {
-                    if (!item.EndsWith(DocUID + ".tarasol") && !item.EndsWith(DocUID + ".zip") && !item.EndsWith(DocUID + ".json"))
-                    {
-                        Byte[] bytes = File.ReadAllBytes(item);
-                        string stream = Convert.ToBase64String(bytes);
-                        Models.Attachment attachment = new Models.Attachment()
-                        {
-                            FileContent = stream,
-                            FileName = Path.GetFileName(item),
-                            FileExtension = Path.GetExtension(item)
-                        };
-                        list.Add(attachment);
-                        File.Delete(item);
-                    }
-                }
-                Directory.Delete(IntegrationSettings.GetSetting("IntegrationDataFolder").ToString() + "\\IntegrationTemp\\" + SessionID, true);
-                return list;
             }
             catch (Exception ex)
             {
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message);
-                throw ex;
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occurred in  : " + ex.Message);
+                throw;
             }
         }
 
-        public static void CallGetFaxFile(string APIURL, string Auth,string filePath)
+        public static void CallGetFaxFile(string APIURL, string Auth, string filePath)
         {
             try
             {
-                HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(APIURL);
-                httpWebRequest.Timeout = 600000;
-                httpWebRequest.Headers.Add("Authorization", "Basic " + Auth);
-                WebResponse httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-                using (StreamReader streamReader = new StreamReader(httpResponse.GetResponseStream()))
+                using (var client = new HttpClient())
                 {
-                    using (Stream output = File.OpenWrite(filePath))
+                    client.Timeout = TimeSpan.FromMilliseconds(600000); // Adjusting the timeout
+
+                    // Adding the Authorization header
+                    client.DefaultRequestHeaders.Add("Authorization", "Basic " + Auth);
+
+                    // Sending GET request
+                    var response = client.GetAsync(APIURL).GetAwaiter().GetResult();
+
+                    if (!response.IsSuccessStatusCode)
                     {
-                        using (Stream responseStream = httpResponse.GetResponseStream())
-                        {
-                            responseStream.CopyTo(output);
-                        }
+                        throw new Exception($"Failed to get fax file. Status Code: {response.StatusCode}");
+                    }
+
+                    // Writing the content to the specified file path
+                    using (var output = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+                    {
+                        response.Content.CopyToAsync(output).GetAwaiter().GetResult();
                     }
                 }
             }
             catch (Exception ex)
             {
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message);
-                throw ex;
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Error occurred in : " + ex.Message);
+                throw;
             }
         }
 

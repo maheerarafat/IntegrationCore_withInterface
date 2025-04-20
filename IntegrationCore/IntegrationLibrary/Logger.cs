@@ -246,7 +246,7 @@ public class Logger : IDisposable
                     // Beacuse we depend on new line as line separator, we must remove any new line in the message
                     // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
                     // str.Append(Message.Replace(vbCrLf, "\n"))
-                    str.Append(Constants.vbNewLine);
+                    str.Append(Environment.NewLine);
                     if (Log != null)
                     {
                         if (Log.IsInfoEnabled)
@@ -338,7 +338,7 @@ public class Logger : IDisposable
                         str.Append(Message.Replace(Constants.vbCrLf, @"\n"));
                     }
 
-                    str.Append(Constants.vbNewLine);
+                    str.Append(Environment.NewLine);
                     if (Log != null)
                     {
                         // If Type = Enum_LogType._InfoStart Or Type = Enum_LogType._InfoEnd Or Type = Enum_LogType._Info Then

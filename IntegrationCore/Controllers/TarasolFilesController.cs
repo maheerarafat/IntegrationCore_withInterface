@@ -15,9 +15,9 @@ namespace IntegrationCore.Controllers
 {
     public class TarasolFilesController : Controller
     {
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IWebHostEnvironment _hostingEnvironment;
         private static IMemoryCache _cache;
-        public TarasolFilesController(IHostingEnvironment hostingEnvironment, IMemoryCache memoryCache)
+        public TarasolFilesController(IWebHostEnvironment hostingEnvironment, IMemoryCache memoryCache)
         {
 
             _hostingEnvironment = hostingEnvironment;

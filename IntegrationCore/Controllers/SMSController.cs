@@ -13,9 +13,9 @@ namespace IntegrationCore.Controllers
 {
     public class SMSController : Controller
     {
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IWebHostEnvironment _hostingEnvironment;
         private static IMemoryCache _cache;
-        public SMSController(IHostingEnvironment hostingEnvironment, IMemoryCache memoryCache)
+        public SMSController(IWebHostEnvironment hostingEnvironment, IMemoryCache memoryCache)
         {
 
             _hostingEnvironment = hostingEnvironment;

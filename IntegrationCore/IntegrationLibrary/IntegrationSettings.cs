@@ -4,7 +4,7 @@ using System.IO;
 using System.Xml;
 using Oracle.ManagedDataAccess.Client;
 using System.Data;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 
 namespace IntegrationCore.IntegrationLibrary
 {
@@ -17,7 +17,7 @@ namespace IntegrationCore.IntegrationLibrary
         {
             ConfigPath = configPath;
         }
-        public static bool LoadSettings(IHostingEnvironment _hostingEnvironment= null )
+        public static bool LoadSettings(IWebHostEnvironment _hostingEnvironment = null )
         {
             try
             {
@@ -133,7 +133,7 @@ namespace IntegrationCore.IntegrationLibrary
             }
 
         }
-        public static object GetSetting(string SettingsCacheKey, IHostingEnvironment _hostingEnvironment = null)
+        public static object GetSetting(string SettingsCacheKey, IWebHostEnvironment _hostingEnvironment = null)
         {
             try
             {
