@@ -21,6 +21,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="IntegrationLibrary\Totp.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="IntegrationSetting.config" />
   </ItemGroup>
 
@@ -47,21 +51,21 @@
     <Reference Include="AM_EncryptCore">
       <HintPath>..\..\..\Users\Ghaith Abbas\Downloads\IntegrationCore-restpassword-05-10-2020\IntegrationCore\IntegrationCore\DLLs\AM_EncryptCore.dll</HintPath>
     </Reference>
-    <Reference Include="Dapper">
+    <!--<Reference Include="Dapper">
       <HintPath>E:\NVSSOFT\Work\Integration\IntegrationCore21-10-2019\IntegrationCore\IntegrationCore\obj\Debug\netcoreapp2.2\Dapper.dll</HintPath>
-    </Reference>
+    </Reference>-->
     <Reference Include="Interop.hMailServer">
       <HintPath>C:\Program Files (x86)\hMailServer\Bin\Interop.hMailServer.dll</HintPath>
     </Reference>
-    <Reference Include="log4net">
+    <!--<Reference Include="log4net">
       <HintPath>E:\NVSSOFT\Work\Integration\IntegrationCore21-10-2019\IntegrationCore\IntegrationCore\obj\Debug\netcoreapp2.2\log4net.dll</HintPath>
-    </Reference>
-    <Reference Include="Oracle.ManagedDataAccess">
+    </Reference>-->
+    <!--<Reference Include="Oracle.ManagedDataAccess">
       <HintPath>E:\NVSSOFT\Work\Integration\IntegrationCore21-10-2019\IntegrationCore\IntegrationCore\obj\Debug\netcoreapp2.2\Oracle.ManagedDataAccess.dll</HintPath>
-    </Reference>
-    <Reference Include="Otp.NET">
+    </Reference>-->
+    <!--<Reference Include="Otp.NET">
       <HintPath>..\..\..\Users\Ghaith Abbas\Downloads\IntegrationCore-restpassword-05-10-2020\IntegrationCore\IntegrationCore\DLLs\Otp.NET.dll</HintPath>
-    </Reference>
+    </Reference>-->
     <Reference Include="RightFax.WebApi.Core">
       <HintPath>DLLs\RightFax.WebApi.Core.dll</HintPath>
     </Reference>
