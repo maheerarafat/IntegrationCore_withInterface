@@ -40,7 +40,7 @@ namespace IntegrationCore.Controllers
             return View();
         }
 
-        [HttpPost]
+        [HttpPost()]
         [Authorize]
         public ActionResult GetLogJobESBSuccuss()
         {
