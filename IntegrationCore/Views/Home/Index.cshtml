@@ -80,14 +80,12 @@
         $(function () {
 
         $("#Login").click(function () {
-            debugger;
             $.ajax({
                 type: 'GET',
                 url: '@Url.Action("GetToken", "Home")' + '?LoginUser=' + $("#LoginUser").val() + '&LoginPassword=' + $("#LoginPassword").val(),
                 //data: JSON.stringify({ "LoginUser": $("#LoginUser").val(), "LoginPassword": $("#LoginPassword").val() }),
                     contentType: "application/json"
             }).done(function (data) {
-                debugger;
                 if (data == "invalid user name or password") {
                     $("#token").text(data);
                 } else {

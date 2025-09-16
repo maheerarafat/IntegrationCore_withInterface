@@ -304,7 +304,6 @@
 
     });
     function get_Settings() {
-        debugger;
         let data = sessionStorage['token'];
         $.ajax({
             method: 'GET',
@@ -314,7 +313,6 @@
                     "Authorization", "Bearer " + data);
             }
         }).done(function (data) {
-            debugger;
             $('#ConnectionString').val(data.connectionString);
             //DBPassword = data.dbPassword;
             $('#UserName').val(data.userName);
@@ -492,7 +490,6 @@
     }
 
     function test_Connection() {
-        debugger;
 
 
         if ($('#DBPassword').val() != '' ) {
