@@ -40,10 +40,21 @@ namespace IntegrationCore.Controllers
         }
 
         public IActionResult Index()
+
         {
+            try
+            {
+
             string UserName = IntegrationSettings.GetSetting("LoginUser").ToString();
             string Password = IntegrationSettings.GetSetting("LoginPassword").ToString();
             return View();
+            }
+            catch (Exception ex)
+            {
+                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, ex.Message, PrintInterface: true); 
+                return View();
+                
+            }
         }
         [HttpGet]
         //[Authorize]
