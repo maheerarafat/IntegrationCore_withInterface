@@ -39,16 +39,14 @@ namespace IntegrationCore
                     };
                 });
 
-            services.AddControllersWithViews().AddRazorRuntimeCompilation(); 
+            services.AddControllersWithViews(); // replaces AddMvc()
+            services.AddRazorPages().AddRazorRuntimeCompilation();
+
             services.AddMemoryCache();
 
-            if (Configuration.GetValue<bool>("SharedConfig:Enable", false))
+            if (bool.Parse(Configuration["SharedConfig:Enable"]))
             {
-                var settingsPath = Configuration["SharedConfig:Path"];
-                if (!string.IsNullOrEmpty(settingsPath))
-                {
-                    IntegrationSettings settings = new IntegrationSettings(settingsPath);
-                }
+                IntegrationSettings settings = new IntegrationSettings(Configuration["SharedConfig:Path"]);
             }
 
             // Background services (optional)
