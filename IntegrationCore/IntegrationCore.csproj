@@ -3,6 +3,9 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <UserSecretsId>a96d8bcf-426a-42e3-a492-c6d8f818f917</UserSecretsId>
+	  <MvcRazorCompileOnPublish>true</MvcRazorCompileOnPublish>
+	  <RazorCompileOnBuild>true</RazorCompileOnBuild>
+
   </PropertyGroup>
 
   <ItemGroup>
@@ -37,7 +40,6 @@
     <PackageReference Include="log4net" Version="3.0.4" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="6.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.15" />
-    <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.3.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.1" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
     <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.8.0" />
@@ -45,6 +47,8 @@
     <PackageReference Include="System.ServiceModel.Http" Version="8.1.2" />
     <PackageReference Include="System.ServiceModel.NetTcp" Version="8.1.2" />
     <PackageReference Include="System.ServiceModel.Security" Version="6.0.0" />
+	  <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.0" />
+
   </ItemGroup>
 
   <ItemGroup>

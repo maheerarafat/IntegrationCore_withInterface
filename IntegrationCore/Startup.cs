@@ -39,8 +39,7 @@ namespace IntegrationCore
                     };
                 });
 
-            services.AddControllersWithViews(); // replaces AddMvc()
-            services.AddRazorPages().AddRazorRuntimeCompilation();
+            services.AddControllersWithViews();
 
             services.AddMemoryCache();
 
