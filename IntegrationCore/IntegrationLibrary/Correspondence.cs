@@ -45,7 +45,7 @@ namespace IntegrationCore.IntegrationLibrary
                     Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "rejected;Corr;Subject;CorrespondenceNo=" + tarasolDocument.CorrespondenceNo + "", TrackInterface: true, PrintInterface: true);
                     return IntResultLib.GetResult(2, "Subject");
                 }
-                
+
                 if (tarasolDocument.Date == null)
                 {
                     string objStr = JsonConvert.SerializeObject(tarasolDocument);
@@ -72,7 +72,7 @@ namespace IntegrationCore.IntegrationLibrary
                     string objStr = JsonConvert.SerializeObject(tarasolDocument);
                     Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "data exception - sender Globalid tarasolDocument : " + objStr, TrackInterface: Logger.EnableLoggingInfo, PrintInterface: Logger.EnableLoggingInfo);
                     Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "rejected;Corr;Sender_Global_ID;CorrespondenceNo=" + tarasolDocument.CorrespondenceNo + "", TrackInterface: true, PrintInterface: true);
-                    return IntResultLib.GetResult(2,"Sender Global ID");
+                    return IntResultLib.GetResult(2, "Sender Global ID");
                 }
                 if (tarasolDocument.TransactionIDs == null)
                 {
@@ -88,7 +88,7 @@ namespace IntegrationCore.IntegrationLibrary
                         string objStr = JsonConvert.SerializeObject(tarasolDocument);
                         Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "data exception- file name tarasolDocument : " + objStr, TrackInterface: Logger.EnableLoggingInfo, PrintInterface: Logger.EnableLoggingInfo);
                         Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "rejected;Corr;FileName;CorrespondenceNo=" + tarasolDocument.CorrespondenceNo + "", TrackInterface: true, PrintInterface: true);
-                        return IntResultLib.GetResult(2,"File Name");
+                        return IntResultLib.GetResult(2, "File Name");
                     }
                 }
                 //Get import folder path
@@ -98,7 +98,7 @@ namespace IntegrationCore.IntegrationLibrary
                 string path = mainPath;
                 if (Directory.Exists(path))
                 {
-                    Directory.Delete(path,true);
+                    Directory.Delete(path, true);
                 }
                 path += "/" + GUID;
                 try
@@ -119,10 +119,10 @@ namespace IntegrationCore.IntegrationLibrary
                             {
                                 var base64string = data.FileContent;
                                 var base64array = Convert.FromBase64String(base64string);
-                              
-                                string filePath = path + "/" + (Path.GetFileNameWithoutExtension(data.FileName) == "___Main___PDF___T04File" ? 
+
+                                string filePath = path + "/" + (Path.GetFileNameWithoutExtension(data.FileName) == "___Main___PDF___T04File" ?
                                     GUID + ".pdf" : (
-                                    (filesImportedCount.ContainsKey(fullFileNameExtenstion) ? ($"{data.FileName}({filesImportedCount[fullFileNameExtenstion]})") : data.FileName )  + // Check file exist in Dictionary
+                                    (filesImportedCount.ContainsKey(fullFileNameExtenstion) ? ($"{data.FileName}({filesImportedCount[fullFileNameExtenstion]})") : data.FileName) + // Check file exist in Dictionary
                                     (string.IsNullOrEmpty(data.FileExtension) ? "" : ("." + data.FileExtension))
                                     ));
                                 System.IO.File.WriteAllBytes(filePath, base64array);
@@ -150,16 +150,17 @@ namespace IntegrationCore.IntegrationLibrary
                                     filesImportedCount[fullFileNameExtenstion] = 1;
                                 }
                                 //
-                            }                               
+                            }
                         }
                     }
-                    if (Directory.GetFiles(path).Length == 0) 
+                    if (Directory.GetFiles(path).Length == 0)
                     {
                         //Logger.AddToLogFile("Correspondence." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, $" wrong Files in Document : {tarasolDocument.CorrespondenceNo} ", TrackInterface: true, PrintInterface: true);
                         Directory.Delete(mainPath, true);
                         Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "rejected;Corr;Currpted_Path;CorrespondenceNo=" + tarasolDocument.CorrespondenceNo + "", TrackInterface: true, PrintInterface: true);
-                        return IntResultLib.GetResult(2," Files problem");
-                    };
+                        return IntResultLib.GetResult(2, " Files problem");
+                    }
+                    ;
                     List<TarasolTargetItem> AddressTo = new List<TarasolTargetItem>();
                     foreach (var item in tarasolDocument.TransactionIDs)
                     {
@@ -185,7 +186,7 @@ namespace IntegrationCore.IntegrationLibrary
                                 AddressTo.Add(new TarasolTargetItem() { GlobalIDs = globalIDs, ExchangeNo = item.Split('@')[0], ExchangeStatus = "1" });
                             }
                         }
-                        
+
                     }
                     if (AddressTo.Count == 0)
                     {
@@ -195,21 +196,21 @@ namespace IntegrationCore.IntegrationLibrary
                         return IntResultLib.GetResult(2, "No Receivers");
                     }
                     DocumentObject documentObject = Mapping.MapImportedFile(tarasolDocument, AddressTo);
-                    
+
                     string jsondata = JsonConvert.SerializeObject(documentObject);
                     if (documentObject != null)
                     {
                         Logger.AddToLogFile("Correspondence." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, $"GUID : {GUID} ", TrackInterface: true, PrintInterface: true);
                         Logger.AddToLogFile("Correspondence." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, $"Reference No : {documentObject.ExternalRefNumber.Value} ", TrackInterface: true, PrintInterface: true);
                     }
-                   
+
                     // Write that JSON to  file,  
                     File.WriteAllText(path + "/" + GUID + ".json", jsondata, encoding: Encoding.UTF8);
                     // Create zip file for correspondence
                     ZipFile.CreateFromDirectory(path, path + ".zip");
                     File.Move(path + ".zip", Path.ChangeExtension(path + ".zip", ".tarasol"));
                     Directory.Delete(path, true);
-                    
+
                 }
                 catch (Exception)
                 {
@@ -220,7 +221,7 @@ namespace IntegrationCore.IntegrationLibrary
                 // Call Correspondence Import API from Tarasol
                 var task = new[]
                 {
-                Task.Run(()=>Logger.AddToLogFile("Correspondence." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, TarasolCorrespondencesImport()))                
+                Task.Run(()=>Logger.AddToLogFile("Correspondence." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, TarasolCorrespondencesImport()))
                 };
                 // if operation succeeded
                 return IntResultLib.GetResult(1);
@@ -230,7 +231,7 @@ namespace IntegrationCore.IntegrationLibrary
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message, PrintInterface: true);
                 throw ex;
             }
-           
+
         }
         public static string TarasolCorrespondencesImport()
         {
@@ -238,7 +239,7 @@ namespace IntegrationCore.IntegrationLibrary
             {
                 string Tarasol_Token = Cache.GetSession().Token;
                 string Session_ID = Cache.GetSession().SessionID;
-                string ImportURL = IntegrationSettings.GetSetting("APIURL").ToString() +"/Corr/CorrespondencesImport?SessionId="+ Session_ID;
+                string ImportURL = IntegrationSettings.GetSetting("APIURL").ToString() + "/Corr/CorrespondencesImport?SessionId=" + Session_ID;
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "ImportURL : " + ImportURL, TrackInterface: true);
                 /*b8a862d1-ed8a-487c-bd44-0ebe1b0f6cf8&CurrentPosition=016b10b9-7930-44b4-96d7-07b6f58cb357*/
                 if (Tarasol_Token == "")
@@ -255,9 +256,9 @@ namespace IntegrationCore.IntegrationLibrary
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message, PrintInterface: true);
                 throw ex;
             }
-            
+
         }
-        
+
         public static object ImportFaxToFolder(TarasolDocument tarasolDocument)
         {
             try
@@ -316,7 +317,7 @@ namespace IntegrationCore.IntegrationLibrary
                     {
                       Task.Run(()=>Logger.AddToLogFile("Correspondence." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, TarasolCorrespondencesImport()))
                     };
-                    
+
                     return IntResultLib.GetResult(1); // if operation succeeded
                 }
                 catch (Exception)
@@ -324,7 +325,7 @@ namespace IntegrationCore.IntegrationLibrary
                     Directory.Delete(path, true);
                     throw;
                 }
-                
+
             }
             catch (Exception ex)
             {
@@ -337,7 +338,7 @@ namespace IntegrationCore.IntegrationLibrary
         {
             try
             {
-                if(acknowledegment is null)
+                if (acknowledegment is null)
                 {
                     Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "rejected;ACK;acknowledegment;acknowledegment=null", TrackInterface: true, PrintInterface: true);
                     return IntResultLib.GetResult(2);
@@ -357,7 +358,7 @@ namespace IntegrationCore.IntegrationLibrary
                         ReadBy = acknowledegment.ReadBy.Trim(),
                         ExchangeStatus = "1"
                     };
-                    if(tarasolAck.ExternalExchangeNo is null)
+                    if (tarasolAck.ExternalExchangeNo is null)
                     {
                         Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "rejected;ACK;acknowledegment;TransactionID=null", TrackInterface: true, PrintInterface: true);
                         Directory.Delete(path, true);
@@ -376,10 +377,10 @@ namespace IntegrationCore.IntegrationLibrary
                         return IntResultLib.GetResult(2, "acknowledgementDate");
                     }
                     string JsonAck = JsonConvert.SerializeObject(tarasolAck);
-                    File.WriteAllText(path + "/" + DocPathName+ "/" + DocPathName + ".json", JsonAck,encoding:Encoding.UTF8);
+                    File.WriteAllText(path + "/" + DocPathName + "/" + DocPathName + ".json", JsonAck, encoding: Encoding.UTF8);
                     ZipFile.CreateFromDirectory(path + "/" + DocPathName,
                         path + "/" + DocPathName + ".zip");
-                    Directory.Delete(path + "/" + DocPathName,true);
+                    Directory.Delete(path + "/" + DocPathName, true);
                     File.Move(path + "/" + DocPathName + ".zip", Path.ChangeExtension(path + "/" + DocPathName + ".zip", ".ack"));
                 }
                 // Call Correspondence Import API from Tarasol
@@ -387,7 +388,7 @@ namespace IntegrationCore.IntegrationLibrary
                 {
                 Task.Run(()=>AcknowledgmentReportLoad())
                 };
-                
+
                 return IntResultLib.GetResult(1);
             }
             catch (Exception ex)
@@ -396,8 +397,8 @@ namespace IntegrationCore.IntegrationLibrary
                 throw ex;
             }
         }
-        
-        public static object ExportFromFolder(IWebHostEnvironment _hostingEnvironment,ExportCorr[] scanRequest)
+
+        public static object ExportFromFolder(IWebHostEnvironment _hostingEnvironment, ExportCorr[] scanRequest)
         {
             try
             {
@@ -409,7 +410,7 @@ namespace IntegrationCore.IntegrationLibrary
                     string[] subDirectories = Directory.GetDirectories(path);
                     foreach (var subDir in subDirectories)
                     {
-                        if(subDir.EndsWith("Draft")|| subDir.EndsWith("Draft-fax")|| subDir.EndsWith("Draft-email"))
+                        if (subDir.EndsWith("Draft") || subDir.EndsWith("Draft-fax") || subDir.EndsWith("Draft-email"))
                         {
                             string[] DraftsubDirectories = Directory.GetDirectories(subDir);
                             foreach (var subDirectory in DraftsubDirectories)
@@ -426,7 +427,7 @@ namespace IntegrationCore.IntegrationLibrary
                                                 continue;
                                             }
                                             string FilePath = Directory.GetFiles(subDirectory, "*.tarasol")[0];
-                                            if(sentDocuments.Contains(CorrItem.CorrUID))
+                                            if (sentDocuments.Contains(CorrItem.CorrUID))
                                             {
                                                 continue;
                                             }
@@ -435,7 +436,7 @@ namespace IntegrationCore.IntegrationLibrary
                                             ZipFile.ExtractToDirectory(FilePath + ".zip", subDirectory);
                                             StreamReader reader;
                                             string strJSONdata = "";
-                                            if (File.Exists(FilePath + ".json") )
+                                            if (File.Exists(FilePath + ".json"))
                                             {
 
                                                 string CorrNameUID = Path.GetFileName(FilePath + ".json").Replace(".json", "");
@@ -451,7 +452,7 @@ namespace IntegrationCore.IntegrationLibrary
                                                 List<MultipartFormDataContent> contentAttachmentFax = new List<MultipartFormDataContent>();
                                                 List<Models.EmailAttachment> emailAttachmentList = new List<EmailAttachment>();
                                                 foreach (string item in Files)
-                                                { 
+                                                {
                                                     if (!item.EndsWith(CorrNameUID + ".tarasol") && !item.EndsWith(CorrNameUID + ".zip") && !item.EndsWith(CorrNameUID + ".json"))
                                                     {
                                                         byte[] bytes = File.ReadAllBytes(item);
@@ -463,14 +464,15 @@ namespace IntegrationCore.IntegrationLibrary
                                                         Regex re = new Regex("[^\\.\\p{IsArabic}A-Za-z0-9_ -]+"); // same regex used in dubai police
 
                                                         string outputString = FileNameWithoutExt;
-                                                          outputString = re.Replace(FileNameWithoutExt, "");
+                                                        outputString = re.Replace(FileNameWithoutExt, "");
                                                         outputString = outputString.Replace(" ", "_");
 
                                                         if (string.IsNullOrEmpty(outputString))
                                                         {
-                                                            fileName =  Guid.NewGuid().ToString() +  Path.GetExtension(fileName);
+                                                            fileName = Guid.NewGuid().ToString() + Path.GetExtension(fileName);
 
-                                                        } else
+                                                        }
+                                                        else
                                                         {
                                                             fileName = outputString + Path.GetExtension(fileName);
                                                         }
@@ -518,8 +520,8 @@ namespace IntegrationCore.IntegrationLibrary
                                                     }
                                                 }
                                                 File.Move(FilePath + ".zip", Path.ChangeExtension(FilePath + ".zip", ".tarasol"));
-                                                
-                                                if(CorrItem.ResendTo != null)
+
+                                                if (CorrItem.ResendTo != null)
                                                 {
                                                     document.AddressTo = CorrItem.ResendTo;
                                                 }
@@ -558,7 +560,7 @@ namespace IntegrationCore.IntegrationLibrary
                                                     {
                                                         try
                                                         {
-                                                            if (string.IsNullOrEmpty(addressTo.Fax) || string.IsNullOrEmpty( addressTo.Exchange_no_fax))
+                                                            if (string.IsNullOrEmpty(addressTo.Fax) || string.IsNullOrEmpty(addressTo.Exchange_no_fax))
                                                             {
                                                                 SendNotificationToTarasol(addressTo.Exchange_no_fax, CorrItem.CorrUID, 0, 0, "addressto fax info error", "addressto fax info error");
                                                             }
@@ -578,11 +580,11 @@ namespace IntegrationCore.IntegrationLibrary
                                                                     (IntegrationSettings.GetSetting("FaxPass").ToString() == "") ? "" : Encryption.DecryptString(IntegrationSettings.GetSetting("FaxPass").ToString()),
                                                                     nameRecipient: document.ExternalRefNumber.Value);
                                                                 }
-                                                                
+
                                                             }
-                                                            
-                                                            
-                                                            
+
+
+
                                                         }
                                                         catch (Exception ex)
                                                         {
@@ -626,7 +628,7 @@ namespace IntegrationCore.IntegrationLibrary
                                                                 }
                                                             }
 
-                                                            
+
                                                         }
                                                         catch (Exception ex)
                                                         {
@@ -643,7 +645,7 @@ namespace IntegrationCore.IntegrationLibrary
                                                         string TempEntity = string.IsNullOrEmpty(item.GlobalIDs.MainParentGlobalID) ? item.GlobalIDs.GlobalID : item.GlobalIDs.MainParentGlobalID;
                                                         if (!EntityCodes.Contains(TempEntity)) EntityCodes.Add(TempEntity);
                                                     }
-                                                        
+
                                                 }
                                                 List<IntResult> ResponseList = new List<IntResult>();
                                                 foreach (var entity in EntityCodes)
@@ -676,7 +678,8 @@ namespace IntegrationCore.IntegrationLibrary
 
                                                     string serialNum = document.ExternalRefNumber.Value.Split('/')[document.ExternalRefNumber.Value.Split('/').Length - 1];
                                                     if (document.PostFromID.GlobalIDs.GlobalID.Trim() == "")
-                                                    { Logger.AddToLogFile("Correspondence." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, $"The export for Corr : {CorrItem.CorrUID}  has been rejected because the source unit dose not have GlobalID");
+                                                    {
+                                                        Logger.AddToLogFile("Correspondence." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, $"The export for Corr : {CorrItem.CorrUID}  has been rejected because the source unit dose not have GlobalID");
                                                         return IntResultLib.GetResult(2);
                                                     }
                                                     //Expose ESB service
@@ -701,22 +704,23 @@ namespace IntegrationCore.IntegrationLibrary
                                                         }
                                                         int MaxSubjectLength = int.Parse(IntegrationSettings.GetSetting("MaxSubjectLength").ToString());
                                                         string subject = "";
-                                                        if (MaxSubjectLength == 0  || MaxSubjectLength > document.Subject.Value.Length)
+                                                        if (MaxSubjectLength == 0 || MaxSubjectLength > document.Subject.Value.Length)
                                                         {
                                                             subject = document.Subject.Value.Trim();
-                                                        } else
+                                                        }
+                                                        else
                                                         {
-                                                           subject = document.Subject.Value.Trim().Substring(0, MaxSubjectLength);
+                                                            subject = document.Subject.Value.Trim().Substring(0, MaxSubjectLength);
                                                         }
 
                                                         ECS_Document eCS_Document = new ECS_Document()
                                                         {
                                                             EntityCode = entity.Replace(IntegrationSettings.GetSetting("EntityPrefix").ToString(), "").Trim(), // last parent
                                                             //shouldn't use SiteEndPoint here
-                                                            SourceUnitId =document.PostFromID.GlobalIDs.GlobalID.Trim(),//Tarasol Global ID 
+                                                            SourceUnitId = document.PostFromID.GlobalIDs.GlobalID.Trim(),//Tarasol Global ID 
                                                             DestinationList = destinationList,
                                                             OutboxNumber = document.ExternalRefNumber.Value.Trim(),
-                                                            
+
                                                             DocumentSubject = subject,
                                                             OutboxDate = Mapping.ConvertToDateTime(document.CreationDate.Value).ToString("yyyy-MM-ddTHH:mm:ss").Trim(),
                                                             Priority = Convert.ToInt16(document.PriorityID.Value.Trim()) /*-1*/,
@@ -774,7 +778,7 @@ namespace IntegrationCore.IntegrationLibrary
                                                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Sending Notification : ", TrackInterface: true);
                                                 foreach (TarasolTargetItem NotiAdd in document.AddressTo)
                                                 {
-                                                    if(NotiAdd.GlobalIDs != null && NotiAdd.GlobalIDs?.MainParentGlobalID == null && NotiAdd.ExchangeStatus == "1")
+                                                    if (NotiAdd.GlobalIDs != null && NotiAdd.GlobalIDs?.MainParentGlobalID == null && NotiAdd.ExchangeStatus == "1")
                                                     {
                                                         SendNotificationToTarasol(NotiAdd.ExchangeNo, CorrItem.CorrUID, 0, 0, "الرمز العام غير موجود ضمن جهة مرتبطة", "Global ID is not under Integrated Entity");
                                                     }
@@ -788,7 +792,7 @@ namespace IntegrationCore.IntegrationLibrary
                                                             }
                                                         }
                                                     }
-                                                    
+
 
                                                 }
                                                 // after sending succeeds
@@ -803,7 +807,7 @@ namespace IntegrationCore.IntegrationLibrary
                                                 //    File.Move(FilePath + ".zip", Path.ChangeExtension(FilePath + ".zip", ".tarasol"));
                                                 //// Prevent sending same correspondence again
                                                 sentDocuments.Add(CorrItem.CorrUID);
-                                                    
+
                                             }
 
                                         }
@@ -821,9 +825,9 @@ namespace IntegrationCore.IntegrationLibrary
                             }
                         }
                     }
-                    
+
                 }
-                return null; 
+                return null;
             }
             catch (Exception ex)
             {
@@ -832,7 +836,7 @@ namespace IntegrationCore.IntegrationLibrary
             }
 
         }
-        
+
         public static void FaxInquiry(ref FaxInquiry[] faxInquiries)
         {
             try
@@ -855,7 +859,7 @@ namespace IntegrationCore.IntegrationLibrary
                         Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Write Ack - ExchangeNo:" + request.ExchangeNo);
                         correspondence.WriteAck(FaxDeliveryRequest);
                     }*/
-                    
+
                 }
             }
             catch (Exception ex)
@@ -865,7 +869,7 @@ namespace IntegrationCore.IntegrationLibrary
             }
 
         }
-        
+
         public static object SendAck(IWebHostEnvironment _hostingEnvironment, ExportCorr[] scanRequest)
         {
             try
@@ -899,10 +903,22 @@ namespace IntegrationCore.IntegrationLibrary
                                     strJSONdata = reader.ReadToEnd();
                                     reader.Dispose();
                                     TarasolAck tarasolAck = JsonConvert.DeserializeObject<TarasolAck>(strJSONdata);
-                                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Write Ack - ExchangeNo:" + tarasolAck.ExternalExchangeNo, TrackInterface:true,PrintInterface:true);
+                                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Write Ack - ExchangeNo:" + tarasolAck.ExternalExchangeNo, TrackInterface: true, PrintInterface: true);
                                     string EntityCode = string.IsNullOrEmpty(tarasolAck.LastParentGlobalID) ? tarasolAck.SenderGlobalID : tarasolAck.LastParentGlobalID.Replace(IntegrationSettings.GetSetting("EntityPrefix").ToString(), "");
                                     if (tarasolAck.ExternalExchangeNo is null || string.IsNullOrEmpty(EntityCode) || tarasolAck.AckDate is null)
                                     {
+                                        if (tarasolAck.ExternalExchangeNo is null)
+                                        {
+                                            SendAckNotificationToTarasol(EntityCode, CorrItem.CorrUID, AckStatus.Failed_MetadataError, 0, "ExternalExchangeNo is null");
+                                        }
+                                        else if (string.IsNullOrEmpty(EntityCode))
+                                        {
+                                            SendAckNotificationToTarasol(EntityCode, CorrItem.CorrUID, AckStatus.Failed_MetadataError, 0, "EntityCode is null");
+                                        }
+                                        else if (tarasolAck.AckDate is null)
+                                        {
+                                            SendAckNotificationToTarasol(EntityCode, CorrItem.CorrUID, AckStatus.Failed_MetadataError, 0, "AckDate is null");
+                                        }
                                         File.Delete(FilePath + ".json");
                                         if (File.Exists(FilePath + ".ack")) File.Delete(FilePath + ".ack");
                                         File.Move(FilePath + ".zip", Path.ChangeExtension(FilePath + ".zip", ".ack"));
@@ -926,11 +942,17 @@ namespace IntegrationCore.IntegrationLibrary
                                         // after sending succeeds
                                         if (Response.Code == 1)
                                         {
-                                            moveToDone(path,CorrItem.CorrUID);
+                                            SendAckNotificationToTarasol(EntityCode, CorrItem.CorrUID, AckStatus.Success, 0);
+                                            moveToDone(path, CorrItem.CorrUID);
+                                        }
+                                        else
+                                        {
+                                            SendAckNotificationToTarasol(XMLstring, CorrItem.CorrUID, AckStatus.Failed_ESBError, 0, string.IsNullOrEmpty(Response.EMessage) ? Response.LMessage : Response.EMessage);
                                         }
                                     }
                                     catch (Exception ex)
                                     {
+                                        SendAckNotificationToTarasol(XMLstring, CorrItem.CorrUID, AckStatus.Failed_ESBError, 0, ex.Message);
                                         Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Write Ack - XMLstring:" + XMLstring, TrackInterface: true, PrintInterface: true);
                                         File.Delete(FilePath + ".json");
                                         if (File.Exists(FilePath + ".ack")) File.Delete(FilePath + ".ack");
@@ -938,9 +960,9 @@ namespace IntegrationCore.IntegrationLibrary
                                         Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message);
                                         throw ex;
                                     }
-                                    
-                                    
-                                    
+
+
+
                                 }
                             }
                         }
@@ -967,14 +989,14 @@ namespace IntegrationCore.IntegrationLibrary
                     Directory.CreateDirectory(path);
                 }
 
-                Directory.Move(sourcPath + "/" + Dest, path + "/" + Dest);               
+                Directory.Move(sourcPath + "/" + Dest, path + "/" + Dest);
             }
             catch (Exception ex)
             {
 
                 throw ex;
             }
-            
+
         }
         public static object SendNotificationToTarasol(String exchangeNo, String corrUID, int status, int RequestNo, string lMessage, string eMessage)
 
@@ -1016,10 +1038,83 @@ namespace IntegrationCore.IntegrationLibrary
                     }";
 
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, t, "NotificationURL : " + NotificationURL, TrackInterface: true);
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, t, "Notification data : " + json,TrackInterface: Logger.EnableLoggingInfo, PrintInterface: true);
-                if (! string.IsNullOrEmpty(errMsg))
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, t, "Notification data : " + json, TrackInterface: Logger.EnableLoggingInfo, PrintInterface: true);
+                if (!string.IsNullOrEmpty(errMsg))
                 {
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, t, "Error Msg: " + errMsg, TrackInterface: Logger.EnableLoggingInfo, PrintInterface: true);
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, t, "Error Msg: " + errMsg, TrackInterface: Logger.EnableLoggingInfo, PrintInterface: true);
+
+                }
+
+                string Tarasol_Token = Cache.GetSession().Token;
+                if (string.IsNullOrEmpty(Tarasol_Token))
+                {
+                    //Cache.SetCache("TarasolSession", null);
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Tarasol_Token : Unauthorized user");
+                    return null;
+                }
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Tarasol_Token : " + Tarasol_Token.Length, TrackInterface: true);
+                object jsonResponse = CallExternalAPI.CallPostAPI(NotificationURL, json, Tarasol_Token);
+                return jsonResponse;
+            }
+            catch (Exception ex)
+            {
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message, PrintInterface: true);
+                return null;
+                //throw ex;
+            }
+        }
+        public enum AckStatus
+        {
+            Failed_MetadataError = 0,
+            Success = 1,
+            Failed_ESBError = 2
+        }
+        public static object SendAckNotificationToTarasol(String exchangeNo, String ackUID, AckStatus ackStatus, int RequestNo, string logErrorMsg = "")
+        {
+            try
+            {
+                string lMessage = "";
+                string eMessage = "";
+
+                Logger.Enum_LogType t = Logger.Enum_LogType._Info;
+                if (ackStatus == AckStatus.Failed_MetadataError)
+                {
+                    t = Logger.Enum_LogType._Error;
+                    lMessage = "فشل ارسال الإشعار بسبب مشكلة في بياناته";
+                    eMessage = "Acknowledgment send failed due to metadata error";
+                }
+                else if (ackStatus == AckStatus.Failed_ESBError)
+                {
+                    t = Logger.Enum_LogType._Error;
+                    lMessage = "فشل ارسال الإشعار بسبب مشكلة بالاتصال عبر ESB";
+                    eMessage = "Acknowledgment send failed due to ESB connection error";
+                }
+                else if (ackStatus == AckStatus.Success)
+                {
+                    lMessage = "تم ارسال الإشعار بنجاح";
+                    eMessage = "Acknowledgment send exported successfully";
+                }
+                int status = ackStatus == AckStatus.Success ? 1 : 0; // Tarasol API expects 1 for success, 0 for failure
+                string NotificationURL = IntegrationSettings.GetSetting("APIURL").ToString() + "/Corr/corrAcknowledgmentStatus";
+                string json = @"{
+                    ""docUid"":""" + ackUID + @""",
+	                ""status"":" + ackStatus + @",
+	                ""ExchangeNo"":" + exchangeNo + @",
+	                ""RequestNo"":" + RequestNo + @",
+	                ""FailReasonEmsg"":""" + eMessage + @""",
+                    ""FailReasonLmsg"":""" + lMessage + @""",
+                    }";
+
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, t, "NotificationURL : " + NotificationURL, TrackInterface: true);
+                string errMsg = logErrorMsg;
+                if (string.IsNullOrEmpty(errMsg))
+                {
+                    errMsg = eMessage;
+                }
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, t, "Notification data : " + json, TrackInterface: Logger.EnableLoggingInfo, PrintInterface: true);
+                if (!string.IsNullOrEmpty(errMsg))
+                {
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, t, "Error Msg: " + errMsg, TrackInterface: Logger.EnableLoggingInfo, PrintInterface: true);
 
                 }
 
@@ -1047,13 +1142,13 @@ namespace IntegrationCore.IntegrationLibrary
             try
             {
                 string Tarasol_Token = Cache.GetSession().Token;
-                string SessionID = Cache.GetSession().SessionID;;
+                string SessionID = Cache.GetSession().SessionID; ;
                 if (Tarasol_Token == "")
                 {
                     Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Tarasol_Token : Unauthorized user");
                     return null;
                 }
-                string apiurl = IntegrationSettings.GetSetting("APIURL").ToString() + "/Corr/AcknowledgmentTransmittalReportLoad?CurrentPage=1&MaxNumberItems=15&SessionId="+SessionID;
+                string apiurl = IntegrationSettings.GetSetting("APIURL").ToString() + "/Corr/AcknowledgmentTransmittalReportLoad?CurrentPage=1&MaxNumberItems=15&SessionId=" + SessionID;
                 string json = @"{""SearchList"":[],""OrderList"":[]}";
 
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "apiurl : " + apiurl, TrackInterface: true);
