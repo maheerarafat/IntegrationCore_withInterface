@@ -11,5 +11,6 @@ namespace IntegrationCore.Models
         public string SenderGlobalID { get; set; }
        
         public string ExchangeStatus { get; set; }
+        public string? DocumentUID { get; set; }
     }
 }

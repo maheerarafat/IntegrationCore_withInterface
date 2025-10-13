@@ -904,20 +904,21 @@ namespace IntegrationCore.IntegrationLibrary
                                     reader.Dispose();
                                     TarasolAck tarasolAck = JsonConvert.DeserializeObject<TarasolAck>(strJSONdata);
                                     Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Write Ack - ExchangeNo:" + tarasolAck.ExternalExchangeNo, TrackInterface: true, PrintInterface: true);
-                                    string EntityCode = string.IsNullOrEmpty(tarasolAck.LastParentGlobalID) ? tarasolAck.SenderGlobalID : tarasolAck.LastParentGlobalID.Replace(IntegrationSettings.GetSetting("EntityPrefix").ToString(), "");
+                                    string EntityCode = string.IsNullOrEmpty(tarasolAck.LastParentGlobalID) ? tarasolAck.SenderGlobalID : string.IsNullOrEmpty(Convert.ToString(IntegrationSettings.GetSetting("EntityPrefix"))) ? tarasolAck.LastParentGlobalID : tarasolAck.LastParentGlobalID.Replace(IntegrationSettings.GetSetting("EntityPrefix").ToString(), "");
                                     if (tarasolAck.ExternalExchangeNo is null || string.IsNullOrEmpty(EntityCode) || tarasolAck.AckDate is null)
                                     {
-                                        if (tarasolAck.ExternalExchangeNo is null)
+                                        //if (tarasolAck.ExternalExchangeNo is null)
+                                        //{
+                                        //    SendAckNotificationToTarasol(EntityCode, CorrItem.CorrUID, AckStatus.Failed_MetadataError, 0, "ExternalExchangeNo is null");
+                                        //}
+                                        //else 
+                                        if (string.IsNullOrEmpty(EntityCode))
                                         {
-                                            SendAckNotificationToTarasol(EntityCode, CorrItem.CorrUID, AckStatus.Failed_MetadataError, 0, "ExternalExchangeNo is null");
-                                        }
-                                        else if (string.IsNullOrEmpty(EntityCode))
-                                        {
-                                            SendAckNotificationToTarasol(EntityCode, CorrItem.CorrUID, AckStatus.Failed_MetadataError, 0, "EntityCode is null");
+                                            SendAckNotificationToTarasol(tarasolAck.ExternalExchangeNo, tarasolAck.DocumentUID, AckStatus.Failed_MetadataError, 0, "EntityCode is null");
                                         }
                                         else if (tarasolAck.AckDate is null)
                                         {
-                                            SendAckNotificationToTarasol(EntityCode, CorrItem.CorrUID, AckStatus.Failed_MetadataError, 0, "AckDate is null");
+                                            SendAckNotificationToTarasol(tarasolAck.ExternalExchangeNo, tarasolAck.DocumentUID, AckStatus.Failed_MetadataError, 0, "AckDate is null");
                                         }
                                         File.Delete(FilePath + ".json");
                                         if (File.Exists(FilePath + ".ack")) File.Delete(FilePath + ".ack");
@@ -942,17 +943,17 @@ namespace IntegrationCore.IntegrationLibrary
                                         // after sending succeeds
                                         if (Response.Code == 1)
                                         {
-                                            SendAckNotificationToTarasol(EntityCode, CorrItem.CorrUID, AckStatus.Success, 0);
+                                            SendAckNotificationToTarasol(tarasolAck.ExternalExchangeNo, tarasolAck.DocumentUID, AckStatus.Success, 0);
                                             moveToDone(path, CorrItem.CorrUID);
                                         }
                                         else
                                         {
-                                            SendAckNotificationToTarasol(XMLstring, CorrItem.CorrUID, AckStatus.Failed_ESBError, 0, string.IsNullOrEmpty(Response.EMessage) ? Response.LMessage : Response.EMessage);
+                                            SendAckNotificationToTarasol(tarasolAck.ExternalExchangeNo, tarasolAck.DocumentUID, AckStatus.Failed_ESBError, 0, string.IsNullOrEmpty(Response.EMessage) ? Response.LMessage : Response.EMessage);
                                         }
                                     }
                                     catch (Exception ex)
                                     {
-                                        SendAckNotificationToTarasol(XMLstring, CorrItem.CorrUID, AckStatus.Failed_ESBError, 0, ex.Message);
+                                        SendAckNotificationToTarasol(tarasolAck.ExternalExchangeNo, tarasolAck.DocumentUID, AckStatus.Failed_ESBError, 0, ex.Message);
                                         Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Write Ack - XMLstring:" + XMLstring, TrackInterface: true, PrintInterface: true);
                                         File.Delete(FilePath + ".json");
                                         if (File.Exists(FilePath + ".ack")) File.Delete(FilePath + ".ack");
@@ -1098,7 +1099,7 @@ namespace IntegrationCore.IntegrationLibrary
                 string NotificationURL = IntegrationSettings.GetSetting("APIURL").ToString() + "/Corr/corrAcknowledgmentStatus";
                 string json = @"{
                     ""docUid"":""" + ackUID + @""",
-	                ""status"":" + ackStatus + @",
+	                ""status"":" + (int)ackStatus + @",
 	                ""ExchangeNo"":" + exchangeNo + @",
 	                ""RequestNo"":" + RequestNo + @",
 	                ""FailReasonEmsg"":""" + eMessage + @""",
