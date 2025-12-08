@@ -183,7 +183,7 @@ namespace IntegrationCore.IntegrationLibrary
                             }
                             else
                             {
-                                AddressTo.Add(new TarasolTargetItem() { GlobalIDs = globalIDs, ExchangeNo = item.Split('@')[0], ExchangeStatus = "1" });
+                                AddressTo.Add(new TarasolTargetItem() { GlobalIDs = globalIDs, ExchangeNo = int.Parse(item.Split('@')[0]), ExchangeStatus = 1 });
                             }
                         }
 
@@ -537,18 +537,18 @@ namespace IntegrationCore.IntegrationLibrary
                                                             //}
                                                             TarasolTargetItem tarasolTargetItem = item;
 
-                                                            tarasolTargetItem.ExchangeStatus = "0";
-                                                            if (CorrItem.ExchangeNo.Contains(item.ExchangeNo))
+                                                            tarasolTargetItem.ExchangeStatus = 0;
+                                                            if (item.ExchangeNo != null && CorrItem.ExchangeNo.Contains(Convert.ToString(item.ExchangeNo)))
                                                             {
-                                                                tarasolTargetItem.ExchangeStatus = "1";
+                                                                tarasolTargetItem.ExchangeStatus = 1;
                                                             }
-                                                            if (CorrItem.ExchangeNo.Contains(item.Exchange_no_email))
+                                                            if (item.Exchange_no_email != null && CorrItem.ExchangeNo.Contains(Convert.ToString(item.Exchange_no_email)))
                                                             {
-                                                                tarasolTargetItem.ExchangeStatus = (Convert.ToInt32(tarasolTargetItem.ExchangeStatus) | 2).ToString();
+                                                                tarasolTargetItem.ExchangeStatus = (tarasolTargetItem.ExchangeStatus | 2);
                                                             }
-                                                            if (CorrItem.ExchangeNo.Contains(item.Exchange_no_fax))
+                                                            if (item.Exchange_no_fax != null && CorrItem.ExchangeNo.Contains(Convert.ToString(item.Exchange_no_fax)))
                                                             {
-                                                                tarasolTargetItem.ExchangeStatus = (Convert.ToInt32(tarasolTargetItem.ExchangeStatus) | 4).ToString();
+                                                                tarasolTargetItem.ExchangeStatus = (tarasolTargetItem.ExchangeStatus | 4);
                                                             }
                                                             newAddressTo.Add(tarasolTargetItem);
                                                         }
@@ -560,9 +560,9 @@ namespace IntegrationCore.IntegrationLibrary
                                                     {
                                                         try
                                                         {
-                                                            if (string.IsNullOrEmpty(addressTo.Fax) || string.IsNullOrEmpty(addressTo.Exchange_no_fax))
+                                                            if (string.IsNullOrEmpty(addressTo.Fax) || string.IsNullOrEmpty(Convert.ToString(addressTo.Exchange_no_fax)))
                                                             {
-                                                                SendNotificationToTarasol(addressTo.Exchange_no_fax, CorrItem.CorrUID, 0, 0, "addressto fax info error", "addressto fax info error");
+                                                                SendNotificationToTarasol(Convert.ToString(addressTo.Exchange_no_fax), CorrItem.CorrUID, 0, 0, "addressto fax info error", "addressto fax info error");
                                                             }
                                                             else
                                                             {
@@ -570,12 +570,12 @@ namespace IntegrationCore.IntegrationLibrary
                                                                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, $"Calling fax service Outgoing Fax number {addressTo.Fax}", TrackInterface: true);
                                                                 if (string.IsNullOrEmpty(IntegrationSettings.GetSetting("FaxServer").ToString()))
                                                                 {
-                                                                    Correspondence.SendNotificationToTarasol(addressTo.Exchange_no_fax, CorrItem.CorrUID, 2, 0, "", "");
+                                                                    Correspondence.SendNotificationToTarasol(Convert.ToString(addressTo.Exchange_no_fax), CorrItem.CorrUID, 2, 0, "", "");
 
                                                                 }
                                                                 else
                                                                 {
-                                                                    SendFax.Send(addressTo.Exchange_no_fax, CorrItem.CorrUID, contentAttachmentFax, addressTo.Fax, IntegrationSettings.GetSetting("FaxServer").ToString(),
+                                                                    SendFax.Send(Convert.ToString(addressTo.Exchange_no_fax), CorrItem.CorrUID, contentAttachmentFax, addressTo.Fax, IntegrationSettings.GetSetting("FaxServer").ToString(),
                                                                     IntegrationSettings.GetSetting("FaxUser").ToString(),
                                                                     (IntegrationSettings.GetSetting("FaxPass").ToString() == "") ? "" : Encryption.DecryptString(IntegrationSettings.GetSetting("FaxPass").ToString()),
                                                                     nameRecipient: document.ExternalRefNumber.Value);
@@ -588,7 +588,7 @@ namespace IntegrationCore.IntegrationLibrary
                                                         }
                                                         catch (Exception ex)
                                                         {
-                                                            SendNotificationToTarasol(addressTo.Exchange_no_fax, CorrItem.CorrUID, 0, 0, ex.Message, ex.Message);
+                                                            SendNotificationToTarasol(Convert.ToString(addressTo.Exchange_no_fax), CorrItem.CorrUID, 0, 0, ex.Message, ex.Message);
                                                             Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message, PrintInterface: true);
                                                             //throw ex;
                                                         }
@@ -597,9 +597,9 @@ namespace IntegrationCore.IntegrationLibrary
                                                     {
                                                         try
                                                         {
-                                                            if (string.IsNullOrEmpty(addressTo.Email) || string.IsNullOrEmpty(addressTo.Exchange_no_email))
+                                                            if (string.IsNullOrEmpty(addressTo.Email) || string.IsNullOrEmpty(Convert.ToString(addressTo.Exchange_no_email)))
                                                             {
-                                                                SendNotificationToTarasol(addressTo.Exchange_no_email, CorrItem.CorrUID, 0, 0, "addressto email info error", "addressto email info error");
+                                                                SendNotificationToTarasol(Convert.ToString(addressTo.Exchange_no_email), CorrItem.CorrUID, 0, 0, "addressto email info error", "addressto email info error");
                                                             }
                                                             else
                                                             {
@@ -619,12 +619,12 @@ namespace IntegrationCore.IntegrationLibrary
                                                                 //Send Notification to Tarasol
                                                                 if (mailResult.EMessage == "success" || mailResult.Code == 1)
                                                                 {
-                                                                    SendNotificationToTarasol(addressTo.Exchange_no_email, CorrItem.CorrUID, 1, 0, "", "");
+                                                                    SendNotificationToTarasol(Convert.ToString(addressTo.Exchange_no_email), CorrItem.CorrUID, 1, 0, "", "");
 
                                                                 }
                                                                 else
                                                                 {
-                                                                    SendNotificationToTarasol(addressTo.Exchange_no_email, CorrItem.CorrUID, 2, 0, "Unable to send Email", "");
+                                                                    SendNotificationToTarasol(Convert.ToString(addressTo.Exchange_no_email), CorrItem.CorrUID, 2, 0, "Unable to send Email", "");
                                                                 }
                                                             }
 
@@ -632,7 +632,7 @@ namespace IntegrationCore.IntegrationLibrary
                                                         }
                                                         catch (Exception ex)
                                                         {
-                                                            SendNotificationToTarasol(addressTo.Exchange_no_email, CorrItem.CorrUID, 0, 0, ex.Message, ex.Message);
+                                                            SendNotificationToTarasol(Convert.ToString(addressTo.Exchange_no_email), CorrItem.CorrUID, 0, 0, ex.Message, ex.Message);
                                                             Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message, PrintInterface: true);
                                                             //throw ex;
                                                         }
@@ -664,7 +664,7 @@ namespace IntegrationCore.IntegrationLibrary
                                                             Destination destination = new Destination();
                                                             destination.DestinationValue = addressTo.GlobalIDs.GlobalID.Trim();
                                                             destinationList.Add(destination);
-                                                            transactionIdList.Add(new TransactionId { TransactionIdValue = addressTo.ExchangeNo.Trim() + "@" + addressTo.GlobalIDs.GlobalID.Trim() + "@" + MainParentGlobalID });
+                                                            transactionIdList.Add(new TransactionId { TransactionIdValue = Convert.ToString(addressTo.ExchangeNo).Trim() + "@" + addressTo.GlobalIDs.GlobalID.Trim() + "@" + MainParentGlobalID });
                                                         }
                                                     }
                                                     Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "transactionIdList : " + transactionIdList.Count, TrackInterface: true);
@@ -757,7 +757,7 @@ namespace IntegrationCore.IntegrationLibrary
 
                                                                 if (entity == (string.IsNullOrEmpty(NotiAdd.GlobalIDs?.MainParentGlobalID) ? NotiAdd.GlobalIDs?.GlobalID : NotiAdd.GlobalIDs?.MainParentGlobalID))
                                                                 {
-                                                                    SendNotificationToTarasol(NotiAdd.ExchangeNo, CorrItem.CorrUID, 2, 0, "", ex.Message);
+                                                                    SendNotificationToTarasol(Convert.ToString(NotiAdd.ExchangeNo), CorrItem.CorrUID, 2, 0, "", ex.Message);
                                                                 }
                                                             }
 
@@ -778,9 +778,9 @@ namespace IntegrationCore.IntegrationLibrary
                                                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Sending Notification : ", TrackInterface: true);
                                                 foreach (TarasolTargetItem NotiAdd in document.AddressTo)
                                                 {
-                                                    if (NotiAdd.GlobalIDs != null && NotiAdd.GlobalIDs?.MainParentGlobalID == null && NotiAdd.ExchangeStatus == "1")
+                                                    if (NotiAdd.GlobalIDs != null && NotiAdd.GlobalIDs?.MainParentGlobalID == null && NotiAdd.ExchangeStatus == 1)
                                                     {
-                                                        SendNotificationToTarasol(NotiAdd.ExchangeNo, CorrItem.CorrUID, 0, 0, "الرمز العام غير موجود ضمن جهة مرتبطة", "Global ID is not under Integrated Entity");
+                                                        SendNotificationToTarasol(Convert.ToString(NotiAdd.ExchangeNo), CorrItem.CorrUID, 0, 0, "الرمز العام غير موجود ضمن جهة مرتبطة", "Global ID is not under Integrated Entity");
                                                     }
                                                     else
                                                     {
@@ -788,7 +788,7 @@ namespace IntegrationCore.IntegrationLibrary
                                                         {
                                                             if (Response.EMessage == (string.IsNullOrEmpty(NotiAdd.GlobalIDs?.MainParentGlobalID) ? NotiAdd.GlobalIDs?.GlobalID : NotiAdd.GlobalIDs?.MainParentGlobalID))
                                                             {
-                                                                SendNotificationToTarasol(NotiAdd.ExchangeNo, CorrItem.CorrUID, Response.Code, 0, Response.EMessage, "");
+                                                                SendNotificationToTarasol(Convert.ToString(NotiAdd.ExchangeNo), CorrItem.CorrUID, Response.Code, 0, Response.EMessage, "");
                                                             }
                                                         }
                                                     }

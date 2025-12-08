@@ -12,12 +12,12 @@ namespace IntegrationCore.Models
     public class TarasolTargetItem
     {
         public GlobalIDs GlobalIDs { get; set; }
-        public string ExchangeNo { get; set; }
-        public string Exchange_no_fax { get; set; }
-        public string Exchange_no_email { get; set; }
+        public int? ExchangeNo { get; set; }
+        public int? Exchange_no_fax { get; set; }
+        public int? Exchange_no_email { get; set; }
         public string Fax { get; set; }
         public string Email { get; set; }
-        public string ExchangeStatus { get; set; }
+        public int? ExchangeStatus { get; set; }
     }
 
     public class GlobalIDs
