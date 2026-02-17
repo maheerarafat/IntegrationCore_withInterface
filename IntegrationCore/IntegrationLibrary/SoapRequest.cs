@@ -12,7 +12,7 @@ namespace IntegrationCore.Models
 {
     public class SoapRequest
     {
-        
+
         public static string HREnvelopeBegining = @"<soapenv:Envelope xmlns:hrm=""http://www.moi.gov.ae/2018/MoiIntegration/HRMurasalatSchema"" xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/"">";
 
         private static HttpWebRequest CreateWebRequest(string url, string Method = "Post", string ContentType = "text/xml;charset=\"utf-8\"", string Accept = "text/xml")
@@ -47,8 +47,8 @@ namespace IntegrationCore.Models
                 throw;
             }
         }
-        
-        
+
+
         ///////////////// HR 
         public static string HREnvelopeHeader = @"<soapenv:Header>
                           <wsse:Security soapenv:mustUnderstand=""1"" xmlns:wsse=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"" xmlns:wsu=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"">
@@ -75,8 +75,8 @@ namespace IntegrationCore.Models
                 {
                     using (StreamReader rd = new StreamReader(webResponse.GetResponseStream()))
                     {
-                        result = RemoveAllNamespaces( rd.ReadToEnd());
-                        
+                        result = RemoveAllNamespaces(rd.ReadToEnd());
+
                         XmlDocument xml = new XmlDocument();
                         xml.LoadXml(result);
                         string ResponseNode = xml.GetElementsByTagName("Body")[0].InnerXml;
@@ -114,7 +114,7 @@ namespace IntegrationCore.Models
                    IntegrationSettings.GetSetting("ESBHRUser").ToString() + @"</wsse:Username><wsse:Password Type =""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText"">" +
                    ESBHRPass + @"</wsse:Password><wsse:Nonce EncodingType=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary"">rWYoctMstXil8ckAYlvARw==</wsse:Nonce><wsu:Created>2019-10-17T11:39:15.723Z</wsu:Created></wsse:UsernameToken></wsse:Security></soapenv:Header><soapenv:Body><hrm:" + Request + @">" + ParameterString + "</hrm:" + Request + @"></soapenv:Body></soapenv:Envelope>";
                 xmlDocument.LoadXml(str);
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, " request string :" + str,TrackInterface: Logger.EnableLoggingInfo);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, " request string :" + str, TrackInterface: Logger.EnableLoggingInfo);
                 return xmlDocument;
             }
             catch (Exception)
@@ -125,17 +125,18 @@ namespace IntegrationCore.Models
 
         }
 
-        
+
         ///////////////// ECS 
         public static IntResult CallECSAddWebService(String Request)
         {
             try
             {
-                string _HRurl = IntegrationSettings.GetSetting("ESBURL").ToString()+ "/MOICorrespondenceService";
+                string _HRurl = IntegrationSettings.GetSetting("ESBURL").ToString() + "/MOICorrespondenceService";
                 XmlDocument xmlDocument = CreateECSSoapEnvelope(Request);
                 ///ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
                 HttpWebRequest httpWebRequest = CreateWebRequest(_HRurl);
                 httpWebRequest.Timeout = 300000;
+                httpWebRequest.ReadWriteTimeout = 300000; // for large attachments
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Soap - InsertEnvelopeIntoWebRequest :", TrackInterface: true);
                 InsertEnvelopeIntoWebRequest(xmlDocument, httpWebRequest);
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Soap - end InsertEnvelopeIntoWebRequest :", TrackInterface: true);
@@ -161,7 +162,7 @@ namespace IntegrationCore.Models
                         {
                             return IntResultLib.GetResult(1);
                         }
-                        else if(Objectresult.RequestStatus == 9998 || Objectresult.RequestStatus == 9999 || Objectresult.RequestStatus == 9997
+                        else if (Objectresult.RequestStatus == 9998 || Objectresult.RequestStatus == 9999 || Objectresult.RequestStatus == 9997
                                 || Objectresult.RequestStatus == 1015 || Objectresult.RequestStatus == 1014 || Objectresult.RequestStatus == 1013
                                 || Objectresult.RequestStatus == 1012 || Objectresult.RequestStatus == 1011 || Objectresult.RequestStatus == 1010
                                 || Objectresult.RequestStatus == 1009 || Objectresult.RequestStatus == 1008 || Objectresult.RequestStatus == 1004
@@ -189,10 +190,48 @@ namespace IntegrationCore.Models
                     }
                 }
             }
+            catch (WebException webEx)
+            {
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "WebException occurred: " + webEx.Message, TrackInterface: true, PrintInterface: true);
+
+                // exception type
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Status: " + webEx.Status.ToString(), TrackInterface: true, PrintInterface: true);
+
+                // try to get more details from the response if available
+                if (webEx.Response != null)
+                {
+                    using (Stream responseStream = webEx.Response.GetResponseStream())
+                    {
+                        if (responseStream != null)
+                        {
+                            using (StreamReader reader = new StreamReader(responseStream))
+                            {
+                                string errorResponse = reader.ReadToEnd();
+                                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Server Response: " + errorResponse, TrackInterface: true, PrintInterface: true);
+                            }
+                        }
+                    }
+
+                    // print HTTP status code if available
+                    if (webEx.Response is HttpWebResponse httpResponse)
+                    {
+                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, $"HTTP Status Code: {(int)httpResponse.StatusCode} ({httpResponse.StatusCode})", TrackInterface: true, PrintInterface: true);
+
+                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Status Description: " + httpResponse.StatusDescription, TrackInterface: true, PrintInterface: true);
+                    }
+                }
+                else
+                {
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Response is null - No response received from server", TrackInterface: true, PrintInterface: true);
+                }
+                throw;
+            }
             catch (Exception ex)
             {
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message);
-                throw ex;
+                // print general exception details
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "General error occurred: " + ex.Message, TrackInterface: true, PrintInterface: true);
+
+                throw;
             }
 
 
@@ -216,7 +255,7 @@ namespace IntegrationCore.Models
                     using (StreamReader rd = new StreamReader(webResponse.GetResponseStream()))
                     {
                         result = rd.ReadToEnd();
-                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "result  : " + result,TrackInterface: Logger.EnableLoggingInfo);
+                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "result  : " + result, TrackInterface: Logger.EnableLoggingInfo);
                         XmlDocument xml = new XmlDocument();
                         xml.LoadXml(result);
                         string ResponseNode = xml.GetElementsByTagName("tns:DeliveryReportResponse")[0].InnerXml.Replace("xmlns:SOAP-ENC=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:tns=\"http://www.moi.gov.ae/2018/MoiIntegration/MOICorrespondenceServiceSchema\"", "").Replace("tns:", "");
@@ -229,7 +268,7 @@ namespace IntegrationCore.Models
                             Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Error - Response : " + result, TrackInterface: true, PrintInterface: true);
                             return IntResultLib.GetResult(2);
                         }
-                        
+
                     }
                 }
             }
@@ -249,11 +288,11 @@ namespace IntegrationCore.Models
                 string ESBECSPass = Encryption.DecryptString(IntegrationSettings.GetSetting("ESBECSPass").ToString());
                 //Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "ESBECSPass : " + ESBECSPass + " /ESBECSPass");
                 XmlDocument xmlDocument = new XmlDocument();
-                string envelope = @"<soapenv:Envelope xmlns:moic=""http://www.moi.gov.ae/2018/MoiIntegration/MOICorrespondenceServiceSchema"" xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/""><soapenv:Header><wsse:Security soapenv:mustUnderstand = ""1"" xmlns:wsse=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"" xmlns:wsu =""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd""><wsse:UsernameToken wsu:Id =""UsernameToken-4CA7F3FE3551917FC815764787625025""><wsse:Username>" 
-                                + IntegrationSettings.GetSetting("ESBECSUser").ToString() + @"</wsse:Username><wsse:Password Type =""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText"">" 
+                string envelope = @"<soapenv:Envelope xmlns:moic=""http://www.moi.gov.ae/2018/MoiIntegration/MOICorrespondenceServiceSchema"" xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/""><soapenv:Header><wsse:Security soapenv:mustUnderstand = ""1"" xmlns:wsse=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"" xmlns:wsu =""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd""><wsse:UsernameToken wsu:Id =""UsernameToken-4CA7F3FE3551917FC815764787625025""><wsse:Username>"
+                                + IntegrationSettings.GetSetting("ESBECSUser").ToString() + @"</wsse:Username><wsse:Password Type =""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText"">"
                                 + ESBECSPass + @"</wsse:Password><wsse:Nonce EncodingType = ""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary"">eFACcvctRERFHgmsuxGrGw==</wsse:Nonce><wsu:Created>2019-12-16T06:46:02.502Z</wsu:Created></wsse:UsernameToken></wsse:Security></soapenv:Header><soapenv:Body>" + Request + @" </soapenv:Body></soapenv:Envelope>";
                 envelope = envelope.Replace("moic_x003A_", "moic:").Replace("ECSAttachment>", "moic:Attachment>");
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End - Logenvelope : " + envelope + " /Logenvelope", TrackInterface: Logger.EnableLoggingInfo,PrintInterface: Logger.EnableLoggingInfo);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End - Logenvelope : " + envelope + " /Logenvelope", TrackInterface: Logger.EnableLoggingInfo, PrintInterface: Logger.EnableLoggingInfo);
                 xmlDocument.LoadXml(envelope);
                 return xmlDocument;
             }
@@ -265,13 +304,13 @@ namespace IntegrationCore.Models
 
         }
 
-        
+
         ///////SMS
         public static object CallSMSWebService(String Request)
         {
             try
             {
-                string _HRurl = IntegrationSettings.GetSetting("ESBURL").ToString() +  "/SendPushNotification";
+                string _HRurl = IntegrationSettings.GetSetting("ESBURL").ToString() + "/SendPushNotification";
                 XmlDocument xmlDocument = CreateSMSSoapEnvelope(Request);
                 //ServicePointManager.ServerCertificateValidationCallback = delegate { return true; }; 
                 HttpWebRequest httpWebRequest = CreateWebRequest(_HRurl);
@@ -325,8 +364,8 @@ namespace IntegrationCore.Models
                                 + MOISMSPass + @"</sen:password><sen:channel>"
                                 + IntegrationSettings.GetSetting("MOISMSChannel").ToString() + @"</sen:channel></sen:MOISecurityHeader>"
                                 + @"<wsse:Security soapenv:mustUnderstand = ""1"" xmlns:wsse=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"" xmlns:wsu =""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd""><wsse:UsernameToken wsu:Id =""UsernameToken-4CA7F3FE3551917FC815764787625025""><wsse:Username>"
-                                + IntegrationSettings.GetSetting("ESBSMSUser").ToString() 
-                                + @"</wsse:Username><wsse:Password Type =""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText"">" 
+                                + IntegrationSettings.GetSetting("ESBSMSUser").ToString()
+                                + @"</wsse:Username><wsse:Password Type =""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText"">"
                                 + ESBSMSPass + @"</wsse:Password><wsse:Nonce EncodingType = ""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary"">eFACcvctRERFHgmsuxGrGw==</wsse:Nonce><wsu:Created>2019-12-16T06:46:02.502Z</wsu:Created></wsse:UsernameToken></wsse:Security></soapenv:Header><soapenv:Body>"
                  + Request + @" </soapenv:Body></soapenv:Envelope>";
                 envelope = envelope.Replace("sen_x003A_", "sen:").Replace(@"<?xml version=""1.0"" encoding=""utf-16""?>", "");
@@ -342,13 +381,13 @@ namespace IntegrationCore.Models
 
         }
 
-        
+
         ////////////////Email Service
         public static object CallEmailWebService(String Request)
         {
             try
             {
-                string _HRurl = IntegrationSettings.GetSetting("ESBEmail").ToString() ;
+                string _HRurl = IntegrationSettings.GetSetting("ESBEmail").ToString();
                 XmlDocument xmlDocument = CreateEmailSoapEnvelope(Request);
                 //ServicePointManager.ServerCertificateValidationCallback = delegate { return true; }; 
                 HttpWebRequest httpWebRequest = CreateWebRequest(_HRurl);
@@ -370,7 +409,7 @@ namespace IntegrationCore.Models
                         }
                         else
                         {
-                            Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Error - Response : " + result, TrackInterface: true,PrintInterface:true);
+                            Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Error - Response : " + result, TrackInterface: true, PrintInterface: true);
                             return IntResultLib.GetResult(2);
                         }
 
@@ -396,7 +435,7 @@ namespace IntegrationCore.Models
                                     + @" xmlns:wsse=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"""
                                     + @" xmlns:wsu=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"">"
                                     + @"<wsse:UsernameToken wsu:Id=""UsernameToken-4CA7F3FE3551917FC815764787625025""><wsse:Username>"
-                                + IntegrationSettings.GetSetting("ESBEmailUser").ToString() 
+                                + IntegrationSettings.GetSetting("ESBEmailUser").ToString()
                                 + @"</wsse:Username><wsse:Password  Type=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText"">"
                 + ESBECSPass + @"</wsse:Password><wsse:Nonce EncodingType=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary"""
                                     + @">eFACcvctRERFHgmsuxGrGw==</wsse:Nonce><wsu:Created>2019-12-16T06:46:02.502Z</wsu:Created></wsse:UsernameToken></wsse:Security></soapenv:Header><soapenv:Body>"
@@ -407,9 +446,9 @@ namespace IntegrationCore.Models
                 //string envelope = @"<soapenv:Envelope xmlns:moic=""http://www.moi.gov.ae/2018/MoiIntegration/MOICorrespondenceServiceSchema"" xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/""><soapenv:Header><wsse:Security soapenv:mustUnderstand = ""1"" xmlns:wsse=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"" xmlns:wsu =""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd""><wsse:UsernameToken wsu:Id =""UsernameToken-4CA7F3FE3551917FC815764787625025""><wsse:Username>"
                 //                + IntegrationSettings.GetSetting("ESBECSUser").ToString() + @"</wsse:Username><wsse:Password Type =""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText"">"
                 //                + ESBECSPass + @"</wsse:Password><wsse:Nonce EncodingType = ""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary"">eFACcvctRERFHgmsuxGrGw==</wsse:Nonce><wsu:Created>2019-12-16T06:46:02.502Z</wsu:Created></wsse:UsernameToken></wsse:Security></soapenv:Header><soapenv:Body>" + Request + @" </soapenv:Body></soapenv:Envelope>";
-                
+
                 envelope = envelope.Replace("ema_x003A_", "ema:").Replace(@"<?xml version=""1.0"" encoding=""utf-16""?>", "").Replace("SoapEMialAttachment>", "ema:Attachment>");
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End - Logenvelope : " + envelope + " /Logenvelope", TrackInterface: Logger.EnableLoggingInfo,PrintInterface:Logger.EnableLoggingInfo);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End - Logenvelope : " + envelope + " /Logenvelope", TrackInterface: Logger.EnableLoggingInfo, PrintInterface: Logger.EnableLoggingInfo);
                 xmlDocument.LoadXml(envelope);
                 return xmlDocument;
             }
@@ -419,8 +458,8 @@ namespace IntegrationCore.Models
             }
 
         }
-        
-        
+
+
         //Implemented based on interface, not part of algorithm
         public static string RemoveAllNamespaces(string xmlDocument)
         {
@@ -445,7 +484,7 @@ namespace IntegrationCore.Models
         }
     }
 
-    
+
 
 
 }
