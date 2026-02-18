@@ -259,7 +259,7 @@ namespace IntegrationCore.Models
                         XmlDocument xml = new XmlDocument();
                         xml.LoadXml(result);
                         string ResponseNode = xml.GetElementsByTagName("tns:DeliveryReportResponse")[0].InnerXml.Replace("xmlns:SOAP-ENC=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:tns=\"http://www.moi.gov.ae/2018/MoiIntegration/MOICorrespondenceServiceSchema\"", "").Replace("tns:", "");
-                        if (ResponseNode.ToLower().Contains("ResponseMessage>Success<".ToLower()) || ResponseNode.ToLower().Contains("ResponseMessage>1<".ToLower()) || ResponseNode.ToLower().Contains("ResponseMessage>Succeded<".ToLower()) || ResponseNode.ToLower().Contains("ResponseMessage>Data updated successfully<".ToLower()))
+                        if (ResponseNode.ToLower().Contains("ResponseMessage>Success<".ToLower()) || ResponseNode.ToLower().Contains("FollowRespponseStatus>1<".ToLower()) || ResponseNode.ToLower().Contains("ResponseMessage>Succeded<".ToLower()) || ResponseNode.ToLower().Contains("ResponseMessage>Data updated successfully<".ToLower()))
                         {
                             return IntResultLib.GetResult(1);
                         }
