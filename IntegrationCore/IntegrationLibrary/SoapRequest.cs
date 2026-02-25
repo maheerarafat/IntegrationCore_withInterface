@@ -87,8 +87,46 @@ namespace IntegrationCore.Models
                     }
                 }
             }
-            catch (Exception)
+            catch (WebException webEx)
             {
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "WebException occurred: " + webEx.Message, TrackInterface: true, PrintInterface: true);
+
+                // exception type
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Status: " + webEx.Status.ToString(), TrackInterface: true, PrintInterface: true);
+
+                // try to get more details from the response if available
+                if (webEx.Response != null)
+                {
+                    using (Stream responseStream = webEx.Response.GetResponseStream())
+                    {
+                        if (responseStream != null)
+                        {
+                            using (StreamReader reader = new StreamReader(responseStream))
+                            {
+                                string errorResponse = reader.ReadToEnd();
+                                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Server Response: " + errorResponse, TrackInterface: true, PrintInterface: true);
+                            }
+                        }
+                    }
+
+                    // print HTTP status code if available
+                    if (webEx.Response is HttpWebResponse httpResponse)
+                    {
+                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, $"HTTP Status Code: {(int)httpResponse.StatusCode} ({httpResponse.StatusCode})", TrackInterface: true, PrintInterface: true);
+
+                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Status Description: " + httpResponse.StatusDescription, TrackInterface: true, PrintInterface: true);
+                    }
+                }
+                else
+                {
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Response is null - No response received from server", TrackInterface: true, PrintInterface: true);
+                }
+                throw;
+            }
+            catch (Exception ex)
+            {
+                // print general exception details
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "General error occurred: " + ex.Message, TrackInterface: true, PrintInterface: true);
 
                 throw;
             }
@@ -272,8 +310,46 @@ namespace IntegrationCore.Models
                     }
                 }
             }
-            catch (Exception)
+            catch (WebException webEx)
             {
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "WebException occurred: " + webEx.Message, TrackInterface: true, PrintInterface: true);
+
+                // exception type
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Status: " + webEx.Status.ToString(), TrackInterface: true, PrintInterface: true);
+
+                // try to get more details from the response if available
+                if (webEx.Response != null)
+                {
+                    using (Stream responseStream = webEx.Response.GetResponseStream())
+                    {
+                        if (responseStream != null)
+                        {
+                            using (StreamReader reader = new StreamReader(responseStream))
+                            {
+                                string errorResponse = reader.ReadToEnd();
+                                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Server Response: " + errorResponse, TrackInterface: true, PrintInterface: true);
+                            }
+                        }
+                    }
+
+                    // print HTTP status code if available
+                    if (webEx.Response is HttpWebResponse httpResponse)
+                    {
+                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, $"HTTP Status Code: {(int)httpResponse.StatusCode} ({httpResponse.StatusCode})", TrackInterface: true, PrintInterface: true);
+
+                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Status Description: " + httpResponse.StatusDescription, TrackInterface: true, PrintInterface: true);
+                    }
+                }
+                else
+                {
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Response is null - No response received from server", TrackInterface: true, PrintInterface: true);
+                }
+                throw;
+            }
+            catch (Exception ex)
+            {
+                // print general exception details
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "General error occurred: " + ex.Message, TrackInterface: true, PrintInterface: true);
 
                 throw;
             }
@@ -341,12 +417,49 @@ namespace IntegrationCore.Models
                     }
                 }
             }
-            catch (Exception)
+            catch (WebException webEx)
             {
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "WebException occurred: " + webEx.Message, TrackInterface: true, PrintInterface: true);
+
+                // exception type
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Status: " + webEx.Status.ToString(), TrackInterface: true, PrintInterface: true);
+
+                // try to get more details from the response if available
+                if (webEx.Response != null)
+                {
+                    using (Stream responseStream = webEx.Response.GetResponseStream())
+                    {
+                        if (responseStream != null)
+                        {
+                            using (StreamReader reader = new StreamReader(responseStream))
+                            {
+                                string errorResponse = reader.ReadToEnd();
+                                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Server Response: " + errorResponse, TrackInterface: true, PrintInterface: true);
+                            }
+                        }
+                    }
+
+                    // print HTTP status code if available
+                    if (webEx.Response is HttpWebResponse httpResponse)
+                    {
+                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, $"HTTP Status Code: {(int)httpResponse.StatusCode} ({httpResponse.StatusCode})", TrackInterface: true, PrintInterface: true);
+
+                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Status Description: " + httpResponse.StatusDescription, TrackInterface: true, PrintInterface: true);
+                    }
+                }
+                else
+                {
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Response is null - No response received from server", TrackInterface: true, PrintInterface: true);
+                }
+                throw;
+            }
+            catch (Exception ex)
+            {
+                // print general exception details
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "General error occurred: " + ex.Message, TrackInterface: true, PrintInterface: true);
 
                 throw;
             }
-
 
         }
         private static XmlDocument CreateSMSSoapEnvelope(String Request)
@@ -416,12 +529,49 @@ namespace IntegrationCore.Models
                     }
                 }
             }
-            catch (Exception)
+            catch (WebException webEx)
             {
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "WebException occurred: " + webEx.Message, TrackInterface: true, PrintInterface: true);
+
+                // exception type
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Status: " + webEx.Status.ToString(), TrackInterface: true, PrintInterface: true);
+
+                // try to get more details from the response if available
+                if (webEx.Response != null)
+                {
+                    using (Stream responseStream = webEx.Response.GetResponseStream())
+                    {
+                        if (responseStream != null)
+                        {
+                            using (StreamReader reader = new StreamReader(responseStream))
+                            {
+                                string errorResponse = reader.ReadToEnd();
+                                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Server Response: " + errorResponse, TrackInterface: true, PrintInterface: true);
+                            }
+                        }
+                    }
+
+                    // print HTTP status code if available
+                    if (webEx.Response is HttpWebResponse httpResponse)
+                    {
+                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, $"HTTP Status Code: {(int)httpResponse.StatusCode} ({httpResponse.StatusCode})", TrackInterface: true, PrintInterface: true);
+
+                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Status Description: " + httpResponse.StatusDescription, TrackInterface: true, PrintInterface: true);
+                    }
+                }
+                else
+                {
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Response is null - No response received from server", TrackInterface: true, PrintInterface: true);
+                }
+                throw;
+            }
+            catch (Exception ex)
+            {
+                // print general exception details
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "General error occurred: " + ex.Message, TrackInterface: true, PrintInterface: true);
 
                 throw;
             }
-
 
         }
         private static XmlDocument CreateEmailSoapEnvelope(String Request)
