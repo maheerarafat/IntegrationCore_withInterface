@@ -680,6 +680,7 @@ namespace IntegrationCore.IntegrationLibrary
                                                     if (document.PostFromID.GlobalIDs.GlobalID.Trim() == "")
                                                     {
                                                         Logger.AddToLogFile("Correspondence." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, $"The export for Corr : {CorrItem.CorrUID}  has been rejected because the source unit dose not have GlobalID");
+                                                        SendNotificationToTarasol("",CorrItem.CorrUID, 0, 0, "", "");
                                                         return IntResultLib.GetResult(2);
                                                     }
                                                     //Expose ESB service

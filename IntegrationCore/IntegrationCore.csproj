@@ -5,7 +5,7 @@
     <UserSecretsId>a96d8bcf-426a-42e3-a492-c6d8f818f917</UserSecretsId>
 	  <MvcRazorCompileOnPublish>true</MvcRazorCompileOnPublish>
 	  <RazorCompileOnBuild>true</RazorCompileOnBuild>
-
+	  <SatelliteResourceLanguages>en;ar</SatelliteResourceLanguages>
   </PropertyGroup>
 
   <ItemGroup>
