@@ -578,7 +578,9 @@ namespace IntegrationCore.IntegrationLibrary
                                                                     SendFax.Send(Convert.ToString(addressTo.Exchange_no_fax), CorrItem.CorrUID, contentAttachmentFax, addressTo.Fax, IntegrationSettings.GetSetting("FaxServer").ToString(),
                                                                     IntegrationSettings.GetSetting("FaxUser").ToString(),
                                                                     (IntegrationSettings.GetSetting("FaxPass").ToString() == "") ? "" : Encryption.DecryptString(IntegrationSettings.GetSetting("FaxPass").ToString()),
-                                                                    nameRecipient: document.ExternalRefNumber.Value);
+                                                                    nameRecipient: document.ExternalRefNumber.Value).GetAwaiter().GetResult();
+
+                                                                    moveFaxToDone(subDirectory, CorrItem.CorrUID);
                                                                 }
 
                                                             }
@@ -619,6 +621,7 @@ namespace IntegrationCore.IntegrationLibrary
                                                                 //Send Notification to Tarasol
                                                                 if (mailResult.EMessage == "success" || mailResult.Code == 1)
                                                                 {
+                                                                    moveEmailToDone(subDirectory, CorrItem.CorrUID);
                                                                     SendNotificationToTarasol(Convert.ToString(addressTo.Exchange_no_email), CorrItem.CorrUID, 1, 0, "", "");
 
                                                                 }
@@ -680,7 +683,7 @@ namespace IntegrationCore.IntegrationLibrary
                                                     if (document.PostFromID.GlobalIDs.GlobalID.Trim() == "")
                                                     {
                                                         Logger.AddToLogFile("Correspondence." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, $"The export for Corr : {CorrItem.CorrUID}  has been rejected because the source unit dose not have GlobalID");
-                                                        SendNotificationToTarasol("",CorrItem.CorrUID, 0, 0, "", "");
+                                                        SendNotificationToTarasol("", CorrItem.CorrUID, 0, 0, "", "");
                                                         return IntResultLib.GetResult(2);
                                                     }
                                                     //Expose ESB service
@@ -986,6 +989,44 @@ namespace IntegrationCore.IntegrationLibrary
             try
             {
                 string path = (string)IntegrationSettings.GetSetting("IntegrationDataFolder") + "/Out/Done/" + DateTime.Now.Year + "/" + DateTime.Now.Month;
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+
+                Directory.Move(sourcPath + "/" + Dest, path + "/" + Dest);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
+        }
+        public static void moveFaxToDone(string sourcPath, string Dest)
+        {
+            try
+            {
+                string path = (string)IntegrationSettings.GetSetting("IntegrationDataFolder") + "/Out/Done-fax/" + DateTime.Now.Year + "/" + DateTime.Now.Month;
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+
+                Directory.Move(sourcPath + "/" + Dest, path + "/" + Dest);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
+        }
+        public static void moveEmailToDone(string sourcPath, string Dest)
+        {
+            try
+            {
+                string path = (string)IntegrationSettings.GetSetting("IntegrationDataFolder") + "/Out/Done-email/" + DateTime.Now.Year + "/" + DateTime.Now.Month;
                 if (!Directory.Exists(path))
                 {
                     Directory.CreateDirectory(path);
