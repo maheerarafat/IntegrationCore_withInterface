@@ -18,7 +18,7 @@ namespace IntegrationCore.IntegrationLibrary
 
             try
             {
-                
+
                 using (var conn = ConnectionManager.GetConnection())
                 {
                     if (conn.State == ConnectionState.Closed)
@@ -48,11 +48,11 @@ namespace IntegrationCore.IntegrationLibrary
                             recordsTotal = count_result.ElementAt(0).FLDCOUNT;
                         }
                         conn.Close();
-                        
+
                     }
 
                 }
-                
+
 
 
             }
@@ -71,7 +71,7 @@ namespace IntegrationCore.IntegrationLibrary
 
             try
             {
-               
+
                 using (var conn = ConnectionManager.GetConnection())
                 {
                     if (conn.State == ConnectionState.Closed)
@@ -103,7 +103,7 @@ namespace IntegrationCore.IntegrationLibrary
                         conn.Close();
                     }
                 }
-                
+
             }
             catch (Exception ex)
             {
@@ -120,7 +120,7 @@ namespace IntegrationCore.IntegrationLibrary
 
             try
             {
-                
+
                 using (var conn = ConnectionManager.GetConnection())
                 {
                     if (conn.State == ConnectionState.Closed)
@@ -161,7 +161,7 @@ namespace IntegrationCore.IntegrationLibrary
                         conn.Close();
                     }
                 }
-                
+
             }
             catch (Exception ex)
             {
@@ -178,7 +178,7 @@ namespace IntegrationCore.IntegrationLibrary
 
             try
             {
-                
+
                 using (var conn = ConnectionManager.GetConnection())
                 {
                     if (conn.State == ConnectionState.Closed)
@@ -212,7 +212,7 @@ namespace IntegrationCore.IntegrationLibrary
                         conn.Close();
                     }
                 }
-                
+
             }
             catch (Exception ex)
             {
@@ -227,7 +227,7 @@ namespace IntegrationCore.IntegrationLibrary
             object result = null;
             try
             {
-                
+
                 using (var conn = ConnectionManager.GetConnection())
                 {
                     if (conn.State == ConnectionState.Closed)
@@ -243,13 +243,13 @@ namespace IntegrationCore.IntegrationLibrary
 
                         var query = String.Format("INSERT INTO INTJobEsb (FLDname, Flddescription, Fldtype, Flddatestart, Flddateend, Fldduration, FLDBODYREQUEST, FLDSENDSCHUDLE, FLDNUMBERTIMESENDSCHUDLE) " +
                             "VALUES ('{0}', '{1}',{2}, TO_DATE('{3}', 'DD/MM/YYYY HH24:MI:SS') , TO_DATE('{4}', 'DD/MM/YYYY HH24:MI:SS'), {5}, '{6}', {7}, {8})",
-                            name, description, type, startDateStr, endDateStr, duration, bodyRequest, statusSchedule, 1);
+                            name, description.Replace("'", "''"), type, startDateStr, endDateStr, duration, bodyRequest.Replace("'", "''"), statusSchedule, 1);
                         //Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Job query : " + query, TrackInterface: Logger.EnableLoggingInfo, PrintInterface: Logger.EnableLoggingInfo);
                         int res = conn.Execute(query);
                         conn.Close();
                     }
                 }
-                
+
 
             }
             catch (Exception ex)
@@ -263,11 +263,11 @@ namespace IntegrationCore.IntegrationLibrary
 
         public static void UpdateProccessScheduleStatus(string fldid, int status)
         {
-            
+
 
             try
             {
-                
+
                 using (var conn = ConnectionManager.GetConnection())
                 {
                     if (conn.State == ConnectionState.Closed)
@@ -284,7 +284,7 @@ namespace IntegrationCore.IntegrationLibrary
                         conn.Close();
                     }
                 }
-               
+
 
             }
             catch (Exception ex)
