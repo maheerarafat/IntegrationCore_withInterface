@@ -6,6 +6,9 @@
 	  <MvcRazorCompileOnPublish>true</MvcRazorCompileOnPublish>
 	  <RazorCompileOnBuild>true</RazorCompileOnBuild>
 	  <SatelliteResourceLanguages>en;ar</SatelliteResourceLanguages>
+	  
+		  <PublishDir>$(ProjectDir)publish\bin\</PublishDir>
+	  
   </PropertyGroup>
 
   <ItemGroup>
@@ -58,9 +61,7 @@
     <!--<Reference Include="Dapper">
       <HintPath>E:\NVSSOFT\Work\Integration\IntegrationCore21-10-2019\IntegrationCore\IntegrationCore\obj\Debug\netcoreapp2.2\Dapper.dll</HintPath>
     </Reference>-->
-    <Reference Include="Interop.hMailServer">
-      <HintPath>C:\Program Files (x86)\hMailServer\Bin\Interop.hMailServer.dll</HintPath>
-    </Reference>
+    
     <!--<Reference Include="log4net">
       <HintPath>E:\NVSSOFT\Work\Integration\IntegrationCore21-10-2019\IntegrationCore\IntegrationCore\obj\Debug\netcoreapp2.2\log4net.dll</HintPath>
     </Reference>-->
