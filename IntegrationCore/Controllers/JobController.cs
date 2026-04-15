@@ -208,6 +208,22 @@ namespace IntegrationCore.Controllers
             }
         }
 
+        [HttpPost]
+        [Authorize]
+        public ActionResult ExcuteManualRequest(int Id)
+        {
+            try
+            {
+                IntResult result = CallExternalAPI.RetryRequest(Id);
+                return Json(result);
+            }
+            catch (Exception ex)
+            {
+                Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, ex.Message);
+                return NotFound(Json(IntResultLib.GetResult(ex)));
+            }
+        }
+
 
     }
 }

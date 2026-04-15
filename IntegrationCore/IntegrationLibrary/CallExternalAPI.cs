@@ -8,105 +8,196 @@ using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace IntegrationCore.IntegrationLibrary
 {
     public class CallExternalAPI
     {
-
-
         public static object CallPostAPI(string APIURL, string PostData, string Tarasol_Token = "")
         {
+            DateTime startDate = DateTime.Now;
+            int requestId = 0;
 
             try
             {
-                using (var client = new HttpClient())
-                {
-                    client.Timeout = TimeSpan.FromMilliseconds(600000); // Adjusting the timeout
-
-                    if (!string.IsNullOrEmpty(Tarasol_Token))
-                    {
-                        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", Tarasol_Token);
-                    }
-
-                    var content = new StringContent(PostData, Encoding.UTF8, "application/json");
-
-                    // Sending POST request
-                    var response = client.PostAsync(APIURL, content).GetAwaiter().GetResult();
-
-                    if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                    {
-                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Unauthorized (Post Request) Rec01   : ");
-                        return CallPostAPI(APIURL, PostData, Cache.GetSession(isNew: true).Token);
-                    }
-
-                    var result = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-
-                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Tarasol Result: " + result);
-
-                    if (result.ToLower().Contains("session expired"))
-                    {
-                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Session Expired Tarasol Result (Post Request) Rec02  : ");
-                        return CallPostAPI(APIURL, PostData, Cache.GetSession(isNew: true).Token);
-                    }
-
-                    return result;
-                }
+                requestId = CreateRequestLog("POST", APIURL, PostData, Tarasol_Token);
+                var responseData = ExecutePost(APIURL, PostData, Tarasol_Token);
+                bool isSuccess = responseData.StatusCode >= HttpStatusCode.OK && responseData.StatusCode < HttpStatusCode.MultipleChoices;
+                UpdateRequestLogAfterResponse(requestId, "POST", APIURL, responseData, startDate, isSuccess, string.Empty);
+                return responseData.Body;
             }
             catch (Exception ex)
             {
+                UpdateRequestLogAfterResponse(requestId, "POST", APIURL, new HttpResponseData
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Body = ex.Message
+                }, startDate, false, ex.Message);
+
                 string errorJson = @"{
             ""result"":""error"",
             ""message"":""\" + ex.Message;
                 errorJson += @"""}";
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message);
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occurred in  : " + ex.Message);
                 return errorJson;
             }
         }
 
         public static object CallGetAPI(string APIURL, string Tarasol_Token = "")
         {
+            DateTime startDate = DateTime.Now;
+            int requestId = 0;
+
             try
             {
-                using (var client = new HttpClient())
-                {
-                    client.Timeout = TimeSpan.FromMilliseconds(600000); // Adjusting the timeout
-
-                    if (!string.IsNullOrEmpty(Tarasol_Token))
-                    {
-                        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", Tarasol_Token);
-                    }
-
-                    // Sending GET request
-                    var response = client.GetAsync(APIURL).GetAwaiter().GetResult();
-
-                    if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                    {
-                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Unauthorized (Get Request) Rec01  : ");
-                        return CallGetAPI(APIURL, Cache.GetSession(isNew: true).Token); // Recursion for unauthorized
-                    }
-
-                    var result = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-
-                    if (result.ToLower().Contains("session expired"))
-                    {
-                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Session Expired Tarasol Result (Get Request) Rec02  : ");
-                        return CallGetAPI(APIURL, Cache.GetSession(isNew: true).Token); // Recursion for session expired
-                    }
-
-                    return result;
-                }
+                requestId = CreateRequestLog("GET", APIURL, string.Empty, Tarasol_Token);
+                var responseData = ExecuteGet(APIURL, Tarasol_Token);
+                bool isSuccess = responseData.StatusCode >= HttpStatusCode.OK && responseData.StatusCode < HttpStatusCode.MultipleChoices;
+                UpdateRequestLogAfterResponse(requestId, "GET", APIURL, responseData, startDate, isSuccess, string.Empty);
+                return responseData.Body;
             }
             catch (Exception ex)
             {
+                UpdateRequestLogAfterResponse(requestId, "GET", APIURL, new HttpResponseData
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Body = ex.Message
+                }, startDate, false, ex.Message);
+
                 string errorJson = @"{
             ""result"":""error"",
             ""message"":""\" + ex.Message;
                 errorJson += @"""}";
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occurred in  : " + ex.Message);
                 return errorJson;
             }
+        }
+
+        public static IntResult RetryRequest(int requestId)
+        {
+            try
+            {
+                IntJobEsb requestLog = Jobs.GetLogJobById(requestId);
+                if (requestLog == null || string.IsNullOrWhiteSpace(requestLog.fldbodyrequest))
+                {
+                    return IntResultLib.GetResult(0);
+                }
+
+                RequestLogPayload payload = JsonConvert.DeserializeObject<RequestLogPayload>(requestLog.fldbodyrequest);
+                if (payload == null || string.IsNullOrWhiteSpace(payload.Url) || string.IsNullOrWhiteSpace(payload.Method))
+                {
+                    return IntResultLib.GetResult(0);
+                }
+
+                DateTime startDate = DateTime.Now;
+                Jobs.MarkRequestAsInProgress(requestId);
+                HttpResponseData responseData = payload.Method.ToUpper() == "POST"
+                    ? ExecutePost(payload.Url, payload.RequestBody, payload.Token)
+                    : ExecuteGet(payload.Url, payload.Token);
+
+                bool isSuccess = responseData.StatusCode >= HttpStatusCode.OK && responseData.StatusCode < HttpStatusCode.MultipleChoices;
+                UpdateRequestLogAfterResponse(requestId, payload.Method.ToUpper(), payload.Url, responseData, startDate, isSuccess, string.Empty);
+                return isSuccess ? IntResultLib.GetResult(1) : IntResultLib.GetResult(0);
+            }
+            catch (Exception ex)
+            {
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Retry request failed: " + ex.Message);
+                return IntResultLib.GetResult(ex);
+            }
+        }
+
+        private static int CreateRequestLog(string method, string APIURL, string requestBody, string token)
+        {
+            RequestLogPayload payload = new RequestLogPayload()
+            {
+                Method = method,
+                Url = APIURL,
+                RequestBody = requestBody,
+                Token = token
+            };
+
+            string payloadAsString = JsonConvert.SerializeObject(payload);
+            return Jobs.AddPendingRequestLog("External API Request", $"{method} {APIURL} - Pending", TrimForDb(payloadAsString, 3500));
+        }
+
+        private static HttpResponseData ExecutePost(string APIURL, string PostData, string token)
+        {
+            using (var client = new HttpClient())
+            {
+                client.Timeout = TimeSpan.FromMilliseconds(600000);
+                if (!string.IsNullOrEmpty(token))
+                {
+                    client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                }
+
+                var content = new StringContent(PostData ?? string.Empty, Encoding.UTF8, "application/json");
+                var response = client.PostAsync(APIURL, content).GetAwaiter().GetResult();
+                return new HttpResponseData()
+                {
+                    StatusCode = response.StatusCode,
+                    Body = response.Content.ReadAsStringAsync().GetAwaiter().GetResult()
+                };
+            }
+        }
+
+        private static HttpResponseData ExecuteGet(string APIURL, string token)
+        {
+            using (var client = new HttpClient())
+            {
+                client.Timeout = TimeSpan.FromMilliseconds(600000);
+                if (!string.IsNullOrEmpty(token))
+                {
+                    client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                }
+
+                var response = client.GetAsync(APIURL).GetAwaiter().GetResult();
+                return new HttpResponseData()
+                {
+                    StatusCode = response.StatusCode,
+                    Body = response.Content.ReadAsStringAsync().GetAwaiter().GetResult()
+                };
+            }
+        }
+
+        private static void UpdateRequestLogAfterResponse(int requestId, string method, string apiUrl, HttpResponseData responseData, DateTime startDate, bool isSuccess, string exceptionMessage)
+        {
+            if (requestId <= 0)
+            {
+                return;
+            }
+
+            string description = $"{method} {apiUrl} | Status:{(int)responseData.StatusCode} | {(isSuccess ? "Success" : "Failed")}";
+            if (!string.IsNullOrWhiteSpace(exceptionMessage))
+            {
+                description += " | Error:" + exceptionMessage;
+            }
+            if (!string.IsNullOrWhiteSpace(responseData.Body))
+            {
+                description += " | Response:" + TrimForDb(responseData.Body, 500);
+            }
+
+            Jobs.UpdateRequestLogResult(
+                requestId,
+                description,
+                isSuccess ? (int)Helper.Enum.responseCode.Success : (int)Helper.Enum.responseCode.Failed,
+                DateTime.Now,
+                (DateTime.Now - startDate).TotalMilliseconds,
+                isSuccess ? (int)Helper.Enum.scheduleType.Done : (int)Helper.Enum.scheduleType.NotStarted);
+        }
+
+        private static string TrimForDb(string value, int maxLength)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return string.Empty;
+            }
+
+            return value.Length <= maxLength ? value : value.Substring(0, maxLength);
+        }
+
+        private class HttpResponseData
+        {
+            public HttpStatusCode StatusCode { get; set; }
+            public string Body { get; set; }
         }
 
 

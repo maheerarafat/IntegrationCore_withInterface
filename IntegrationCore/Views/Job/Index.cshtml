@@ -103,6 +103,7 @@
                                 <th>Function Name</th>
                                 <th>Message</th>
                                 <th>Failed</th>
+                                <th>Retry</th>
                             </tr>
                         </thead>
                     </table>
@@ -198,7 +199,12 @@
                     return time_ago(data);
                     //return convertString2Date(data);
                 }
-            }
+            },
+            {
+                data: null, render: function (data, type, row) {
+                    return "<a href='#' class='btn btn-warning' onclick=run_submit_error('" + row.flduid + "'); >Retry</a>";
+                }
+            },
         ]
         let urlRequest = '@Url.Action("GetLogJobESBFaild", "Job")';
         render_dataTable(urlRequest, "failed_log", columns, 'cover-spin');
@@ -222,7 +228,7 @@
             },
             {
                 data: null, render: function (data, type, row) {
-                    return "<a href='#' class='btn btn-warning' onclick=run_submit_error('" + row.flduid + "','" + row.fldname + "','" + row.fldbodyrequest + "'); >Re-submit</a>";
+                    return "<a href='#' class='btn btn-warning' onclick=run_submit_error('" + row.flduid + "'); >Re-submit</a>";
                 }
             }
         ]
@@ -307,15 +313,15 @@
     }
 
 
-    function run_submit_error(id, methodName, dataRequest) {
+    function run_submit_error(id) {
         
         $('#cover-spin').show(0);
         $.post('@Url.Action("ExcuteManualRequest", "Job")',
-            {Id: id, MethodName: methodName, BodyRequest: dataRequest },
+            {Id: id },
             function (data, status) {
                 
                 $('#cover-spin').css('display', 'none');
-                if (status = 'success') {
+                if (status == 'success') {
 
                 } else {
                     $('.alert').css('display', 'block');
@@ -330,7 +336,5 @@
     }
 
 </script>
-
-
 
 
