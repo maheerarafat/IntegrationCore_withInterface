@@ -21,8 +21,8 @@ namespace IntegrationCore.IntegrationLibrary
 
             try
             {
-                requestId = CreateRequestLog("POST", APIURL, PostData, Tarasol_Token);
-                var responseData = ExecutePost(APIURL, PostData, Tarasol_Token);
+                requestId = CreateRequestLog("POST", APIURL, PostData);
+                var responseData = ExecutePostWithTokenRefresh(APIURL, PostData, Tarasol_Token);
                 bool isSuccess = responseData.StatusCode >= HttpStatusCode.OK && responseData.StatusCode < HttpStatusCode.MultipleChoices;
                 UpdateRequestLogAfterResponse(requestId, "POST", APIURL, responseData, startDate, isSuccess, string.Empty);
                 return responseData.Body;
@@ -50,8 +50,8 @@ namespace IntegrationCore.IntegrationLibrary
 
             try
             {
-                requestId = CreateRequestLog("GET", APIURL, string.Empty, Tarasol_Token);
-                var responseData = ExecuteGet(APIURL, Tarasol_Token);
+                requestId = CreateRequestLog("GET", APIURL, string.Empty);
+                var responseData = ExecuteGetWithTokenRefresh(APIURL, Tarasol_Token);
                 bool isSuccess = responseData.StatusCode >= HttpStatusCode.OK && responseData.StatusCode < HttpStatusCode.MultipleChoices;
                 UpdateRequestLogAfterResponse(requestId, "GET", APIURL, responseData, startDate, isSuccess, string.Empty);
                 return responseData.Body;
@@ -90,9 +90,10 @@ namespace IntegrationCore.IntegrationLibrary
 
                 DateTime startDate = DateTime.Now;
                 Jobs.MarkRequestAsInProgress(requestId);
+                string retryToken = Cache.GetSession().Token;
                 HttpResponseData responseData = payload.Method.ToUpper() == "POST"
-                    ? ExecutePost(payload.Url, payload.RequestBody, payload.Token)
-                    : ExecuteGet(payload.Url, payload.Token);
+                    ? ExecutePostWithTokenRefresh(payload.Url, payload.RequestBody, retryToken)
+                    : ExecuteGetWithTokenRefresh(payload.Url, retryToken);
 
                 bool isSuccess = responseData.StatusCode >= HttpStatusCode.OK && responseData.StatusCode < HttpStatusCode.MultipleChoices;
                 UpdateRequestLogAfterResponse(requestId, payload.Method.ToUpper(), payload.Url, responseData, startDate, isSuccess, string.Empty);
@@ -105,14 +106,13 @@ namespace IntegrationCore.IntegrationLibrary
             }
         }
 
-        private static int CreateRequestLog(string method, string APIURL, string requestBody, string token)
+        private static int CreateRequestLog(string method, string APIURL, string requestBody)
         {
             RequestLogPayload payload = new RequestLogPayload()
             {
                 Method = method,
                 Url = APIURL,
-                RequestBody = requestBody,
-                Token = token
+                RequestBody = requestBody
             };
 
             string payloadAsString = JsonConvert.SerializeObject(payload);
@@ -139,6 +139,18 @@ namespace IntegrationCore.IntegrationLibrary
             }
         }
 
+        private static HttpResponseData ExecutePostWithTokenRefresh(string APIURL, string PostData, string token = "")
+        {
+            HttpResponseData response = ExecutePost(APIURL, PostData, token);
+            if (response.StatusCode != HttpStatusCode.Unauthorized)
+            {
+                return response;
+            }
+
+            string refreshedToken = Cache.GetSession(isNew: true).Token;
+            return ExecutePost(APIURL, PostData, refreshedToken);
+        }
+
         private static HttpResponseData ExecuteGet(string APIURL, string token)
         {
             using (var client = new HttpClient())
@@ -156,6 +168,18 @@ namespace IntegrationCore.IntegrationLibrary
                     Body = response.Content.ReadAsStringAsync().GetAwaiter().GetResult()
                 };
             }
+        }
+
+        private static HttpResponseData ExecuteGetWithTokenRefresh(string APIURL, string token = "")
+        {
+            HttpResponseData response = ExecuteGet(APIURL, token);
+            if (response.StatusCode != HttpStatusCode.Unauthorized)
+            {
+                return response;
+            }
+
+            string refreshedToken = Cache.GetSession(isNew: true).Token;
+            return ExecuteGet(APIURL, refreshedToken);
         }
 
         private static void UpdateRequestLogAfterResponse(int requestId, string method, string apiUrl, HttpResponseData responseData, DateTime startDate, bool isSuccess, string exceptionMessage)

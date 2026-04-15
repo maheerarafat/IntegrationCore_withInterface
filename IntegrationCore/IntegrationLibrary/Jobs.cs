@@ -294,7 +294,6 @@ namespace IntegrationCore.IntegrationLibrary
         {
             int requestId = 0;
             DateTime startDate = DateTime.Now;
-            string startDateStr = startDate.ToString("dd/MM/yyyy HH:mm:ss");
 
             try
             {
@@ -307,20 +306,30 @@ namespace IntegrationCore.IntegrationLibrary
 
                     if (conn.State == ConnectionState.Open)
                     {
-                        string safeName = (name ?? string.Empty).Replace("'", "''");
-                        string safeDescription = (description ?? string.Empty).Replace("'", "''");
-                        string safeBody = (bodyRequest ?? string.Empty).Replace("'", "''");
+                        DynamicParameters parameters = new DynamicParameters();
+                        parameters.Add("name", name ?? string.Empty);
+                        parameters.Add("description", description ?? string.Empty);
+                        parameters.Add("type", (int)Helper.Enum.responseCode.SuccessNotify);
+                        parameters.Add("startDate", startDate);
+                        parameters.Add("bodyRequest", bodyRequest ?? string.Empty);
+                        parameters.Add("statusSchedule", (int)Helper.Enum.scheduleType.Progress);
 
-                        var insertQuery = String.Format("INSERT INTO INTJobEsb (FLDname, Flddescription, Fldtype, Flddatestart, Flddateend, Fldduration, FLDBODYREQUEST, FLDSENDSCHUDLE, FLDNUMBERTIMESENDSCHUDLE) " +
-                            "VALUES ('{0}', '{1}',{2}, TO_DATE('{3}', 'DD/MM/YYYY HH24:MI:SS') , TO_DATE('{3}', 'DD/MM/YYYY HH24:MI:SS'), 0, '{4}', {5}, 0)",
-                            safeName, safeDescription, (int)Helper.Enum.responseCode.SuccessNotify, startDateStr, safeBody, (int)Helper.Enum.scheduleType.Progress);
-                        conn.Execute(insertQuery);
+                        bool isOracleConnection = conn.GetType().Name.ToLower().Contains("oracle");
+                        if (isOracleConnection)
+                        {
+                            parameters.Add("requestId", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                            string oracleInsertQuery = "INSERT INTO INTJobEsb (FLDname, Flddescription, Fldtype, Flddatestart, Flddateend, Fldduration, FLDBODYREQUEST, FLDSENDSCHUDLE, FLDNUMBERTIMESENDSCHUDLE) " +
+                                "VALUES (:name, :description, :type, :startDate, :startDate, 0, :bodyRequest, :statusSchedule, 0) RETURNING flduid INTO :requestId";
+                            conn.Execute(oracleInsertQuery, parameters);
+                            requestId = parameters.Get<int>("requestId");
+                        }
+                        else
+                        {
+                            string sqlServerInsertQuery = "INSERT INTO INTJobEsb (FLDname, Flddescription, Fldtype, Flddatestart, Flddateend, Fldduration, FLDBODYREQUEST, FLDSENDSCHUDLE, FLDNUMBERTIMESENDSCHUDLE) " +
+                                "OUTPUT INSERTED.flduid VALUES (@name, @description, @type, @startDate, @startDate, 0, @bodyRequest, @statusSchedule, 0)";
+                            requestId = conn.QueryFirstOrDefault<int>(sqlServerInsertQuery, parameters);
+                        }
 
-                        string idQuery = conn.GetType().Name.ToLower().Contains("oracle")
-                            ? "select flduid from (select flduid from INTJobEsb order by flduid desc) where rownum = 1"
-                            : "select top 1 flduid from INTJobEsb order by flduid desc";
-
-                        requestId = conn.QueryFirstOrDefault<int>(idQuery);
                         conn.Close();
                     }
                 }
