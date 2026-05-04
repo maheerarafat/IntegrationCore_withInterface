@@ -1054,8 +1054,9 @@ namespace IntegrationCore.IntegrationLibrary
                     return null;
                 }
                 string apiurl = IntegrationSettings.GetSetting("APIURL").ToString() + "/Corr/AcknowledgmentTransmittalReportLoad?CurrentPage=1&MaxNumberItems=15&SessionId="+SessionID;
-                string json = @"{""SearchList"":[],""OrderList"":[]}";
-
+                //string json = @"{""SearchList"":[],""OrderList"":[]}";
+                string json = @"{""SearchList"":[{ ""Value"":""01/01/2000"",""LName"":"""",""EName"":""01/01/2000"",""FieldName"":""SendDate"",""Opertation"":""eq"",""LogicOP"":"""",""Order"":0}],""OrderList"":[]}";
+                //{ "SearchList":[{ "Value":"30/04/2026","LName":"","EName":"30/04/2026","FieldName":"StartDate","Opertation":"eq","LogicOP":"","Order":0}],"OrderList":[]}
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "apiurl : " + apiurl, TrackInterface: true);
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Tarasol_Token : " + Tarasol_Token.Length, TrackInterface: true);
                 CallExternalAPI.CallPostAPI(apiurl, json, Tarasol_Token);
