@@ -1036,8 +1036,8 @@ namespace IntegrationCore.IntegrationLibrary
             }
             catch (Exception ex)
             {
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, ex.Message, TrackInterface: true);
 
-                throw ex;
             }
 
         }

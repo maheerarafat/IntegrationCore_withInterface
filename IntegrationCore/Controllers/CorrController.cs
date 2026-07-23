@@ -158,7 +158,6 @@ namespace IntegrationCore.Controllers
         {
             try
             {
-                Debugger.Launch();
                 string objStr = Newtonsoft.Json.JsonConvert.SerializeObject(scanRequest);
                 if (string.IsNullOrEmpty(objStr)) throw new NullReferenceException("Invalid or Input");
 
