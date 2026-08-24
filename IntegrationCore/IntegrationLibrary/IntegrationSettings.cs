@@ -93,10 +93,10 @@ namespace IntegrationCore.IntegrationLibrary
                     return false;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
-                throw ex;
+                throw;
             }
            
         }
@@ -129,7 +129,7 @@ namespace IntegrationCore.IntegrationLibrary
             catch (Exception ex)
             {
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message, PrintInterface: true);
-                throw ex;
+                throw;
             }
 
         }
@@ -149,7 +149,7 @@ namespace IntegrationCore.IntegrationLibrary
             catch (Exception ex)
             {
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message);
-                throw ex;
+                throw;
             }
             
             
@@ -222,7 +222,7 @@ namespace IntegrationCore.IntegrationLibrary
             catch (Exception ex)
             {
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message);
-                throw ex;
+                throw;
             }
 
 

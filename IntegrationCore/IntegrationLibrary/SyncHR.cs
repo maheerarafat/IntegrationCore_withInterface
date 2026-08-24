@@ -73,7 +73,7 @@ namespace IntegrationCore.IntegrationLibrary
         //    catch (Exception ex)
         //    {
         //        Logger.AddToLogFile("SyncHR." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "stage Exception  :" + ex.Message);
-        //        throw ex;
+        //        throw;
         //    }
 
         //    return result;
@@ -138,7 +138,7 @@ namespace IntegrationCore.IntegrationLibrary
         //    catch (Exception ex)
         //    {
         //        Logger.AddToLogFile("SyncHR." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "stage Exception  :" + ex.Message);
-        //        throw ex;
+        //        throw;
         //    }
         //}
         //public static void UpdatePassword(string username, string password)
@@ -196,7 +196,7 @@ namespace IntegrationCore.IntegrationLibrary
         //    catch (Exception ex)
         //    {
         //        Logger.AddToLogFile("SyncHR." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "stage Exception  :" + ex.Message);
-        //        throw ex;
+        //        throw;
         //    }
         //}
         //public static string GetUserSecuirtyLookup(String num)
@@ -265,7 +265,7 @@ namespace IntegrationCore.IntegrationLibrary
         //    catch (Exception ex)
         //    {
         //        Logger.AddToLogFile("SyncHR." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "stage Exception  :" + ex.Message);
-        //        throw ex;
+        //        throw;
         //    }
 
         //    return secuirtyKey;

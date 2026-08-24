@@ -51,7 +51,7 @@ namespace IntegrationCore.IntegrationLibrary
                 string XMLstring = XMLProcessing.Serialize(emailObject);
                 return SoapRequest.CallEmailWebService(XMLstring);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 Exception exception = new Exception("Unable to send Email");

@@ -1,11 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <UserSecretsId>a96d8bcf-426a-42e3-a492-c6d8f818f917</UserSecretsId>
 	  <MvcRazorCompileOnPublish>true</MvcRazorCompileOnPublish>
 	  <RazorCompileOnBuild>true</RazorCompileOnBuild>
 	  <SatelliteResourceLanguages>en;ar</SatelliteResourceLanguages>
+	  <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
@@ -36,18 +37,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dapper" Version="2.1.66" />
-    <PackageReference Include="log4net" Version="3.0.4" />
+    <PackageReference Include="Dapper" Version="2.1.79" />
+    <PackageReference Include="log4net" Version="3.4.0" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="6.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.15" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.1" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
-    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.8.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.11" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.2" />
+    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.26.300" />
     <PackageReference Include="System.ServiceModel.Duplex" Version="6.0.0" />
-    <PackageReference Include="System.ServiceModel.Http" Version="8.1.2" />
-    <PackageReference Include="System.ServiceModel.NetTcp" Version="8.1.2" />
+    <PackageReference Include="System.ServiceModel.Http" Version="10.0.652802" />
+    <PackageReference Include="System.ServiceModel.NetTcp" Version="10.0.652802" />
     <PackageReference Include="System.ServiceModel.Security" Version="6.0.0" />
-	  <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.0" />
 
   </ItemGroup>
 
@@ -55,21 +54,9 @@
     <Reference Include="AM_EncryptCore">
       <HintPath>..\..\..\Users\Ghaith Abbas\Downloads\IntegrationCore-restpassword-05-10-2020\IntegrationCore\IntegrationCore\DLLs\AM_EncryptCore.dll</HintPath>
     </Reference>
-    <!--<Reference Include="Dapper">
-      <HintPath>E:\NVSSOFT\Work\Integration\IntegrationCore21-10-2019\IntegrationCore\IntegrationCore\obj\Debug\netcoreapp2.2\Dapper.dll</HintPath>
-    </Reference>-->
     <Reference Include="Interop.hMailServer">
       <HintPath>C:\Program Files (x86)\hMailServer\Bin\Interop.hMailServer.dll</HintPath>
     </Reference>
-    <!--<Reference Include="log4net">
-      <HintPath>E:\NVSSOFT\Work\Integration\IntegrationCore21-10-2019\IntegrationCore\IntegrationCore\obj\Debug\netcoreapp2.2\log4net.dll</HintPath>
-    </Reference>-->
-    <!--<Reference Include="Oracle.ManagedDataAccess">
-      <HintPath>E:\NVSSOFT\Work\Integration\IntegrationCore21-10-2019\IntegrationCore\IntegrationCore\obj\Debug\netcoreapp2.2\Oracle.ManagedDataAccess.dll</HintPath>
-    </Reference>-->
-    <!--<Reference Include="Otp.NET">
-      <HintPath>..\..\..\Users\Ghaith Abbas\Downloads\IntegrationCore-restpassword-05-10-2020\IntegrationCore\IntegrationCore\DLLs\Otp.NET.dll</HintPath>
-    </Reference>-->
     <Reference Include="RightFax.WebApi.Core">
       <HintPath>DLLs\RightFax.WebApi.Core.dll</HintPath>
     </Reference>
@@ -93,7 +80,6 @@
 		<None Include="IntegrationSetting.config" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
 	</ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="10.0.11" />
   </ItemGroup>
-
 </Project>

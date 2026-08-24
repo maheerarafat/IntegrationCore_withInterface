@@ -56,9 +56,9 @@ namespace IntegrationCore.IntegrationLibrary
 
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
 
             return result;
@@ -105,9 +105,9 @@ namespace IntegrationCore.IntegrationLibrary
                 }
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
 
             return result;
@@ -163,9 +163,9 @@ namespace IntegrationCore.IntegrationLibrary
                 }
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
 
             return result;
@@ -214,9 +214,9 @@ namespace IntegrationCore.IntegrationLibrary
                 }
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
 
             return result;
@@ -287,9 +287,9 @@ namespace IntegrationCore.IntegrationLibrary
 
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
 
         }

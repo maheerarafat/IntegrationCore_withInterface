@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.IO;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 
 namespace IntegrationCore.Controllers
 {
@@ -28,7 +29,7 @@ namespace IntegrationCore.Controllers
                 IntegrationSettings.LoadSettings(_hostingEnvironment);
             }
         }
-        
+
         [HttpPost]
         [Authorize] //////////////////Used Currently
         public FileStreamResult GetCorrFileFromTarasol(string InterfaceID)
@@ -38,9 +39,9 @@ namespace IntegrationCore.Controllers
             {
                 var claimsIdentity = this.User.Identity as ClaimsIdentity;
                 var userId = claimsIdentity.FindFirst("name")?.Value;
-                if(userId.ToString() == IntegrationSettings.GetSetting("DMSUser").ToString())
+                if (userId.ToString() == IntegrationSettings.GetSetting("DMSUser").ToString())
                 {
-                    Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start - Interface:" + InterfaceID, TrackInterface: true,PrintInterface:true);
+                    Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Start - Interface:" + InterfaceID, TrackInterface: true, PrintInterface: true);
                     MemoryStream jsonResult = TarasolFiles.GetStreamFileFromTarasol(InterfaceID, _cache);
                     Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End", TrackInterface: true);
                     System.Net.Mime.ContentDisposition cd = new System.Net.Mime.ContentDisposition
@@ -48,19 +49,19 @@ namespace IntegrationCore.Controllers
                         FileName = InterfaceID,
                         Inline = true  // false = prompt the user for downloading;  true = browser to try to show the file inline
                     };
-                    Response.Headers.Add("Content-Disposition", cd.ToString());
-                    return File(jsonResult, "application/zip",InterfaceID +".zip");
+                    Response.Headers.Append("Content-Disposition", cd.ToString());
+                    return File(jsonResult, "application/zip", InterfaceID + ".zip");
                 }
                 else
                 {
                     throw new NullReferenceException("Invalid or Expired Session");
                 }
-                
+
             }
             catch (Exception ex)
             {
                 Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, ex.Message);
-                throw ex;
+                throw;
             }
         }
 
@@ -83,7 +84,7 @@ namespace IntegrationCore.Controllers
                         FileName = InterfaceID,
                         Inline = true  // false = prompt the user for downloading;  true = browser to try to show the file inline
                     };
-                    Response.Headers.Add("Content-Disposition", cd.ToString());
+                    Response.Headers.Append("Content-Disposition", cd.ToString());
                     return File(jsonResult, "application/zip", InterfaceID + ".zip");
                 }
                 else
@@ -95,7 +96,7 @@ namespace IntegrationCore.Controllers
             catch (Exception ex)
             {
                 Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, ex.Message);
-                throw ex;
+                throw;
             }
         }
 
@@ -124,7 +125,7 @@ namespace IntegrationCore.Controllers
         //    catch (Exception ex)
         //    {
         //        Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, ex.Message);
-        //        throw ex;
+        //        throw;
         //    }
         //}
 
@@ -141,7 +142,7 @@ namespace IntegrationCore.Controllers
                 var userId = claimsIdentity.FindFirst("name")?.Value;
                 if (userId.ToString() == IntegrationSettings.GetSetting("DMSUser").ToString())
                 {
-                    Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "file count :" + Request.Form.Files.Count, TrackInterface: true,PrintInterface: true);
+                    Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "file count :" + Request.Form.Files.Count, TrackInterface: true, PrintInterface: true);
                     List<SendFileToTarasolReturnedData> jsonResult = await TarasolFiles.SendFilesStreamToTarasolAsync(Request.Form.Files, InterfaceID);
 
                     Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End", TrackInterface: true);
@@ -151,7 +152,7 @@ namespace IntegrationCore.Controllers
                 {
                     throw new NullReferenceException("Invalid or Expired Session");
                 }
-                
+
             }
             catch (Exception ex)
             {
@@ -159,7 +160,7 @@ namespace IntegrationCore.Controllers
                 return Json(IntResultLib.GetResult(ex));
             }
         }
-        
+
         //[HttpPost]
         //[Authorize]
         //public JsonResult GetMultiFilesFromTarasol([FromBody] FileRequest getFileRequest)
@@ -175,7 +176,7 @@ namespace IntegrationCore.Controllers
         //    catch (Exception ex)
         //    {
         //        Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, ex.Message);
-        //        throw ex;
+        //        throw;
         //    }
         //}
 
@@ -199,23 +200,23 @@ namespace IntegrationCore.Controllers
         //}
 
         [HttpGet]
-        public RedirectResult callDMSInteface(string InterfaceUID,string Direction)
+        public RedirectResult callDMSInteface(string InterfaceUID, string Direction)
         {
             Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "InterfaceUID:" + InterfaceUID, TrackInterface: true);
-            return RedirectPermanent(IntegrationSettings.GetSetting("DMSInterfaceURL").ToString() + "/#/login/" + ((Direction == "1")? "import/" : "download/") + InterfaceUID);
+            return RedirectPermanent(IntegrationSettings.GetSetting("DMSInterfaceURL").ToString() + "/#/login/" + ((Direction == "1") ? "import/" : "download/") + InterfaceUID);
         }
-        
+
         [HttpGet]
-        public ActionResult DMSInterface(string SessionID, string DocUID,string Direction,string PageGUID)
+        public ActionResult DMSInterface(string SessionID, string DocUID, string Direction, string PageGUID)
         {
-            
+
             Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "session:" + SessionID + " - Docuid:" + DocUID + " - Direction:" + Direction + " - PageGUID:" + PageGUID, TrackInterface: true);
-            DownloadUploadRequest downloadUploadRequest = new DownloadUploadRequest() { SessionID = SessionID, DocUID = DocUID,PageGUID = PageGUID };
+            DownloadUploadRequest downloadUploadRequest = new DownloadUploadRequest() { SessionID = SessionID, DocUID = DocUID, PageGUID = PageGUID };
             string InterfaceUID = Guid.NewGuid().ToString();
             ViewBag.InterfaceUID = InterfaceUID;
             ViewBag.Direction = Direction;
             ViewBag.DMS_URL = IntegrationSettings.GetSetting("DMSInterfaceURL").ToString();
-            TarasolFiles.setSession(downloadUploadRequest,InterfaceUID);
+            TarasolFiles.setSession(downloadUploadRequest, InterfaceUID);
             return View();
         }
     }

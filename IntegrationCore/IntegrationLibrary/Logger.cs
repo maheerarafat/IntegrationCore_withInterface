@@ -138,15 +138,8 @@ public class Logger : IDisposable
 
     class Performance
     {
-        public string FunctionName;
-        public string Scope;
-        public DateTime LastCallTime;
-        public Int64 NumberOfCalls;
-        public double AverageDuratin;
         public double CurrentDuration;
-        public double SumDuration;
         public DateTime LogDay;
-        public int ThreadId;
 
         public Performance()
         {
@@ -193,7 +186,7 @@ public class Logger : IDisposable
             {
                 CurrentDuration = (DateTime.Now - _Now).TotalMilliseconds;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 CurrentDuration = -1;
             }// very big number
@@ -256,7 +249,7 @@ public class Logger : IDisposable
                         System.IO.File.AppendAllText(AppDomain.CurrentDomain.BaseDirectory + @"Logs\" + "loggingError.txt", "Log is nothing : Date:" + DateTime.Now.ToString() + " scope:" + _FunctionScope + Constants.vbCrLf);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 System.IO.File.AppendAllText(AppDomain.CurrentDomain.BaseDirectory + @"Logs\" + "loggingError.txt", "Error catch : Date:" + DateTime.Now.ToString() + " scope:" + _FunctionScope + Constants.vbCrLf);
             }
@@ -348,7 +341,7 @@ public class Logger : IDisposable
                         System.IO.File.AppendAllText(AppDomain.CurrentDomain.BaseDirectory + @"Logs\" + "loggingError.txt", "Log is nothing : Date:" + DateTime.Now.ToString() + " scope:" + Scope + Constants.vbCrLf);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 System.IO.File.AppendAllText(AppDomain.CurrentDomain.BaseDirectory + @"Logs\" + "loggingError.txt", "Error catch : Date:" + DateTime.Now.ToString() + " scope:" + Scope + Constants.vbCrLf);
             }
@@ -410,7 +403,7 @@ public class Logger : IDisposable
                 _Scope = CallingFunctionStackFrame.GetMethod().DeclaringType.Namespace + "." + CallingFunctionStackFrame.GetMethod().DeclaringType.Name
                  + "." + CallingFunctionStackFrame.GetMethod().Name;
                 // If Trim(FunctionScope) <> "" Then
-                _Scope = _Scope; // & "." & FunctionScope
+                //_Scope = _Scope; // & "." & FunctionScope
                 _FunctionScope = _Scope + "." + _FunctionScope;
 
                 AddToLogFileWithPerformance(true);

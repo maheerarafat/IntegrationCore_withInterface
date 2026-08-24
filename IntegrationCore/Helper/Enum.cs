@@ -10,7 +10,7 @@ namespace IntegrationCore.Helper
         /// <summary>
         /// 
         /// </summary>
-        public enum lang
+        public enum Lang
         {
             English,
             Arabic

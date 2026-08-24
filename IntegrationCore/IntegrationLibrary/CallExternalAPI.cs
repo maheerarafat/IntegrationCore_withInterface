@@ -197,7 +197,7 @@ namespace IntegrationCore.IntegrationLibrary
             catch (Exception ex)
             {
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message);
-                throw ex;
+                throw;
             }
         }
 

@@ -46,7 +46,7 @@ namespace IntegrationCore.IntegrationLibrary
                     return IntResultLib.GetResult(2, "Subject");
                 }
 
-                if (tarasolDocument.Date == null)
+                if (tarasolDocument.Date == new DateTime())
                 {
                     string objStr = JsonConvert.SerializeObject(tarasolDocument);
                     Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "data exception tarasolDocument : " + objStr, TrackInterface: Logger.EnableLoggingInfo, PrintInterface: Logger.EnableLoggingInfo);
@@ -229,7 +229,7 @@ namespace IntegrationCore.IntegrationLibrary
             catch (Exception ex)
             {
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message, PrintInterface: true);
-                throw ex;
+                throw;
             }
 
         }
@@ -254,7 +254,7 @@ namespace IntegrationCore.IntegrationLibrary
             catch (Exception ex)
             {
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message, PrintInterface: true);
-                throw ex;
+                throw;
             }
 
         }
@@ -264,7 +264,7 @@ namespace IntegrationCore.IntegrationLibrary
             try
             {
                 //Check Required fields
-                if (tarasolDocument.Date == null)
+                if (tarasolDocument.Date == new DateTime())
                 {
                     Logger.AddToLogFile("Correspondence." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, $" wrong data in fax date is null ", TrackInterface: true, PrintInterface: true);
                     throw new System.Data.DataException();
@@ -330,7 +330,7 @@ namespace IntegrationCore.IntegrationLibrary
             catch (Exception ex)
             {
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message, PrintInterface: true);
-                throw ex;
+                throw;
             }
         }
 
@@ -394,7 +394,7 @@ namespace IntegrationCore.IntegrationLibrary
             catch (Exception ex)
             {
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message, PrintInterface: true);
-                throw ex;
+                throw;
             }
         }
 
@@ -592,7 +592,7 @@ namespace IntegrationCore.IntegrationLibrary
                                                         {
                                                             SendNotificationToTarasol(Convert.ToString(addressTo.Exchange_no_fax), CorrItem.CorrUID, 0, 0, ex.Message, ex.Message);
                                                             Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message, PrintInterface: true);
-                                                            //throw ex;
+                                                            //throw;
                                                         }
                                                     }
                                                     if ((Convert.ToInt32(addressTo.ExchangeStatus) & 2) == 2) // Email type
@@ -637,7 +637,7 @@ namespace IntegrationCore.IntegrationLibrary
                                                         {
                                                             SendNotificationToTarasol(Convert.ToString(addressTo.Exchange_no_email), CorrItem.CorrUID, 0, 0, ex.Message, ex.Message);
                                                             Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message, PrintInterface: true);
-                                                            //throw ex;
+                                                            //throw;
                                                         }
                                                     }
                                                 }
@@ -819,7 +819,7 @@ namespace IntegrationCore.IntegrationLibrary
                                         {
 
                                             SendNotificationToTarasol("", CorrItem.CorrUID, 0, 0, ex.Message, "");
-                                            throw ex;
+                                            throw;
                                         }
 
                                     }
@@ -836,7 +836,7 @@ namespace IntegrationCore.IntegrationLibrary
             catch (Exception ex)
             {
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message, PrintInterface: true);
-                throw ex;
+                throw;
             }
 
         }
@@ -869,7 +869,7 @@ namespace IntegrationCore.IntegrationLibrary
             catch (Exception ex)
             {
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message, PrintInterface: true);
-                throw ex;
+                throw;
             }
 
         }
@@ -963,7 +963,7 @@ namespace IntegrationCore.IntegrationLibrary
                                         if (File.Exists(FilePath + ".ack")) File.Delete(FilePath + ".ack");
                                         File.Move(FilePath + ".zip", Path.ChangeExtension(FilePath + ".zip", ".ack"));
                                         Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message);
-                                        throw ex;
+                                        throw;
                                     }
 
 
@@ -980,7 +980,7 @@ namespace IntegrationCore.IntegrationLibrary
             catch (Exception ex)
             {
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message, PrintInterface: true);
-                throw ex;
+                throw;
             }
 
         }
@@ -996,10 +996,10 @@ namespace IntegrationCore.IntegrationLibrary
 
                 Directory.Move(sourcPath + "/" + Dest, path + "/" + Dest);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
-                throw ex;
+                throw;
             }
 
         }
@@ -1015,10 +1015,10 @@ namespace IntegrationCore.IntegrationLibrary
 
                 Directory.Move(sourcPath + "/" + Dest, path + "/" + Dest);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
-                throw ex;
+                throw;
             }
 
         }
@@ -1034,10 +1034,10 @@ namespace IntegrationCore.IntegrationLibrary
 
                 Directory.Move(sourcPath + "/" + Dest, path + "/" + Dest);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
-                throw ex;
+                throw;
             }
 
         }
@@ -1103,7 +1103,7 @@ namespace IntegrationCore.IntegrationLibrary
             {
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message, PrintInterface: true);
                 return null;
-                //throw ex;
+                //throw;
             }
         }
         public enum AckStatus
@@ -1176,7 +1176,7 @@ namespace IntegrationCore.IntegrationLibrary
             {
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message, PrintInterface: true);
                 return null;
-                //throw ex;
+                //throw;
             }
         }
 
@@ -1202,7 +1202,7 @@ namespace IntegrationCore.IntegrationLibrary
             catch (Exception ex)
             {
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message, PrintInterface: true);
-                throw ex;
+                throw;
             }
         }
         //public static object GetTargetByGlobalID(string Globalid)
@@ -1243,7 +1243,7 @@ namespace IntegrationCore.IntegrationLibrary
         //    catch (Exception ex)
         //    {
         //        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "error occured in  : " + ex.Message);
-        //        throw ex;
+        //        throw;
         //    }
         //}
     }

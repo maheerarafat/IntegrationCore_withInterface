@@ -64,7 +64,7 @@ namespace IntegrationCore.Controllers
         //    catch (Exception ex)
         //    {
         //        Logger.AddToLogFile(ControllerContext.ActionDescriptor.ControllerName + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, ex.Message);
-        //        throw ex;
+        //        throw;
         //    }
         //}
     }
