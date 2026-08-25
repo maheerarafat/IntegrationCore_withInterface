@@ -1,138 +1,136 @@
-﻿using System;
+﻿using IntegrationCore.IntegrationLibrary;
+using System;
 using System.Collections.Generic;
-using System.Xml;
-using System.Net;
-using System.IO;
-using IntegrationCore.IntegrationLibrary;
 using System.IdentityModel.Tokens.Jwt;
-using System.Xml.Linq;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace IntegrationCore.Models
 {
     public class SoapRequest
     {
+        private static readonly HttpClient _httpClient = new HttpClient
+        {
+            Timeout = TimeSpan.FromMinutes(5)
+        };
 
-        public static string HREnvelopeBegining = @"<soapenv:Envelope xmlns:hrm=""http://www.moi.gov.ae/2018/MoiIntegration/HRMurasalatSchema"" xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/"">";
-
-        private static HttpWebRequest CreateWebRequest(string url, string Method = "Post", string ContentType = "text/xml;charset=\"utf-8\"", string Accept = "text/xml")
+        private static async Task<string> PostSoapAsync(
+         string url,
+         string soapXml,
+         string contentType = "text/xml;charset=\"utf-8\"",
+         string accept = "text/xml",
+         CancellationToken ct = default)
         {
             try
             {
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Soap - CreateWebRequest url :" + url, TrackInterface: true);
-                //ServicePointManager.ServerCertificateValidationCallback = delegate { return true; }; 
-                HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
-                httpWebRequest.Timeout = 300000;
-                httpWebRequest.ContentType = ContentType;
-                httpWebRequest.Accept = Accept;
-                httpWebRequest.Method = Method;
-                return httpWebRequest;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-        private static void InsertEnvelopeIntoWebRequest(XmlDocument soapEnvelpoeXML, HttpWebRequest httpWebRequest)
-        {
-            try
-            {
-                using (Stream stream = httpWebRequest.GetRequestStream())
+                Logger.AddToLogFile(
+                    System.Reflection.MethodBase.GetCurrentMethod().Name,
+                    Logger.Enum_LogType._Info,
+                    "Soap - PostSoapAsync url :" + url,
+                    TrackInterface: true);
+
+                using var request = new HttpRequestMessage(HttpMethod.Post, url);
+                request.Content = new StringContent(soapXml, Encoding.UTF8);
+
+                // Keep exact content-type used by legacy code
+                request.Content.Headers.Clear();
+                request.Content.Headers.TryAddWithoutValidation("Content-Type", contentType);
+
+                request.Headers.Accept.Clear();
+                request.Headers.TryAddWithoutValidation("Accept", accept);
+
+                using HttpResponseMessage response = await _httpClient.SendAsync(
+                    request,
+                    HttpCompletionOption.ResponseContentRead,
+                    ct).ConfigureAwait(false);
+
+                string responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+                if (!response.IsSuccessStatusCode)
                 {
-                    soapEnvelpoeXML.Save(stream);
+                    Logger.AddToLogFile(
+                        System.Reflection.MethodBase.GetCurrentMethod().Name,
+                        Logger.Enum_LogType._Error,
+                        $"HTTP Status Code: {(int)response.StatusCode} ({response.StatusCode})",
+                        TrackInterface: true,
+                        PrintInterface: true);
+
+                    Logger.AddToLogFile(
+                        System.Reflection.MethodBase.GetCurrentMethod().Name,
+                        Logger.Enum_LogType._Error,
+                        "Server Response: " + responseBody,
+                        TrackInterface: true,
+                        PrintInterface: true);
+
+                    response.EnsureSuccessStatusCode();
                 }
+
+                return responseBody;
             }
-            catch (Exception)
+            catch (TaskCanceledException ex) when (!ct.IsCancellationRequested)
             {
+                Logger.AddToLogFile(
+                    System.Reflection.MethodBase.GetCurrentMethod().Name,
+                    Logger.Enum_LogType._Error,
+                    "Request timed out: " + ex.Message,
+                    TrackInterface: true,
+                    PrintInterface: true);
                 throw;
             }
         }
-
 
         ///////////////// HR 
-        public static string HREnvelopeHeader = @"<soapenv:Header>
-                          <wsse:Security soapenv:mustUnderstand=""1"" xmlns:wsse=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"" xmlns:wsu=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"">
-                             <wsse:UsernameToken>
-                                <wsse:Username>stshr-testuser</wsse:Username>
-                                <wsse:Password>P@ssw0rd</wsse:Password>
-                             </wsse:UsernameToken>
-                          </wsse:Security>
-                       </soapenv:Header>";
         public static object CallHRWebService(String Request, List<string[]> Parameters = null)
         {
             try
             {
                 string _HRurl = IntegrationSettings.GetSetting("ESBURL").ToString() + "/HRMurasalat";
                 XmlDocument xmlDocument = CreateHRSoapEnvelope(Request, Parameters);
-                //ServicePointManager.ServerCertificateValidationCallback = delegate { return true; }; 
-                HttpWebRequest httpWebRequest = CreateWebRequest(_HRurl);
-                httpWebRequest.Timeout = 300000;
-                InsertEnvelopeIntoWebRequest(xmlDocument, httpWebRequest);
-                IAsyncResult asyncResult = httpWebRequest.BeginGetResponse(null, null);
-                asyncResult.AsyncWaitHandle.WaitOne();
-                string result;
-                using (WebResponse webResponse = httpWebRequest.EndGetResponse(asyncResult))
-                {
-                    using (StreamReader rd = new StreamReader(webResponse.GetResponseStream()))
-                    {
-                        result = RemoveAllNamespaces(rd.ReadToEnd());
 
-                        XmlDocument xml = new XmlDocument();
-                        xml.LoadXml(result);
-                        string ResponseNode = xml.GetElementsByTagName("Body")[0].InnerXml;
-                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, " response string :" + ResponseNode, TrackInterface: true);
-                        return ResponseNode;
-                        //Vacations vacation111 = Serializer.Desrializer<Vacations>(ResponseNode);
-                        //string JsonResult = JsonConvert.SerializeXmlNode(xml);
-                    }
-                }
+                string result = PostSoapAsync(_HRurl, xmlDocument.OuterXml).GetAwaiter().GetResult();
+                result = RemoveAllNamespaces(result);
+
+                XmlDocument xml = new XmlDocument();
+                xml.LoadXml(result);
+                string ResponseNode = xml.GetElementsByTagName("Body")[0].InnerXml;
+
+                Logger.AddToLogFile(
+                    System.Reflection.MethodBase.GetCurrentMethod().Name,
+                    Logger.Enum_LogType._Info,
+                    " response string :" + ResponseNode,
+                    TrackInterface: true);
+
+                return ResponseNode;
             }
-            catch (WebException webEx)
+            catch (HttpRequestException httpEx)
             {
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "WebException occurred: " + webEx.Message, TrackInterface: true, PrintInterface: true);
-
-                // exception type
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Status: " + webEx.Status.ToString(), TrackInterface: true, PrintInterface: true);
-
-                // try to get more details from the response if available
-                if (webEx.Response != null)
-                {
-                    using (Stream responseStream = webEx.Response.GetResponseStream())
-                    {
-                        if (responseStream != null)
-                        {
-                            using (StreamReader reader = new StreamReader(responseStream))
-                            {
-                                string errorResponse = reader.ReadToEnd();
-                                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Server Response: " + errorResponse, TrackInterface: true, PrintInterface: true);
-                            }
-                        }
-                    }
-
-                    // print HTTP status code if available
-                    if (webEx.Response is HttpWebResponse httpResponse)
-                    {
-                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, $"HTTP Status Code: {(int)httpResponse.StatusCode} ({httpResponse.StatusCode})", TrackInterface: true, PrintInterface: true);
-
-                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Status Description: " + httpResponse.StatusDescription, TrackInterface: true, PrintInterface: true);
-                    }
-                }
-                else
-                {
-                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Response is null - No response received from server", TrackInterface: true, PrintInterface: true);
-                }
+                Logger.AddToLogFile(
+                    System.Reflection.MethodBase.GetCurrentMethod().Name,
+                    Logger.Enum_LogType._Error,
+                    "HttpRequestException occurred: " + httpEx.Message,
+                    TrackInterface: true,
+                    PrintInterface: true);
                 throw;
             }
             catch (Exception ex)
             {
-                // print general exception details
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "General error occurred: " + ex.Message, TrackInterface: true, PrintInterface: true);
-
+                Logger.AddToLogFile(
+                    System.Reflection.MethodBase.GetCurrentMethod().Name,
+                    Logger.Enum_LogType._Error,
+                    "General error occurred: " + ex.Message,
+                    TrackInterface: true,
+                    PrintInterface: true);
                 throw;
             }
-
-
         }
+
         private static XmlDocument CreateHRSoapEnvelope(String Request, List<string[]> Parameters = null)
         {
             try
@@ -171,198 +169,111 @@ namespace IntegrationCore.Models
             {
                 string _HRurl = IntegrationSettings.GetSetting("ESBURL").ToString() + "/MOICorrespondenceService";
                 XmlDocument xmlDocument = CreateECSSoapEnvelope(Request);
-                ///ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
-                HttpWebRequest httpWebRequest = CreateWebRequest(_HRurl);
-                httpWebRequest.Timeout = 300000;
-                httpWebRequest.ReadWriteTimeout = 300000; // for large attachments
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Soap - InsertEnvelopeIntoWebRequest :", TrackInterface: true);
-                InsertEnvelopeIntoWebRequest(xmlDocument, httpWebRequest);
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Soap - end InsertEnvelopeIntoWebRequest :", TrackInterface: true);
-                IAsyncResult asyncResult = httpWebRequest.BeginGetResponse(null, null);
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Soap - asyncResult finish :", TrackInterface: true);
-                asyncResult.AsyncWaitHandle.WaitOne();
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Soap - asyncResult wait finish :" + asyncResult.IsCompleted.ToString(), TrackInterface: true);
-                string result;
-                using (WebResponse webResponse = httpWebRequest.EndGetResponse(asyncResult))
+
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Soap - sending request :", TrackInterface: true);
+                string result = PostSoapAsync(_HRurl, xmlDocument.OuterXml).GetAwaiter().GetResult();
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Soap - Response : " + result, TrackInterface: true);
+
+                XmlDocument xml = new XmlDocument();
+                xml.LoadXml(result);
+
+                string ResponseNode = xml.GetElementsByTagName("tns:AddNewDocumentResponse")[0]
+                    .InnerXml
+                    .Replace("xmlns:tns=\"http://www.moi.gov.ae/2018/MoiIntegration/MOICorrespondenceServiceSchema\"", "")
+                    .Replace("tns:", "");
+
+                Ecs_DocumentAddResponse Objectresult = XMLProcessing.Deserializer<Ecs_DocumentAddResponse>(ResponseNode);
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Objectresult.RequestStatus :" + Objectresult.RequestStatus, TrackInterface: true);
+
+                if (Objectresult.RequestStatus == 1 || Objectresult.StatusMessage.ToLower() == "success")
+                    return IntResultLib.GetResult(1);
+
+                if (Objectresult.RequestStatus == 9998 || Objectresult.RequestStatus == 9999 || Objectresult.RequestStatus == 9997
+                    || Objectresult.RequestStatus == 1015 || Objectresult.RequestStatus == 1014 || Objectresult.RequestStatus == 1013
+                    || Objectresult.RequestStatus == 1012 || Objectresult.RequestStatus == 1011 || Objectresult.RequestStatus == 1010
+                    || Objectresult.RequestStatus == 1009 || Objectresult.RequestStatus == 1008 || Objectresult.RequestStatus == 1004
+                    || Objectresult.RequestStatus == 1003 || Objectresult.RequestStatus == 1002 || Objectresult.RequestStatus == 1001)
                 {
-                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Soap - reading Response :", TrackInterface: true);
-                    using (StreamReader rd = new StreamReader(webResponse.GetResponseStream()))
-                    {
-                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Soap - start reading Response :", TrackInterface: true);
-                        result = rd.ReadToEnd();
-                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Soap - Response : " + result, TrackInterface: true);
-                        XmlDocument xml = new XmlDocument();
-                        xml.LoadXml(result);
-                        string ResponseNode = xml.GetElementsByTagName("tns:AddNewDocumentResponse")[0].InnerXml.Replace("xmlns:tns=\"http://www.moi.gov.ae/2018/MoiIntegration/MOICorrespondenceServiceSchema\"", "").Replace("tns:", "");
-                        Ecs_DocumentAddResponse Objectresult = XMLProcessing.Deserializer<Ecs_DocumentAddResponse>(ResponseNode);
-                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Objectresult.RequestStatus :" + Objectresult.RequestStatus, TrackInterface: true);
-                        if (Objectresult.RequestStatus == 1 || Objectresult.StatusMessage.ToLower() == "Success".ToLower())
-                        {
-                            return IntResultLib.GetResult(1);
-                        }
-                        else if (Objectresult.RequestStatus == 9998 || Objectresult.RequestStatus == 9999 || Objectresult.RequestStatus == 9997
-                                || Objectresult.RequestStatus == 1015 || Objectresult.RequestStatus == 1014 || Objectresult.RequestStatus == 1013
-                                || Objectresult.RequestStatus == 1012 || Objectresult.RequestStatus == 1011 || Objectresult.RequestStatus == 1010
-                                || Objectresult.RequestStatus == 1009 || Objectresult.RequestStatus == 1008 || Objectresult.RequestStatus == 1004
-                                || Objectresult.RequestStatus == 1003 || Objectresult.RequestStatus == 1002 || Objectresult.RequestStatus == 1001)
-                        {
-                            Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Error - Response : " + result, TrackInterface: true, PrintInterface: true);
-                            return IntResultLib.GetResult(2);
-                        }
-                        else if (Objectresult.RequestStatus == 1007 || Objectresult.RequestStatus == 1006 || Objectresult.RequestStatus == 1005 || Objectresult.RequestStatus == 2
-                            || Objectresult.RequestStatus == 3)
-                        {
-                            Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Error - Response : " + result, TrackInterface: true, PrintInterface: true);
-                            return IntResultLib.GetResult(0);
-                        }
-                        else if (Objectresult.StatusMessage.ToLower().Contains("object ref") || Objectresult.StatusMessage.ToLower().Contains("communication request is nul") || Objectresult.StatusMessage.ToLower().Contains("one or more errors"))
-                        {
-                            Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Error - Response : " + result, TrackInterface: true, PrintInterface: true);
-                            return IntResultLib.GetResult(2);
-                        }
-                        else
-                        {
-                            Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Error - Response : " + result, TrackInterface: true, PrintInterface: true);
-                            return IntResultLib.GetResult(0);
-                        }
-                    }
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Error - Response : " + result, TrackInterface: true, PrintInterface: true);
+                    return IntResultLib.GetResult(2);
                 }
+
+                if (Objectresult.RequestStatus == 1007 || Objectresult.RequestStatus == 1006 || Objectresult.RequestStatus == 1005 || Objectresult.RequestStatus == 2
+                    || Objectresult.RequestStatus == 3)
+                {
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Error - Response : " + result, TrackInterface: true, PrintInterface: true);
+                    return IntResultLib.GetResult(0);
+                }
+
+                if (Objectresult.StatusMessage.ToLower().Contains("object ref")
+                    || Objectresult.StatusMessage.ToLower().Contains("communication request is nul")
+                    || Objectresult.StatusMessage.ToLower().Contains("one or more errors"))
+                {
+                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Error - Response : " + result, TrackInterface: true, PrintInterface: true);
+                    return IntResultLib.GetResult(2);
+                }
+
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Error - Response : " + result, TrackInterface: true, PrintInterface: true);
+                return IntResultLib.GetResult(0);
             }
-            catch (WebException webEx)
+            catch (HttpRequestException httpEx)
             {
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "WebException occurred: " + webEx.Message, TrackInterface: true, PrintInterface: true);
-
-                // exception type
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Status: " + webEx.Status.ToString(), TrackInterface: true, PrintInterface: true);
-
-                // try to get more details from the response if available
-                if (webEx.Response != null)
-                {
-                    using (Stream responseStream = webEx.Response.GetResponseStream())
-                    {
-                        if (responseStream != null)
-                        {
-                            using (StreamReader reader = new StreamReader(responseStream))
-                            {
-                                string errorResponse = reader.ReadToEnd();
-                                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Server Response: " + errorResponse, TrackInterface: true, PrintInterface: true);
-                            }
-                        }
-                    }
-
-                    // print HTTP status code if available
-                    if (webEx.Response is HttpWebResponse httpResponse)
-                    {
-                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, $"HTTP Status Code: {(int)httpResponse.StatusCode} ({httpResponse.StatusCode})", TrackInterface: true, PrintInterface: true);
-
-                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Status Description: " + httpResponse.StatusDescription, TrackInterface: true, PrintInterface: true);
-                    }
-                }
-                else
-                {
-                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Response is null - No response received from server", TrackInterface: true, PrintInterface: true);
-                }
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "HttpRequestException occurred: " + httpEx.Message, TrackInterface: true, PrintInterface: true);
                 throw;
             }
             catch (Exception ex)
             {
-                // print general exception details
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "General error occurred: " + ex.Message, TrackInterface: true, PrintInterface: true);
-
                 throw;
             }
-
-
         }
+
         public static IntResult CallECSDeliveryWebService(String Request)
         {
             try
             {
                 string _HRurl = IntegrationSettings.GetSetting("ESBURL").ToString() + "/MOICorrespondenceService";
-                ////bool EnableLoggingInfo = (bool)IntegrationSettings.GetSetting("EnableLoggingInfo");
                 XmlDocument xmlDocument = CreateECSSoapEnvelope(Request);
-                //ServicePointManager.ServerCertificateValidationCallback = delegate { return true; }; 
-                HttpWebRequest httpWebRequest = CreateWebRequest(_HRurl);
-                httpWebRequest.Timeout = 300000;
-                InsertEnvelopeIntoWebRequest(xmlDocument, httpWebRequest);
-                IAsyncResult asyncResult = httpWebRequest.BeginGetResponse(null, null);
-                asyncResult.AsyncWaitHandle.WaitOne();
-                string result;
-                using (WebResponse webResponse = httpWebRequest.EndGetResponse(asyncResult))
-                {
-                    using (StreamReader rd = new StreamReader(webResponse.GetResponseStream()))
-                    {
-                        result = rd.ReadToEnd();
-                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "result  : " + result, TrackInterface: Logger.EnableLoggingInfo);
-                        XmlDocument xml = new XmlDocument();
-                        xml.LoadXml(result);
-                        string ResponseNode = xml.GetElementsByTagName("tns:DeliveryReportResponse")[0].InnerXml.Replace("xmlns:SOAP-ENC=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:tns=\"http://www.moi.gov.ae/2018/MoiIntegration/MOICorrespondenceServiceSchema\"", "").Replace("tns:", "");
-                        if (ResponseNode.ToLower().Contains("ResponseMessage>Success<".ToLower()) || ResponseNode.ToLower().Contains("FollowRespponseStatus>1<".ToLower()) || ResponseNode.ToLower().Contains("ResponseMessage>Succeded<".ToLower()) || ResponseNode.ToLower().Contains("ResponseMessage>Data updated successfully<".ToLower()))
-                        {
-                            return IntResultLib.GetResult(1);
-                        }
-                        else
-                        {
-                            Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Error - Response : " + result, TrackInterface: true, PrintInterface: true);
-                            return IntResultLib.GetResult(2);
-                        }
 
-                    }
+                string result = PostSoapAsync(_HRurl, xmlDocument.OuterXml).GetAwaiter().GetResult();
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "result  : " + result, TrackInterface: Logger.EnableLoggingInfo);
+
+                XmlDocument xml = new XmlDocument();
+                xml.LoadXml(result);
+
+                string ResponseNode = xml.GetElementsByTagName("tns:DeliveryReportResponse")[0]
+                    .InnerXml
+                    .Replace("xmlns:SOAP-ENC=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:tns=\"http://www.moi.gov.ae/2018/MoiIntegration/MOICorrespondenceServiceSchema\"", "")
+                    .Replace("tns:", "");
+
+                if (ResponseNode.ToLower().Contains("ResponseMessage>Success<".ToLower())
+                    || ResponseNode.ToLower().Contains("FollowRespponseStatus>1<".ToLower())
+                    || ResponseNode.ToLower().Contains("ResponseMessage>Succeded<".ToLower())
+                    || ResponseNode.ToLower().Contains("ResponseMessage>Data updated successfully<".ToLower()))
+                {
+                    return IntResultLib.GetResult(1);
                 }
+
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Error - Response : " + result, TrackInterface: true, PrintInterface: true);
+                return IntResultLib.GetResult(2);
             }
-            catch (WebException webEx)
+            catch (HttpRequestException httpEx)
             {
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "WebException occurred: " + webEx.Message, TrackInterface: true, PrintInterface: true);
-
-                // exception type
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Status: " + webEx.Status.ToString(), TrackInterface: true, PrintInterface: true);
-
-                // try to get more details from the response if available
-                if (webEx.Response != null)
-                {
-                    using (Stream responseStream = webEx.Response.GetResponseStream())
-                    {
-                        if (responseStream != null)
-                        {
-                            using (StreamReader reader = new StreamReader(responseStream))
-                            {
-                                string errorResponse = reader.ReadToEnd();
-                                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Server Response: " + errorResponse, TrackInterface: true, PrintInterface: true);
-                            }
-                        }
-                    }
-
-                    // print HTTP status code if available
-                    if (webEx.Response is HttpWebResponse httpResponse)
-                    {
-                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, $"HTTP Status Code: {(int)httpResponse.StatusCode} ({httpResponse.StatusCode})", TrackInterface: true, PrintInterface: true);
-
-                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Status Description: " + httpResponse.StatusDescription, TrackInterface: true, PrintInterface: true);
-                    }
-                }
-                else
-                {
-                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Response is null - No response received from server", TrackInterface: true, PrintInterface: true);
-                }
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "HttpRequestException occurred: " + httpEx.Message, TrackInterface: true, PrintInterface: true);
                 throw;
             }
             catch (Exception ex)
             {
-                // print general exception details
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "General error occurred: " + ex.Message, TrackInterface: true, PrintInterface: true);
-
                 throw;
             }
-
-
         }
+
         private static XmlDocument CreateECSSoapEnvelope(String Request)
         {
             try
             {
-                //Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "Request : " + Request + " /Request");
                 string ESBECSPass = Encryption.DecryptString(IntegrationSettings.GetSetting("ESBECSPass").ToString());
-                //Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "ESBECSPass : " + ESBECSPass + " /ESBECSPass");
                 XmlDocument xmlDocument = new XmlDocument();
                 string envelope = @"<soapenv:Envelope xmlns:moic=""http://www.moi.gov.ae/2018/MoiIntegration/MOICorrespondenceServiceSchema"" xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/""><soapenv:Header><wsse:Security soapenv:mustUnderstand = ""1"" xmlns:wsse=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"" xmlns:wsu =""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd""><wsse:UsernameToken wsu:Id =""UsernameToken-4CA7F3FE3551917FC815764787625025""><wsse:Username>"
                                 + IntegrationSettings.GetSetting("ESBECSUser").ToString() + @"</wsse:Username><wsse:Password Type =""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText"">"
@@ -388,80 +299,31 @@ namespace IntegrationCore.Models
             {
                 string _HRurl = IntegrationSettings.GetSetting("ESBURL").ToString() + "/SendPushNotification";
                 XmlDocument xmlDocument = CreateSMSSoapEnvelope(Request);
-                //ServicePointManager.ServerCertificateValidationCallback = delegate { return true; }; 
-                HttpWebRequest httpWebRequest = CreateWebRequest(_HRurl);
-                httpWebRequest.Timeout = 300000;
-                InsertEnvelopeIntoWebRequest(xmlDocument, httpWebRequest);
-                IAsyncResult asyncResult = httpWebRequest.BeginGetResponse(null, null);
-                asyncResult.AsyncWaitHandle.WaitOne();
-                string result;
-                using (WebResponse webResponse = httpWebRequest.EndGetResponse(asyncResult))
-                {
-                    using (StreamReader rd = new StreamReader(webResponse.GetResponseStream()))
-                    {
-                        result = rd.ReadToEnd();
-                        //XmlDocument xml = new XmlDocument();
-                        //xml.LoadXml(result);
-                        //string ResponseNode = xml.GetElementsByTagName("S:Body")[0].InnerXml.Replace("tns:", "").Replace(@"xmlns:ns1=""http://adpolice.gov.ae/"" xmlns:tns=""http://moi.gov.ae/2019/MoiIntegration/SendPushNotificationSchema""", "");
-                        string ResponseNode = result.Replace("tns:", "").Replace(@"xmlns:ns1=""http://adpolice.gov.ae/"" xmlns:tns=""http://moi.gov.ae/2019/MoiIntegration/SendPushNotificationSchema""", "");
-                        if (ResponseNode.IndexOf("<SMSSerailNumber>1</SMSSerailNumber>") != -1)
-                        {
-                            return IntResultLib.GetResult(1);
-                        }
-                        else
-                        {
-                            Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Error - Response : " + result, TrackInterface: true, PrintInterface: true);
-                            return IntResultLib.GetResult(2);
-                        }
 
-                    }
-                }
+                string result = PostSoapAsync(_HRurl, xmlDocument.OuterXml).GetAwaiter().GetResult();
+
+                string ResponseNode = result
+                    .Replace("tns:", "")
+                    .Replace(@"xmlns:ns1=""http://adpolice.gov.ae/"" xmlns:tns=""http://moi.gov.ae/2019/MoiIntegration/SendPushNotificationSchema""", "");
+
+                if (ResponseNode.IndexOf("<SMSSerailNumber>1</SMSSerailNumber>") != -1)
+                    return IntResultLib.GetResult(1);
+
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Error - Response : " + result, TrackInterface: true, PrintInterface: true);
+                return IntResultLib.GetResult(2);
             }
-            catch (WebException webEx)
+            catch (HttpRequestException httpEx)
             {
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "WebException occurred: " + webEx.Message, TrackInterface: true, PrintInterface: true);
-
-                // exception type
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Status: " + webEx.Status.ToString(), TrackInterface: true, PrintInterface: true);
-
-                // try to get more details from the response if available
-                if (webEx.Response != null)
-                {
-                    using (Stream responseStream = webEx.Response.GetResponseStream())
-                    {
-                        if (responseStream != null)
-                        {
-                            using (StreamReader reader = new StreamReader(responseStream))
-                            {
-                                string errorResponse = reader.ReadToEnd();
-                                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Server Response: " + errorResponse, TrackInterface: true, PrintInterface: true);
-                            }
-                        }
-                    }
-
-                    // print HTTP status code if available
-                    if (webEx.Response is HttpWebResponse httpResponse)
-                    {
-                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, $"HTTP Status Code: {(int)httpResponse.StatusCode} ({httpResponse.StatusCode})", TrackInterface: true, PrintInterface: true);
-
-                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Status Description: " + httpResponse.StatusDescription, TrackInterface: true, PrintInterface: true);
-                    }
-                }
-                else
-                {
-                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Response is null - No response received from server", TrackInterface: true, PrintInterface: true);
-                }
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "HttpRequestException occurred: " + httpEx.Message, TrackInterface: true, PrintInterface: true);
                 throw;
             }
             catch (Exception ex)
             {
-                // print general exception details
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "General error occurred: " + ex.Message, TrackInterface: true, PrintInterface: true);
-
                 throw;
             }
-
         }
+
         private static XmlDocument CreateSMSSoapEnvelope(String Request)
         {
             try
@@ -502,78 +364,30 @@ namespace IntegrationCore.Models
             {
                 string _HRurl = IntegrationSettings.GetSetting("ESBEmail").ToString();
                 XmlDocument xmlDocument = CreateEmailSoapEnvelope(Request);
-                //ServicePointManager.ServerCertificateValidationCallback = delegate { return true; }; 
-                HttpWebRequest httpWebRequest = CreateWebRequest(_HRurl);
-                httpWebRequest.Timeout = 300000;
-                InsertEnvelopeIntoWebRequest(xmlDocument, httpWebRequest);
-                IAsyncResult asyncResult = httpWebRequest.BeginGetResponse(null, null);
-                asyncResult.AsyncWaitHandle.WaitOne();
-                string result;
-                using (WebResponse webResponse = httpWebRequest.EndGetResponse(asyncResult))
-                {
-                    using (StreamReader rd = new StreamReader(webResponse.GetResponseStream()))
-                    {
-                        result = rd.ReadToEnd();
-                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Error - Response : " + result, TrackInterface: Logger.EnableLoggingInfo, PrintInterface: Logger.EnableLoggingInfo);
-                        string ResponseNode = result.Replace("ema:", "").Replace(@"xmlns:ns1=""http://adpolice.gov.ae/"" xmlns:tns=""http://moi.gov.ae/2019/MoiIntegration/SendPushNotificationSchema""", "");
-                        if (ResponseNode.IndexOf("<Status>1</Status>") != -1)
-                        {
-                            return IntResultLib.GetResult(1);
-                        }
-                        else
-                        {
-                            Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Error - Response : " + result, TrackInterface: true, PrintInterface: true);
-                            return IntResultLib.GetResult(2);
-                        }
 
-                    }
-                }
+                string result = PostSoapAsync(_HRurl, xmlDocument.OuterXml).GetAwaiter().GetResult();
+
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Error - Response : " + result, TrackInterface: Logger.EnableLoggingInfo, PrintInterface: Logger.EnableLoggingInfo);
+
+                string ResponseNode = result.Replace("ema:", "").Replace(@"xmlns:ns1=""http://adpolice.gov.ae/"" xmlns:tns=""http://moi.gov.ae/2019/MoiIntegration/SendPushNotificationSchema""", "");
+                if (ResponseNode.IndexOf("<Status>1</Status>") != -1)
+                    return IntResultLib.GetResult(1);
+
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Error - Response : " + result, TrackInterface: true, PrintInterface: true);
+                return IntResultLib.GetResult(2);
             }
-            catch (WebException webEx)
+            catch (HttpRequestException httpEx)
             {
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "WebException occurred: " + webEx.Message, TrackInterface: true, PrintInterface: true);
-
-                // exception type
-                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Status: " + webEx.Status.ToString(), TrackInterface: true, PrintInterface: true);
-
-                // try to get more details from the response if available
-                if (webEx.Response != null)
-                {
-                    using (Stream responseStream = webEx.Response.GetResponseStream())
-                    {
-                        if (responseStream != null)
-                        {
-                            using (StreamReader reader = new StreamReader(responseStream))
-                            {
-                                string errorResponse = reader.ReadToEnd();
-                                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Server Response: " + errorResponse, TrackInterface: true, PrintInterface: true);
-                            }
-                        }
-                    }
-
-                    // print HTTP status code if available
-                    if (webEx.Response is HttpWebResponse httpResponse)
-                    {
-                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, $"HTTP Status Code: {(int)httpResponse.StatusCode} ({httpResponse.StatusCode})", TrackInterface: true, PrintInterface: true);
-
-                        Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Status Description: " + httpResponse.StatusDescription, TrackInterface: true, PrintInterface: true);
-                    }
-                }
-                else
-                {
-                    Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "Response is null - No response received from server", TrackInterface: true, PrintInterface: true);
-                }
+                Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "HttpRequestException occurred: " + httpEx.Message, TrackInterface: true, PrintInterface: true);
                 throw;
             }
             catch (Exception ex)
             {
-                // print general exception details
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Error, "General error occurred: " + ex.Message, TrackInterface: true, PrintInterface: true);
-
                 throw;
             }
-
         }
+
         private static XmlDocument CreateEmailSoapEnvelope(String Request)
         {
             try
@@ -590,12 +404,6 @@ namespace IntegrationCore.Models
                 + ESBECSPass + @"</wsse:Password><wsse:Nonce EncodingType=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary"""
                                     + @">eFACcvctRERFHgmsuxGrGw==</wsse:Nonce><wsu:Created>2019-12-16T06:46:02.502Z</wsu:Created></wsse:UsernameToken></wsse:Security></soapenv:Header><soapenv:Body>"
                 + Request + @"</soapenv:Body></soapenv:Envelope>";
-
-                //string ESBECSPass = Encryption.DecryptString(IntegrationSettings.GetSetting("ESBECSPass").ToString());
-                //XmlDocument xmlDocument = new XmlDocument();
-                //string envelope = @"<soapenv:Envelope xmlns:moic=""http://www.moi.gov.ae/2018/MoiIntegration/MOICorrespondenceServiceSchema"" xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/""><soapenv:Header><wsse:Security soapenv:mustUnderstand = ""1"" xmlns:wsse=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"" xmlns:wsu =""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd""><wsse:UsernameToken wsu:Id =""UsernameToken-4CA7F3FE3551917FC815764787625025""><wsse:Username>"
-                //                + IntegrationSettings.GetSetting("ESBECSUser").ToString() + @"</wsse:Username><wsse:Password Type =""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText"">"
-                //                + ESBECSPass + @"</wsse:Password><wsse:Nonce EncodingType = ""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary"">eFACcvctRERFHgmsuxGrGw==</wsse:Nonce><wsu:Created>2019-12-16T06:46:02.502Z</wsu:Created></wsse:UsernameToken></wsse:Security></soapenv:Header><soapenv:Body>" + Request + @" </soapenv:Body></soapenv:Envelope>";
 
                 envelope = envelope.Replace("ema_x003A_", "ema:").Replace(@"<?xml version=""1.0"" encoding=""utf-16""?>", "").Replace("SoapEMialAttachment>", "ema:Attachment>");
                 Logger.AddToLogFile(System.Reflection.MethodBase.GetCurrentMethod().Name, Logger.Enum_LogType._Info, "End - Logenvelope : " + envelope + " /Logenvelope", TrackInterface: Logger.EnableLoggingInfo, PrintInterface: Logger.EnableLoggingInfo);
@@ -633,8 +441,5 @@ namespace IntegrationCore.Models
             return new XElement(xmlDocument.Name.LocalName, xmlDocument.Elements().Select(el => RemoveAllNamespaces(el)));
         }
     }
-
-
-
 
 }
