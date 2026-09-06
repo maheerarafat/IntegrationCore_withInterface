@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mail;
 using System.Threading.Tasks;
-using hMailServer;
 namespace IntegrationCore.IntegrationLibrary
 {
     public class DirectEmailService

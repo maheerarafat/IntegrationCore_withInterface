@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Authorization;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Http;
-using hMailServer;
 using Microsoft.AspNetCore.Hosting;
 
 

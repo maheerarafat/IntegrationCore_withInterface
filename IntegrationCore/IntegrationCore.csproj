@@ -54,9 +54,6 @@
     <Reference Include="AM_EncryptCore">
       <HintPath>..\..\..\Users\Ghaith Abbas\Downloads\IntegrationCore-restpassword-05-10-2020\IntegrationCore\IntegrationCore\DLLs\AM_EncryptCore.dll</HintPath>
     </Reference>
-    <Reference Include="Interop.hMailServer">
-      <HintPath>C:\Program Files (x86)\hMailServer\Bin\Interop.hMailServer.dll</HintPath>
-    </Reference>
     <Reference Include="RightFax.WebApi.Core">
       <HintPath>DLLs\RightFax.WebApi.Core.dll</HintPath>
     </Reference>
